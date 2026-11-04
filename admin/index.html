@@ -538,6 +538,64 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
   box-shadow: 0 0 4px #e67e22;
   animation: none;
 }
+/* Order Cards & Comment Moderation Styles */
+.order-card-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.order-card-box:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.order-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.order-status-new { background: #eef7f2; color: #1f8f4e; border: 1px solid #c7ebd3; }
+.order-status-confirmed { background: #e8f0fe; color: #1967d2; border: 1px solid #c3d9ff; }
+.order-status-inprogress { background: #fef6ec; color: #c8643c; border: 1px solid #fae2cc; }
+.order-status-completed { background: #f4edf9; color: #7b2cbf; border: 1px solid #e1c9f3; }
+.order-status-delivered { background: #eef7f2; color: #1f8f4e; border: 1px solid #1f8f4e; }
+.order-status-cancelled { background: #fdf2f2; color: var(--danger); border: 1px solid #f9caca; }
+
+.status-select {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  color: var(--ink);
+}
+.status-select:focus {
+  outline: 0;
+  border-color: var(--accent);
+}
+.admin-comment-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--card-shadow);
+}
+
 .pulse-dot.left {
   background: #a0a090;
   box-shadow: none;
@@ -743,6 +801,35 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         <span class="nav-label">Portfolio Projects</span>
       </button>
 
+      <div class="nav-section-label">Orders &amp; Interactions</div>
+
+      <!-- Artwork Orders -->
+      <button class="nav-item" data-tab="orders" onclick="switchTab('orders')" title="Artwork Orders">
+        <span class="nav-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </span>
+        <span class="nav-label">Artwork Orders</span>
+        <span class="nav-badge" id="sideBadgeOrders" style="background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3">0</span>
+      </button>
+
+      <!-- Customer Comments -->
+      <button class="nav-item" data-tab="comments" onclick="switchTab('comments')" title="Customer Comments">
+        <span class="nav-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2 2z"></path></svg>
+        </span>
+        <span class="nav-label">Customer Comments</span>
+        <span class="nav-badge" id="sideBadgeComments" style="background:var(--soft);color:var(--ink)">0</span>
+      </button>
+
+      <!-- Artwork Likes -->
+      <button class="nav-item" data-tab="likes" onclick="switchTab('likes')" title="Artwork Likes">
+        <span class="nav-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+        </span>
+        <span class="nav-label">Artwork Likes</span>
+        <span class="nav-badge" id="sideBadgeLikes" style="background:#fdf2f2;color:#e74c3c">0</span>
+      </button>
+
       <div class="nav-section-label">Live Monitor &amp; Inbox</div>
 
       <!-- 8. Live Visitors -->
@@ -862,8 +949,30 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
           </div>
         </div>
 
-        <!-- Real-Time Stats Grid -->
+        <!-- Real-Time Stats Grid (Row 1: Orders, Likes, Comments, Live Visitors) -->
         <div class="stats-grid">
+          <div class="stat-card" onclick="switchTab('orders')" style="cursor:pointer;border-left:4px solid #1f8f4e">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="stat-num" style="color:#1f8f4e" id="statOrderCount">0</span>
+              <span class="badge" id="statPendingOrders" style="background:#eef7f2;color:#1f8f4e;font-size:10px">0 New</span>
+            </div>
+            <span class="stat-label">Artwork Orders</span>
+          </div>
+          <div class="stat-card" onclick="switchTab('likes')" style="cursor:pointer">
+            <span class="stat-num" style="color:#e74c3c" id="statTotalLikes">0</span>
+            <span class="stat-label">Total Artwork Likes</span>
+          </div>
+          <div class="stat-card" onclick="switchTab('comments')" style="cursor:pointer">
+            <span class="stat-num" style="color:var(--ink)" id="statTotalComments">0</span>
+            <span class="stat-label">Customer Comments</span>
+          </div>
+          <div class="stat-card" onclick="switchTab('visitors')" style="cursor:pointer">
+            <span class="stat-num" style="color:#1f8f4e" id="statLiveVisitors">0</span>
+            <span class="stat-label">Live Active Visitors</span>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="margin-top:-14px">
           <div class="stat-card" onclick="switchTab('artworks')" style="cursor:pointer">
             <span class="stat-num" id="statArtCount">0</span>
             <span class="stat-label">Cloud Artworks</span>
@@ -872,13 +981,13 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
             <span class="stat-num" id="statCatCount">0</span>
             <span class="stat-label">Categories</span>
           </div>
-          <div class="stat-card" onclick="switchTab('social')" style="cursor:pointer">
-            <span class="stat-num" id="statSocCount">0</span>
-            <span class="stat-label">Social Accounts</span>
+          <div class="stat-card" onclick="switchTab('likes')" style="cursor:pointer">
+            <span class="stat-num" id="statTopLikedArt" style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">–</span>
+            <span class="stat-label">Most Liked Artwork</span>
           </div>
-          <div class="stat-card" onclick="switchTab('visitors')" style="cursor:pointer">
-            <span class="stat-num" style="color:#1f8f4e" id="statLiveVisitors">3</span>
-            <span class="stat-label">Live Active Visitors</span>
+          <div class="stat-card" onclick="switchTab('orders')" style="cursor:pointer">
+            <span class="stat-num" id="statTopOrderedArt" style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">–</span>
+            <span class="stat-label">Most Ordered Artwork</span>
           </div>
         </div>
 
@@ -1231,6 +1340,161 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
                 <span class="badge" style="background:#eef7f2;color:#1f8f4e">Completed</span>
                 <span style="font-weight:700;color:var(--accent)">₹12,000</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           TAB: ARTWORK ORDERS
+           ============================================== -->
+      <div id="tab-orders" class="tab-content hide">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <h1>Artwork Orders</h1>
+            <p style="color:var(--muted);margin-top:4px">Customer commission inquiries, selected sizes, framing choices, custom notes, and WhatsApp connection.</p>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:7px;background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700">
+            <span class="pulse-dot"></span> Real-Time Cloud Orders
+          </span>
+        </div>
+
+        <!-- ORDER KPI CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-num" id="orderKpiTotal">0</span>
+            <span class="stat-label">Total Artwork Orders</span>
+          </div>
+          <div class="stat-card" style="border-left:4px solid #1f8f4e">
+            <span class="stat-num" style="color:#1f8f4e" id="orderKpiNew">0</span>
+            <span class="stat-label">New / Pending Orders</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" style="color:var(--accent)" id="orderKpiActive">0</span>
+            <span class="stat-label">Confirmed &amp; In Progress</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="orderKpiDone">0</span>
+            <span class="stat-label">Completed &amp; Delivered</span>
+          </div>
+        </div>
+
+        <!-- ORDERS PANEL WITH FILTERS -->
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:20px">
+            <div>
+              <h2 style="margin-bottom:2px">Customer Order Records</h2>
+              <p style="font-size:12px;color:var(--muted)">Manage status, review reference photos, save notes, and contact buyers via WhatsApp.</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="visitor-filter-btn active" data-order-filter="all" onclick="setOrderFilter('all')">All (<span id="countOrderAll">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="New" onclick="setOrderFilter('New')">New (<span id="countOrderNew">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="Confirmed" onclick="setOrderFilter('Confirmed')">Confirmed</button>
+              <button class="visitor-filter-btn" data-order-filter="In Progress" onclick="setOrderFilter('In Progress')">In Progress</button>
+              <button class="visitor-filter-btn" data-order-filter="Completed" onclick="setOrderFilter('Completed')">Completed</button>
+              <button class="visitor-filter-btn" data-order-filter="Delivered" onclick="setOrderFilter('Delivered')">Delivered</button>
+              <button class="visitor-filter-btn" data-order-filter="Cancelled" onclick="setOrderFilter('Cancelled')">Cancelled</button>
+            </div>
+          </div>
+
+          <div id="adminOrdersList" style="display:grid;gap:16px">
+            <div style="text-align:center;padding:36px;color:var(--muted)">
+              Loading customer artwork orders from Cloud Firestore...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           TAB: CUSTOMER COMMENTS
+           ============================================== -->
+      <div id="tab-comments" class="tab-content hide">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <h1>Customer Comments</h1>
+            <p style="color:var(--muted);margin-top:4px">Artwork discussions, visitor feedback, customer questions, and artist reply moderation.</p>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:7px;background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700">
+            <span class="pulse-dot"></span> Live Discussion Feed
+          </span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-num" id="commentKpiTotal">0</span>
+            <span class="stat-label">Total Comments</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" style="color:#1f8f4e" id="commentKpiActive">0</span>
+            <span class="stat-label">Public Active</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" style="color:var(--accent)" id="commentKpiReplied">0</span>
+            <span class="stat-label">Artist Replied</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" style="color:var(--muted)" id="commentKpiHidden">0</span>
+            <span class="stat-label">Hidden / Moderated</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:20px">
+            <div>
+              <h2 style="margin-bottom:2px">Comment Moderation &amp; Replies</h2>
+              <p style="font-size:12px;color:var(--muted)">Reply as Faheem, hide inappropriate content, or remove comments.</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="visitor-filter-btn active" data-comment-filter="all" onclick="setCommentFilter('all')">All (<span id="countCommentAll">0</span>)</button>
+              <button class="visitor-filter-btn" data-comment-filter="active" onclick="setCommentFilter('active')">Active</button>
+              <button class="visitor-filter-btn" data-comment-filter="needs_reply" onclick="setCommentFilter('needs_reply')">Needs Reply</button>
+              <button class="visitor-filter-btn" data-comment-filter="hidden" onclick="setCommentFilter('hidden')">Hidden</button>
+            </div>
+          </div>
+
+          <div id="adminCommentsList" style="display:grid;gap:16px">
+            <div style="text-align:center;padding:36px;color:var(--muted)">
+              Loading customer comments from Cloud Firestore...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           TAB: ARTWORK LIKES
+           ============================================== -->
+      <div id="tab-likes" class="tab-content hide">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <h1>Artwork Likes &amp; Favorites</h1>
+            <p style="color:var(--muted);margin-top:4px">Real-time audience appreciation and artwork popularity leaderboard.</p>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:7px;background:#fdf2f2;color:#e74c3c;border:1px solid #f9caca;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700">
+            ❤️ Live Favorites Radar
+          </span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card" style="border-left:4px solid #e74c3c">
+            <span class="stat-num" style="color:#e74c3c" id="likeKpiTotal">0</span>
+            <span class="stat-label">Total Artwork Likes</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="likeKpiArtCount">0</span>
+            <span class="stat-label">Artworks with Likes</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" style="color:var(--accent);font-size:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="likeKpiTopArt">–</span>
+            <span class="stat-label">Most Liked Artwork</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Artwork Popularity Leaderboard</h2>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:18px">Ranked by actual customer heart votes across desktop, mobile, and tablets.</p>
+          <div id="adminLikesLeaderboard" style="display:grid;gap:12px">
+            <div style="text-align:center;padding:36px;color:var(--muted)">
+              Gathering like statistics from Cloud Firestore...
             </div>
           </div>
         </div>
@@ -1667,6 +1931,18 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
   </div>
 </div>
 
+<!-- Customer Reference Image Lightbox Modal -->
+<div id="modalPhotoZoom" class="modal" onclick="if(event.target===this)closeModal('modalPhotoZoom')">
+  <div class="modal-box" style="max-width:720px;text-align:center;padding:24px">
+    <button class="modal-close" onclick="closeModal('modalPhotoZoom')">&times;</button>
+    <h3 style="margin-bottom:14px">Customer Reference Image</h3>
+    <img id="zoomModalImg" src="" style="max-width:100%;max-height:75vh;border-radius:14px;object-fit:contain" alt="Customer Reference">
+    <div style="margin-top:14px">
+      <button class="btn line sm" onclick="closeModal('modalPhotoZoom')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Custom Firebase Config Modal -->
 <div id="modalFbConfig" class="modal">
   <div class="modal-box">
@@ -1939,6 +2215,15 @@ function initCloudRealtime(){
 
     // 5. Real-time Live Visitor Radar & Analytics listener
     initLiveSessionsListener();
+
+    // 6. Real-time Artwork Orders listener
+    initAdminOrdersListener();
+
+    // 7. Real-time Customer Comments listener
+    initAdminCommentsListener();
+
+    // 8. Real-time Artwork Likes listener
+    initAdminLikesListener();
 
   }catch(err){
     console.error("Firebase init error:", err);

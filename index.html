@@ -156,6 +156,298 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 }
 .f-quote{font-family:'Pirata One',serif;font-size:clamp(22px,3vw,30px);letter-spacing:.5px;color:#d8d8d0;margin-top:18px;max-width:520px;line-height:1.3}
 .f-quote em{color:var(--accent);font-style:normal}
+
+/* Artwork Interactive Features: Likes, Comments, Ordering */
+.card .im { position: relative; }
+.card-like-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(20, 20, 20, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.15s, background 0.15s;
+}
+.card-like-badge:hover {
+  transform: scale(1.08);
+  background: rgba(20, 20, 20, 0.9);
+}
+.card-like-badge.liked {
+  background: #ffffff;
+  color: #e74c3c;
+  border-color: #e74c3c;
+  box-shadow: 0 4px 12px rgba(231,76,60,0.25);
+}
+.card-like-badge.liked svg {
+  fill: #e74c3c;
+  stroke: #e74c3c;
+}
+.card-order-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font: 700 10px 'Libre Baskerville', Georgia, serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+.card-order-btn:hover {
+  background: var(--ink);
+  transform: translateY(-2px);
+}
+
+/* Modal Interaction Controls */
+.modal-actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 6px 0;
+}
+.btn-like-modal {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font: 700 12px 'Libre Baskerville', Georgia, serif;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-like-modal:hover {
+  background: #fff;
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+.btn-like-modal.liked {
+  background: #fdf2f2;
+  border-color: #f9caca;
+  color: #e74c3c;
+}
+.btn-like-modal.liked svg {
+  fill: #e74c3c;
+  stroke: #e74c3c;
+  animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.btn-order-modal {
+  flex: 1;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font: 700 12px 'Libre Baskerville', Georgia, serif;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-order-modal:hover {
+  background: var(--ink);
+  transform: translateY(-1px);
+}
+
+/* Modal Comments Section */
+.art-comments-wrap {
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.comments-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+.comment-item {
+  background: var(--soft);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.comment-author-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.comment-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e0ded7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+.comment-name {
+  font-weight: 700;
+  font-size: 12.5px;
+}
+.comment-time {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.comment-text {
+  color: var(--ink);
+  line-height: 1.45;
+}
+.admin-reply-box {
+  background: #fff;
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+.comment-form input,
+.comment-form textarea {
+  font-size: 13px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+}
+.comment-form textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Order Modal Dialog */
+.order-box {
+  max-width: 640px;
+  width: 100%;
+  background: #fff;
+  border-radius: 24px;
+  padding: 34px 28px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.order-art-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--soft);
+  padding: 12px 16px;
+  border-radius: 16px;
+  margin: 16px 0 20px;
+}
+.order-art-preview img {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.order-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+.order-type-option {
+  cursor: pointer;
+  position: relative;
+}
+.order-type-option input {
+  display: none;
+}
+.order-type-option .type-box {
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+}
+.order-type-option input:checked + .type-box {
+  border-color: var(--accent);
+  background: rgba(200, 100, 60, 0.05);
+}
+.type-icon { font-size: 18px; margin-bottom: 2px; }
+.type-name { font-weight: 700; font-size: 12px; color: var(--ink); }
+.type-sub { font-size: 10.5px; color: var(--muted); line-height: 1.25; }
+.order-row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-group {
+  margin-bottom: 12px;
+}
+.form-group label {
+  font-size: 11px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+@media(max-width:640px) {
+  .order-row2 { grid-template-columns: 1fr; }
+  .order-type-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -292,10 +584,199 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
   <h3 id="vTitle"></h3>
   <div id="vPrice" style="font-size:18px"></div>
   <p id="vDesc" style="color:#55554c"></p>
-  <a class="btn wa" id="vWa" target="_blank" rel="noopener" style="text-align:center">Inquire on WhatsApp</a>
-  <button class="btn ig" id="vIg" style="text-align:center">Inquire on Instagram</button>
+
+  <!-- Interactive Action Buttons -->
+  <div class="modal-actions-row">
+    <button class="btn-like-modal" id="vLikeBtn" onclick="toggleLikeCurrentArtwork()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <span id="vLikeCount">0</span> Likes
+    </button>
+    <button class="btn btn-order-modal" id="vOrderBtn" onclick="openOrderModal(currentViewingArtworkId)">
+      ✨ Order This Artwork
+    </button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+    <a class="btn wa" id="vWa" target="_blank" rel="noopener" style="text-align:center;padding:10px 14px;font-size:11.5px">Inquire on WhatsApp</a>
+    <button class="btn ig" id="vIg" style="text-align:center;padding:10px 14px;font-size:11.5px">Inquire on Instagram</button>
+  </div>
+
+  <!-- Real-time Comments Section -->
+  <div class="art-comments-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">
+        Customer Comments (<span id="vCommentCount">0</span>)
+      </h4>
+      <span style="font-size:11px;color:var(--muted)">Share your thoughts</span>
+    </div>
+
+    <!-- Comments List -->
+    <div class="comments-list" id="vCommentsList">
+      <div style="text-align:center;padding:18px;color:var(--muted);font-size:12px">
+        No comments on this artwork yet. Be the first to share your thoughts!
+      </div>
+    </div>
+
+    <!-- Comment Form -->
+    <form class="comment-form" onsubmit="return submitComment(event)">
+      <div style="display:flex;gap:8px" id="commentAuthorFields">
+        <input type="text" id="commentAuthorName" placeholder="Your name *" required style="flex:1">
+      </div>
+      <div id="replyingNotice" style="display:none;font-size:11px;color:var(--accent);font-weight:700;align-items:center;justify-content:space-between">
+        <span>Replying to <span id="replyingToName"></span></span>
+        <button type="button" onclick="cancelReply()" style="background:none;border:0;color:var(--muted);cursor:pointer;font-size:11px">Cancel ✕</button>
+      </div>
+      <textarea id="commentTextInput" placeholder="Write a comment or ask a question about this artwork..." required rows="2"></textarea>
+      <button type="submit" class="btn" style="padding:8px 18px;font-size:11px;align-self:flex-end">
+        Post Comment
+      </button>
+    </form>
+  </div>
+
 </div>
 </div></div>
+
+<!-- Dedicated Artwork Order Modal -->
+<div class="modal" id="orderModal" onclick="if(event.target===this)closeM('orderModal')">
+  <div class="order-box">
+    <button class="close" onclick="closeM('orderModal')">×</button>
+    <div>
+      <span class="badge" style="background:var(--soft);color:var(--accent);display:inline-block;margin-bottom:8px">Faheemgraphy Commission Studio</span>
+      <h2 style="font-family:'Anton',sans-serif;font-size:30px;text-transform:uppercase;line-height:1.1">Order This Artwork</h2>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:4px">Submit your order details directly to artist Faheem. Each piece is crafted with care.</p>
+    </div>
+
+    <!-- Artwork Snapshot Banner -->
+    <div class="order-art-preview">
+      <img id="orderArtImg" src="" alt="Artwork Preview">
+      <div style="flex:1;overflow:hidden">
+        <small id="orderArtCat" style="color:var(--accent);letter-spacing:.2em;text-transform:uppercase;font-size:10px;font-weight:700"></small>
+        <h4 id="orderArtTitle" style="font-size:16px;font-weight:700;margin:2px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h4>
+        <div id="orderArtPrice" style="font-size:14px;font-weight:700;color:var(--ink)"></div>
+      </div>
+    </div>
+
+    <!-- Order Form View -->
+    <form id="orderForm" onsubmit="return handleOrderSubmit(event)">
+      <div class="form-group">
+        <label>Select Order Type *</label>
+        <div class="order-type-grid">
+          <label class="order-type-option">
+            <input type="radio" name="orderType" value="Exact Same Artwork" checked>
+            <div class="type-box">
+              <span class="type-icon">🖼️</span>
+              <span class="type-name">Exact Same Artwork</span>
+              <span class="type-sub">Original piece or museum-grade archival print</span>
+            </div>
+          </label>
+          <label class="order-type-option">
+            <input type="radio" name="orderType" value="Similar Artwork in This Style">
+            <div class="type-box">
+              <span class="type-icon">🎨</span>
+              <span class="type-name">Similar Style</span>
+              <span class="type-sub">Same medium and aesthetic, crafted uniquely</span>
+            </div>
+          </label>
+          <label class="order-type-option">
+            <input type="radio" name="orderType" value="Customized Version (Portraits / Names)">
+            <div class="type-box">
+              <span class="type-icon">✍️</span>
+              <span class="type-name">Customized Version</span>
+              <span class="type-sub">Personal portrait, custom names, special dates</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="order-row2">
+        <div class="form-group">
+          <label>Artwork Size *</label>
+          <select id="orderSize" required>
+            <option value="A4 Size (8.3 x 11.7 in)">A4 Size (8.3 x 11.7 in) - Desktop &amp; Small Frame</option>
+            <option value="A3 Size (11.7 x 16.5 in)" selected>A3 Size (11.7 x 16.5 in) - Most Popular Choice</option>
+            <option value="A2 Size (16.5 x 23.4 in)">A2 Size (16.5 x 23.4 in) - Statement Wall Art</option>
+            <option value="A1 Large Size (23.4 x 33.1 in)">A1 Large (23.4 x 33.1 in) - Gallery Format</option>
+            <option value="Custom Dimensions">Custom Dimensions (Discuss with Artist)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Framing &amp; Packaging *</label>
+          <select id="orderFraming">
+            <option value="Premium Wooden Frame with Glass">Premium Wooden Frame with Glass (Ready to Hang)</option>
+            <option value="Rolled in Hard Protective Art Tube">Rolled in Protective Art Tube (Unframed)</option>
+            <option value="Stretched Canvas Wrap">Stretched Canvas Wrap</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="order-row2">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" id="orderQty" min="1" max="25" value="1" required>
+        </div>
+        <div class="form-group">
+          <label>Customer Full Name *</label>
+          <input type="text" id="orderCustomerName" placeholder="Enter your full name" required>
+        </div>
+      </div>
+
+      <div class="order-row2">
+        <div class="form-group">
+          <label>Phone / WhatsApp Number *</label>
+          <input type="tel" id="orderCustomerPhone" placeholder="e.g. +91 9876543210" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address (Optional)</label>
+          <input type="email" id="orderCustomerEmail" placeholder="yourname@gmail.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Delivery Address &amp; Pincode *</label>
+        <textarea id="orderCustomerAddress" rows="2" placeholder="Full delivery address, street, landmark, city, state, pincode" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Customization Details &amp; Special Requests</label>
+        <textarea id="orderCustomNotes" rows="2" placeholder="Describe any specific customization: e.g. names to calligraphy, anniversary date, color adjustments..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Reference Photo (Optional - for customized portraits)</label>
+        <input type="file" id="orderRefPhotoInput" accept="image/*" onchange="handleOrderRefPhoto(this)">
+        <div id="orderRefPreviewWrap" style="display:none;margin-top:8px;align-items:center;gap:10px">
+          <img id="orderRefPreviewImg" src="" style="width:60px;height:60px;border-radius:10px;object-fit:cover;border:1px solid var(--line)" alt="Reference">
+          <span style="font-size:11px;color:var(--muted)">Reference photo attached</span>
+          <button type="button" onclick="clearOrderRefPhoto()" style="background:none;border:0;color:var(--danger);font-size:11px;cursor:pointer">Remove ✕</button>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <button type="submit" id="orderSubmitBtn" class="btn wa" style="width:100%;padding:14px;font-size:13px;letter-spacing:.12em">
+          ✨ Submit Artwork Order
+        </button>
+      </div>
+    </form>
+
+    <!-- Order Success View -->
+    <div id="orderSuccessScreen" style="display:none;text-align:center;padding:20px 8px">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <h3 style="font-family:'Anton',sans-serif;font-size:32px;text-transform:uppercase">Order Successfully Placed!</h3>
+      <p style="color:var(--muted);margin:8px 0 18px;font-size:13px">
+        Your order has been recorded directly into Faheemgraphy's cloud system.<br>
+        Order Reference: <strong id="successOrderRef" style="color:var(--accent);font-family:monospace;font-size:15px"></strong>
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:380px;margin:0 auto">
+        <a id="successOrderWaLink" target="_blank" rel="noopener" class="btn wa" style="text-align:center;padding:13px">
+          💬 Confirm Instantly on WhatsApp with Faheem
+        </a>
+        <button type="button" class="btn" style="background:var(--soft);color:var(--ink)" onclick="closeM('orderModal')">
+          Back to Gallery
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -397,6 +878,12 @@ function initCloudRealtime(){
       }
     }, err => console.warn("Firestore about error:", err));
 
+    // Realtime Listener 5: Likes
+    initLikesListener();
+
+    // Realtime Listener 6: Comments
+    initCommentsListener();
+
   }catch(err){
     console.error("Firebase initialization failed:", err);
     setCloudLive(false);
@@ -478,7 +965,26 @@ function applySettings(){
 }
 
 function card(a){
-  return `<div class="card" onclick="show('${a.id}')"><div class="im"><img src="${a.img}" alt="${esc(a.title)}" loading="lazy"></div>${a.price?`<span class="p">${esc(a.price)}</span>`:''}<h3>${esc(a.title)}</h3><small>${esc(a.cat)}</small></div>`;
+  const aid = String(a.id);
+  const likes = (likesMap && likesMap[aid]) || 0;
+  const isLiked = visitorLikes && visitorLikes.has(aid);
+  return `
+    <div class="card" onclick="show('${a.id}')">
+      <div class="im">
+        <img src="${a.img}" alt="${esc(a.title)}" loading="lazy">
+        <button type="button" class="card-like-badge ${isLiked ? 'liked' : ''}" data-aid="${aid}" onclick="toggleLike('${a.id}', event)" title="Like this artwork" aria-label="Like artwork">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="${isLiked ? '#e74c3c' : 'none'}" stroke="${isLiked ? '#e74c3c' : '#ffffff'}" stroke-width="2.2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span class="like-cnt">${likes}</span>
+        </button>
+        <button type="button" class="card-order-btn" onclick="openOrderModal('${a.id}', event)" title="Order This Artwork">
+          Order
+        </button>
+      </div>
+      ${a.price?`<span class="p">${esc(a.price)}</span>`:''}
+      <h3>${esc(a.title)}</h3>
+      <small>${esc(a.cat)}</small>
+    </div>
+  `;
 }
 
 function render(){
@@ -533,9 +1039,12 @@ function closeM(id){
 }
 
 /* Viewer + inquiries */
+let currentViewingArtworkId = null;
+
 function show(id){
   const a = arts.find(x => String(x.id) === String(id));
   if(!a) return;
+  currentViewingArtworkId = String(a.id);
   $("vImg").src = a.img;
   $("vCat").textContent = a.cat;
   $("vTitle").textContent = a.title;
@@ -545,6 +1054,16 @@ function show(id){
   const msg = `Hi ${brand}, I'm interested in the artwork "${a.title}" (${a.cat})${a.price ? " – " + a.price : ""}. Is it available?`;
   $("vWa").href = `https://wa.me/${settings.whatsapp || "918921166278"}?text=${encodeURIComponent(msg)}`;
   $("vIg").onclick = () => igSend(msg);
+
+  // Auto-fill Google Auth user into comment name if logged in
+  if(currentVisitorAuth && $("commentAuthorName")){
+    if(!$("commentAuthorName").value) $("commentAuthorName").value = currentVisitorAuth.displayName || "";
+  }
+
+  // Update dynamic likes and comments for this artwork
+  renderModalLikeState();
+  renderArtworkComments();
+
   $("view").classList.add("open");
   trackVisitorActivity("Viewing Artwork: " + a.title, true);
 }
@@ -570,6 +1089,451 @@ function sendCustom(e, ig){
   const msg = `Hi ${brand}, I'm ${$("cn").value}.\nI'd like a custom order.\nType: ${$("ct").value}\nSize: ${$("cs").value || "Not decided"}\nIdea: ${$("cd").value}`;
   if(ig) igSend(msg);
   else window.open(`https://wa.me/${settings.whatsapp || "918921166278"}?text=${encodeURIComponent(msg)}`, "_blank");
+  return false;
+}
+
+/* =========================================================
+   CUSTOMER INTERACTION: LIKES, COMMENTS & ARTWORK ORDERS
+   ========================================================= */
+let likesMap = {}; // artworkId -> count
+let visitorLikes = new Set(); // artworkIds liked by this client
+let allComments = []; // array of comment docs
+let currentReplyingCommentId = null;
+let currentReplyingCommentAuthor = null;
+let currentOrderArtwork = null;
+let currentRefImageData = null;
+
+// 1. LIKES SYSTEM
+function initLikesListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  fb.db.collection("faheemgraphy_likes").onSnapshot(snapshot => {
+    const counts = {};
+    const liked = new Set();
+    const vid = currentVisitorId || localStorage.getItem("fg_vid");
+    const uid = currentVisitorAuth ? currentVisitorAuth.uid : null;
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const aid = String(data.artworkId);
+      counts[aid] = (counts[aid] || 0) + 1;
+      if((vid && data.visitorId === vid) || (uid && data.userId === uid)){
+        liked.add(aid);
+      }
+    });
+
+    likesMap = counts;
+    visitorLikes = liked;
+
+    updateAllLikeBadges();
+    renderModalLikeState();
+  }, err => console.warn("Likes listener error:", err));
+}
+
+function isArtworkLiked(aid){
+  return visitorLikes.has(String(aid));
+}
+
+function getArtworkLikeCount(aid){
+  return likesMap[String(aid)] || 0;
+}
+
+function updateAllLikeBadges(){
+  arts.forEach(a => {
+    const aid = String(a.id);
+    const count = getArtworkLikeCount(aid);
+    const isLiked = isArtworkLiked(aid);
+    document.querySelectorAll(`.card-like-badge[data-aid="${aid}"]`).forEach(el => {
+      el.classList.toggle("liked", isLiked);
+      const cnt = el.querySelector(".like-cnt");
+      if(cnt) cnt.textContent = count;
+      const svg = el.querySelector("svg");
+      if(svg){
+        svg.setAttribute("fill", isLiked ? "#e74c3c" : "none");
+        svg.setAttribute("stroke", isLiked ? "#e74c3c" : "#ffffff");
+      }
+    });
+  });
+}
+
+function toggleLike(artworkId, event){
+  if(event){
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  const aid = String(artworkId);
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+
+  const vid = currentVisitorId || localStorage.getItem("fg_vid") || ("v_" + Math.random().toString(36).substring(2, 8));
+  const docId = `${aid}_${vid}`;
+  const isCurrentlyLiked = visitorLikes.has(aid);
+  const a = arts.find(x => String(x.id) === aid);
+
+  if(isCurrentlyLiked){
+    visitorLikes.delete(aid);
+    likesMap[aid] = Math.max(0, (likesMap[aid] || 1) - 1);
+    updateAllLikeBadges();
+    renderModalLikeState();
+    fb.db.collection("faheemgraphy_likes").doc(docId).delete().catch(err => console.warn(err));
+  } else {
+    visitorLikes.add(aid);
+    likesMap[aid] = (likesMap[aid] || 0) + 1;
+    updateAllLikeBadges();
+    renderModalLikeState();
+    const likeDoc = {
+      artworkId: aid,
+      artworkTitle: a ? a.title : "Artwork",
+      artworkCat: a ? a.cat : "",
+      visitorId: vid,
+      userName: (currentVisitorAuth && currentVisitorAuth.displayName) ? currentVisitorAuth.displayName : "Anonymous Art Lover",
+      userPhoto: (currentVisitorAuth && currentVisitorAuth.photoURL) ? currentVisitorAuth.photoURL : null,
+      userId: currentVisitorAuth ? currentVisitorAuth.uid : null,
+      createdAt: Date.now()
+    };
+    fb.db.collection("faheemgraphy_likes").doc(docId).set(likeDoc).then(() => {
+      toast(`Liked "${a ? a.title : 'artwork'}" ❤️`);
+      trackVisitorActivity("Liked Artwork: " + (a ? a.title : aid), true);
+    }).catch(err => console.warn(err));
+  }
+}
+
+function toggleLikeCurrentArtwork(){
+  if(currentViewingArtworkId){
+    toggleLike(currentViewingArtworkId);
+  }
+}
+
+function renderModalLikeState(){
+  if(!currentViewingArtworkId) return;
+  const aid = String(currentViewingArtworkId);
+  const count = getArtworkLikeCount(aid);
+  const isLiked = isArtworkLiked(aid);
+  const btn = $("vLikeBtn");
+  const countSpan = $("vLikeCount");
+  if(btn && countSpan){
+    countSpan.textContent = count;
+    btn.classList.toggle("liked", isLiked);
+    const svg = btn.querySelector("svg");
+    if(svg){
+      svg.setAttribute("fill", isLiked ? "#e74c3c" : "none");
+      svg.setAttribute("stroke", isLiked ? "#e74c3c" : "currentColor");
+    }
+  }
+}
+
+// 2. COMMENTS SYSTEM
+function initCommentsListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  fb.db.collection("faheemgraphy_comments")
+    .orderBy("createdAt", "asc")
+    .onSnapshot(snapshot => {
+      const items = [];
+      snapshot.forEach(doc => {
+        items.push({ id: doc.id, ...doc.data() });
+      });
+      allComments = items;
+      renderArtworkComments();
+    }, err => console.warn("Comments listener error:", err));
+}
+
+function renderArtworkComments(){
+  if(!currentViewingArtworkId) return;
+  const aid = String(currentViewingArtworkId);
+  const comments = allComments.filter(c => String(c.artworkId) === aid && c.status !== "hidden");
+  
+  if($("vCommentCount")) $("vCommentCount").textContent = comments.length;
+  const listEl = $("vCommentsList");
+  if(!listEl) return;
+
+  if(!comments.length){
+    listEl.innerHTML = `
+      <div style="text-align:center;padding:18px;color:var(--muted);font-size:12px">
+        No comments on this artwork yet. Share your thoughts or ask Faheem a question!
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = comments.map(c => {
+    const initial = (c.authorName || "C").trim().charAt(0).toUpperCase();
+    const hasPhoto = c.authorPhoto && c.authorPhoto.length > 5;
+    const avatarHtml = hasPhoto
+      ? `<img src="${esc(c.authorPhoto)}" class="comment-avatar" alt="Author" onerror="this.outerHTML='<div class=\\'comment-avatar\\'>${initial}</div>'">`
+      : `<div class="comment-avatar">${initial}</div>`;
+    
+    const replyBtn = `<button type="button" onclick="setReplyTo('${c.id}', '${esc(c.authorName)}')" style="background:none;border:0;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;padding:0">Reply</button>`;
+
+    const adminReplyHtml = c.adminReply ? `
+      <div class="admin-reply-box">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <span style="font-weight:700;font-size:11.5px;color:var(--accent)">🎨 Artist Reply from Faheem</span>
+          <span style="font-size:10px;color:var(--muted)">Verified</span>
+        </div>
+        <div style="color:var(--ink);font-size:12px;line-height:1.4">${esc(c.adminReply)}</div>
+      </div>
+    ` : "";
+
+    const replyingLabel = c.replyToAuthor ? `<span style="color:var(--accent);font-size:11px;margin-right:4px">@${esc(c.replyToAuthor)}</span>` : "";
+
+    return `
+      <div class="comment-item">
+        <div class="comment-header">
+          <div class="comment-author-wrap">
+            ${avatarHtml}
+            <div>
+              <span class="comment-name">${esc(c.authorName || "Art Lover")}</span>
+              ${c.isAuth ? `<span style="background:#e8f0fe;color:#1967d2;font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;margin-left:4px">Google User</span>` : ""}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="comment-time">${formatCommentTime(c.createdAt)}</span>
+            ${replyBtn}
+          </div>
+        </div>
+        <div class="comment-text">
+          ${replyingLabel}${esc(c.text)}
+        </div>
+        ${adminReplyHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+function formatCommentTime(ts){
+  if(!ts) return "Just now";
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if(diff < 60) return "Just now";
+  if(diff < 3600) return Math.floor(diff / 60) + "m ago";
+  if(diff < 86400) return Math.floor(diff / 3600) + "h ago";
+  return new Date(ts).toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+function setReplyTo(commentId, authorName){
+  currentReplyingCommentId = commentId;
+  currentReplyingCommentAuthor = authorName;
+  if($("replyingNotice")){
+    $("replyingNotice").style.display = "flex";
+    $("replyingToName").textContent = authorName;
+  }
+  const input = $("commentTextInput");
+  if(input){
+    input.focus();
+    input.placeholder = `Reply to ${authorName}...`;
+  }
+}
+
+function cancelReply(){
+  currentReplyingCommentId = null;
+  currentReplyingCommentAuthor = null;
+  if($("replyingNotice")) $("replyingNotice").style.display = "none";
+  const input = $("commentTextInput");
+  if(input) input.placeholder = "Write a comment or ask a question about this artwork...";
+}
+
+async function submitComment(e){
+  e.preventDefault();
+  if(!currentViewingArtworkId) return false;
+  const aid = String(currentViewingArtworkId);
+  const a = arts.find(x => String(x.id) === aid);
+  const text = $("commentTextInput").value.trim();
+  if(!text) return false;
+
+  let authorName = $("commentAuthorName").value.trim();
+  if(!authorName && currentVisitorAuth){
+    authorName = currentVisitorAuth.displayName;
+  }
+  if(!authorName) authorName = "Art Lover";
+
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    toast("Database not ready");
+    return false;
+  }
+
+  const commentData = {
+    artworkId: aid,
+    artworkTitle: a ? a.title : "Artwork",
+    artworkCat: a ? a.cat : "",
+    authorName,
+    authorPhoto: currentVisitorAuth ? currentVisitorAuth.photoURL : null,
+    authorEmail: currentVisitorAuth ? currentVisitorAuth.email : null,
+    isAuth: !!currentVisitorAuth,
+    visitorId: currentVisitorId || localStorage.getItem("fg_vid") || "visitor",
+    text,
+    status: "active",
+    replyToId: currentReplyingCommentId || null,
+    replyToAuthor: currentReplyingCommentAuthor || null,
+    adminReply: null,
+    createdAt: Date.now()
+  };
+
+  try {
+    await fb.db.collection("faheemgraphy_comments").add(commentData);
+    $("commentTextInput").value = "";
+    cancelReply();
+    toast("Comment posted! ✨");
+    trackVisitorActivity("Commented on Artwork: " + (a ? a.title : aid), true);
+  } catch(err){
+    console.error("Comment submit error:", err);
+    toast("Failed to post comment: " + err.message);
+  }
+  return false;
+}
+
+// 3. ARTWORK ORDERING SYSTEM
+function openOrderModal(artworkId, event){
+  if(event){
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  const aid = String(artworkId);
+  const a = arts.find(x => String(x.id) === aid);
+  if(!a) return;
+  currentOrderArtwork = a;
+
+  // Pre-fill artwork details in Order Modal
+  if($("orderArtImg")) $("orderArtImg").src = a.img;
+  if($("orderArtCat")) $("orderArtCat").textContent = a.cat;
+  if($("orderArtTitle")) $("orderArtTitle").textContent = a.title;
+  if($("orderArtPrice")) $("orderArtPrice").textContent = a.price ? a.price : "Custom Quote upon specifications";
+
+  // Pre-fill user details if Google auth is active
+  if(currentVisitorAuth){
+    if($("orderCustomerName") && !$("orderCustomerName").value) $("orderCustomerName").value = currentVisitorAuth.displayName || "";
+    if($("orderCustomerEmail") && !$("orderCustomerEmail").value) $("orderCustomerEmail").value = currentVisitorAuth.email || "";
+  }
+
+  // Reset form views
+  if($("orderForm")) $("orderForm").style.display = "block";
+  if($("orderSuccessScreen")) $("orderSuccessScreen").style.display = "none";
+  clearOrderRefPhoto();
+
+  $("orderModal").classList.add("open");
+  trackVisitorActivity("Opened Order Form for: " + a.title, true);
+}
+
+function handleOrderRefPhoto(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Compress reference image in canvas
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 800;
+      let w = img.width, h = img.height;
+      if(w > maxDim || h > maxDim){
+        if(w > h){ h = Math.round((h * maxDim) / w); w = maxDim; }
+        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      currentRefImageData = canvas.toDataURL("image/jpeg", 0.75);
+
+      if($("orderRefPreviewImg")) $("orderRefPreviewImg").src = currentRefImageData;
+      if($("orderRefPreviewWrap")) $("orderRefPreviewWrap").style.display = "flex";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearOrderRefPhoto(){
+  currentRefImageData = null;
+  if($("orderRefPhotoInput")) $("orderRefPhotoInput").value = "";
+  if($("orderRefPreviewWrap")) $("orderRefPreviewWrap").style.display = "none";
+  if($("orderRefPreviewImg")) $("orderRefPreviewImg").src = "";
+}
+
+async function handleOrderSubmit(e){
+  e.preventDefault();
+  if(!currentOrderArtwork) return false;
+  const a = currentOrderArtwork;
+
+  const btn = $("orderSubmitBtn");
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = "Recording Order to Cloud...";
+  }
+
+  const orderTypeEl = document.querySelector('input[name="orderType"]:checked');
+  const orderType = orderTypeEl ? orderTypeEl.value : "Exact Same Artwork";
+  const size = $("orderSize").value;
+  const framing = $("orderFraming").value;
+  const qty = parseInt($("orderQty").value, 10) || 1;
+  const customerName = $("orderCustomerName").value.trim();
+  const customerPhone = $("orderCustomerPhone").value.trim();
+  const customerEmail = $("orderCustomerEmail").value.trim();
+  const customerAddress = $("orderCustomerAddress").value.trim();
+  const customNotes = $("orderCustomNotes").value.trim();
+
+  // Generate clean reference code
+  const orderRef = "FG-" + Math.floor(100000 + Math.random() * 900000);
+
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    toast("Database not ready");
+    if(btn){ btn.disabled = false; btn.textContent = "✨ Submit Artwork Order"; }
+    return false;
+  }
+
+  const orderRecord = {
+    orderId: orderRef,
+    artworkId: String(a.id),
+    artworkTitle: a.title,
+    artworkCat: a.cat,
+    artworkPrice: a.price || "",
+    artworkImage: a.img,
+    orderType,
+    size,
+    framing,
+    quantity: qty,
+    customerName,
+    customerPhone,
+    customerEmail: customerEmail || null,
+    customerAddress,
+    customNotes: customNotes || null,
+    refImage: currentRefImageData || null,
+    status: "New",
+    adminNotes: "",
+    visitorId: currentVisitorId || localStorage.getItem("fg_vid") || "visitor",
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+
+  try {
+    await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderRecord);
+
+    // Prepare WhatsApp Confirmation Link
+    const brand = settings.brandName || "Faheemgraphy";
+    const waNumber = settings.whatsapp || "918921166278";
+    const waMsg = `Hi ${brand}, I just submitted an artwork order!\n\n📋 *Order Ref:* ${orderRef}\n🎨 *Artwork:* ${a.title} (${a.cat})\n✨ *Type:* ${orderType}\n📏 *Size:* ${size}\n🖼️ *Framing:* ${framing}\n🔢 *Quantity:* ${qty}\n👤 *Name:* ${customerName}\n📞 *Phone:* ${customerPhone}\n📍 *Address:* ${customerAddress}${customNotes ? '\n📝 *Notes:* ' + customNotes : ''}\n\nPlease confirm availability and next steps. Thank you!`;
+
+    const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMsg)}`;
+    if($("successOrderWaLink")) $("successOrderWaLink").href = waLink;
+    if($("successOrderRef")) $("successOrderRef").textContent = orderRef;
+
+    // Show Success Screen
+    if($("orderForm")) $("orderForm").style.display = "none";
+    if($("orderSuccessScreen")) $("orderSuccessScreen").style.display = "block";
+
+    toast(`Order ${orderRef} submitted successfully! 🎉`);
+    trackVisitorActivity("Submitted Artwork Order: " + orderRef + " (" + a.title + ")", true);
+  } catch(err){
+    console.error("Order error:", err);
+    toast("Order submission error: " + err.message);
+  } finally {
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = "✨ Submit Artwork Order";
+    }
+  }
+
   return false;
 }
 
