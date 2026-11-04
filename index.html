@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+7<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -499,6 +499,208 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 }
 
 /* ==========================================================================
+   MY ORDERS COMPONENT STYLES
+   ========================================================================== */
+.nav-my-orders-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.nav-my-orders-btn:hover {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.nav-my-orders-btn svg {
+  color: var(--accent);
+  transition: color 0.2s;
+}
+.nav-my-orders-btn:hover svg {
+  color: #fff;
+}
+.my-orders-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  line-height: 1.2;
+}
+
+/* My Orders Dialog & Cards */
+.my-orders-dialog {
+  max-width: 680px;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+}
+.my-orders-header {
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.my-orders-body {
+  padding: 22px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.my-order-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 20px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+}
+.my-order-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.my-order-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.my-order-ref {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: .05em;
+  background: var(--soft);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+.my-order-date {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.my-order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.status-pill-new { background: #eef7f2; color: #1f8f4e; border: 1px solid #c7ebd3; }
+.status-pill-confirmed { background: #e8f0fe; color: #1967d2; border: 1px solid #c3d9ff; }
+.status-pill-inprogress { background: #fef6ec; color: #c8643c; border: 1px solid #fae2cc; }
+.status-pill-completed { background: #f4edf9; color: #7b2cbf; border: 1px solid #e1c9f3; }
+.status-pill-delivered { background: #eef7f2; color: #1f8f4e; border: 1px solid #1f8f4e; }
+.status-pill-cancelled { background: #fdf2f2; color: #e74c3c; border: 1px solid #f9caca; }
+
+.my-order-main {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.my-order-thumb {
+  width: 76px;
+  height: 95px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--soft);
+}
+.my-order-meta {
+  flex: 1;
+  min-width: 0;
+}
+.my-order-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.my-order-type {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+.my-order-specs {
+  font-size: 12px;
+  color: #55554c;
+  line-height: 1.5;
+}
+.my-order-admin-note {
+  background: #fdfaf6;
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+.my-order-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@media(max-width:640px) {
+  .my-orders-dialog {
+    max-height: 92vh;
+    border-radius: 18px;
+  }
+  .my-orders-header {
+    padding: 18px 20px 14px;
+  }
+  .my-orders-body {
+    padding: 16px 18px;
+  }
+  .my-order-main {
+    gap: 12px;
+  }
+  .my-order-thumb {
+    width: 64px;
+    height: 80px;
+  }
+}
+
+/* ==========================================================================
    FAHEEM GRAPHY - PREMIUM SPLASH SCREEN
    ========================================================================== */
 .fg-splash-screen {
@@ -705,6 +907,11 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 <a href="#custom" onclick="document.getElementById('lk').classList.remove('open')">Custom Orders</a>
 <a href="#about" onclick="document.getElementById('lk').classList.remove('open')">About</a>
 <a href="#contact" onclick="document.getElementById('lk').classList.remove('open')">Contact</a>
+<button type="button" class="nav-my-orders-btn" id="navMyOrders" onclick="openMyOrdersModal(); document.getElementById('lk').classList.remove('open')" style="display:none" title="Track your submitted artwork orders">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+  <span>My Orders</span>
+  <span class="my-orders-badge" id="navMyOrdersBadge" style="display:none">0</span>
+</button>
 <a id="navIgLink" href="https://instagram.com/fa_i_heem" target="_blank" rel="noopener" aria-label="Instagram">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
 </a>
@@ -1045,9 +1252,56 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
         <a id="successOrderWaLink" target="_blank" rel="noopener" class="btn wa" style="text-align:center;padding:13px">
           💬 Confirm Instantly on WhatsApp with Faheem
         </a>
+        <button type="button" class="btn" style="background:var(--ink);color:#fff;padding:12px;font-size:11.5px" onclick="closeM('orderModal'); openMyOrdersModal();">
+          🛍️ Track in "My Orders" Live
+        </button>
         <button type="button" class="btn" style="background:var(--soft);color:var(--ink)" onclick="closeM('orderModal')">
           Back to Gallery
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MY ORDERS MODAL -->
+<div class="modal" id="myOrdersModal" onclick="if(event.target===this)closeM('myOrdersModal')">
+  <div class="my-orders-dialog">
+    <div class="my-orders-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">🛍️</span>
+          <h2 style="font-family:'Anton',sans-serif;font-size:24px;text-transform:uppercase;line-height:1;margin:0">My Artwork Orders</h2>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px">Live real-time status and commission updates from Faheemgraphy Studio.</p>
+      </div>
+      <button class="close" onclick="closeM('myOrdersModal')" style="position:static;line-height:1">×</button>
+    </div>
+
+    <!-- Quick Lookup Bar for Cross-Device / Phone Tracking -->
+    <div style="background:var(--soft);padding:10px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)">
+        <span class="pulse-dot"></span>
+        <span>Live Cloud Synchronized</span>
+      </div>
+      <button type="button" onclick="toggleOrderLookupBox()" style="background:none;border:0;color:var(--accent);font-size:11.5px;font-weight:700;cursor:pointer;padding:0">
+        🔍 Track an order by ID or phone
+      </button>
+    </div>
+
+    <div id="orderLookupBox" style="display:none;background:#fff;padding:14px 24px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;gap:8px">
+        <input type="text" id="orderLookupInput" placeholder="Enter Order Ref (e.g. FG-123456) or phone number" style="flex:1;font-size:12px;padding:8px 12px;border:1px solid var(--line);border-radius:8px">
+        <button type="button" class="btn" style="padding:8px 16px;font-size:11px" onclick="lookupAndTrackOrder()">Track</button>
+        <button type="button" class="btn line" style="padding:8px 12px;font-size:11px" onclick="toggleOrderLookupBox()">✕</button>
+      </div>
+    </div>
+
+    <!-- Orders List Container -->
+    <div class="my-orders-body" id="myOrdersList">
+      <div style="text-align:center;padding:48px 16px;color:var(--muted)">
+        <div style="font-size:36px;margin-bottom:10px">🛍️</div>
+        <div style="font-weight:700;color:var(--ink);font-size:15px;margin-bottom:4px">No Orders Placed Yet</div>
+        <div style="font-size:12.5px;max-width:320px;margin:0 auto">Once you submit an artwork commission or custom order, its live progress will track here.</div>
       </div>
     </div>
   </div>
@@ -1100,6 +1354,7 @@ async function init(){
 
   // 2. Initialize Real-Time Firebase Cloud Listeners
   initCloudRealtime();
+  initMyOrdersListener();
 }
 
 function initCloudRealtime(){
@@ -1569,6 +1824,7 @@ async function sendCustom(e, ig){
 
     try {
       await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderDoc);
+      registerCustomerOrder(orderRef);
       toast(`Custom order ${orderRef} recorded in studio dashboard! ✨`);
     } catch(err){
       console.warn("Could not save custom order doc:", err);
@@ -2065,6 +2321,7 @@ async function handleOrderSubmit(e){
 
   try {
     await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderRecord);
+    registerCustomerOrder(orderRef);
 
     // Prepare WhatsApp Confirmation Link
     const brand = settings.brandName || "Faheemgraphy";
@@ -2092,6 +2349,328 @@ async function handleOrderSubmit(e){
   }
 
   return false;
+}
+
+/* =========================================================
+   MY ORDERS REAL-TIME TRACKING SYSTEM
+   ========================================================= */
+let myOrdersMap = {};
+let myOrdersUnsubs = [];
+let myOrdersSubscribedIds = new Set();
+
+function getCustomerOrderIds(){
+  try {
+    const raw = localStorage.getItem("fg_my_order_ids");
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function registerCustomerOrder(orderRef){
+  if(!orderRef) return;
+  try {
+    let list = getCustomerOrderIds();
+    if(!list.includes(orderRef)){
+      list.unshift(orderRef);
+      localStorage.setItem("fg_my_order_ids", JSON.stringify(list));
+    }
+  } catch(e){}
+
+  // Immediately subscribe to real-time updates for this order
+  subscribeSingleOrder(orderRef);
+
+  // Immediately reveal My Orders in navbar with smooth animation
+  updateMyOrdersNavVisibility();
+}
+
+function updateMyOrdersNavVisibility(){
+  const navBtn = $("navMyOrders");
+  if(!navBtn) return;
+
+  const orderIds = getCustomerOrderIds();
+  const orderCount = Object.keys(myOrdersMap).length || orderIds.length;
+
+  if(orderCount > 0){
+    navBtn.style.display = "inline-flex";
+    const badge = $("navMyOrdersBadge");
+    if(badge){
+      const activeCount = Object.values(myOrdersMap).filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length;
+      badge.textContent = activeCount > 0 ? activeCount : orderCount;
+      badge.style.display = "inline-block";
+    }
+  } else {
+    navBtn.style.display = "none";
+  }
+}
+
+function openMyOrdersModal(){
+  const modal = $("myOrdersModal");
+  if(!modal) return;
+  modal.classList.add("open");
+  renderMyOrders();
+  trackVisitorActivity("Opened My Orders Portal", true);
+}
+
+function toggleOrderLookupBox(){
+  const box = $("orderLookupBox");
+  if(!box) return;
+  const isHidden = (box.style.display === "none" || !box.style.display);
+  box.style.display = isHidden ? "block" : "none";
+  if(isHidden){
+    setTimeout(() => {
+      const inp = $("orderLookupInput");
+      if(inp) inp.focus();
+    }, 50);
+  }
+}
+
+async function lookupAndTrackOrder(){
+  const input = $("orderLookupInput");
+  if(!input) return;
+  const val = input.value.trim();
+  if(!val){
+    toast("Please enter an Order Ref or phone number");
+    return;
+  }
+
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    toast("Database not ready");
+    return;
+  }
+
+  toast("Searching for order...");
+  try {
+    // 1. Try direct doc ID
+    const directDoc = await fb.db.collection("faheemgraphy_orders").doc(val).get();
+    if(directDoc.exists){
+      registerCustomerOrder(directDoc.id);
+      myOrdersMap[directDoc.id] = { id: directDoc.id, ...directDoc.data() };
+      renderMyOrders();
+      toast(`Order #${directDoc.id} linked to My Orders! 🎉`);
+      input.value = "";
+      toggleOrderLookupBox();
+      return;
+    }
+
+    // 2. Try where orderId equals val
+    const q1 = await fb.db.collection("faheemgraphy_orders").where("orderId", "==", val).get();
+    if(!q1.empty){
+      q1.forEach(doc => {
+        registerCustomerOrder(doc.id);
+        myOrdersMap[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      renderMyOrders();
+      toast("Found your order! Linked to My Orders 🎉");
+      input.value = "";
+      toggleOrderLookupBox();
+      return;
+    }
+
+    // 3. Try by phone number
+    const q2 = await fb.db.collection("faheemgraphy_orders").where("customerPhone", "==", val).get();
+    if(!q2.empty){
+      q2.forEach(doc => {
+        registerCustomerOrder(doc.id);
+        myOrdersMap[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      renderMyOrders();
+      toast(`Found ${q2.size} order(s) for ${val}! Linked to My Orders 🎉`);
+      input.value = "";
+      toggleOrderLookupBox();
+      return;
+    }
+
+    toast("No order found with that Reference ID or Phone.");
+  } catch(err){
+    console.warn("Lookup error:", err);
+    toast("Error searching order: " + err.message);
+  }
+}
+
+function subscribeSingleOrder(orderId){
+  if(!orderId || myOrdersSubscribedIds.has(orderId)) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+
+  try {
+    myOrdersSubscribedIds.add(orderId);
+    const unsub = fb.db.collection("faheemgraphy_orders").doc(orderId).onSnapshot(doc => {
+      if(doc.exists){
+        const oldData = myOrdersMap[doc.id];
+        const newData = { id: doc.id, ...doc.data() };
+        
+        // Notify customer instantly if status was updated by admin in real-time
+        if(oldData && oldData.status && oldData.status !== newData.status){
+          toast(`Order #${newData.orderId || newData.id} status updated: ${newData.status} 🎨`);
+        }
+
+        myOrdersMap[doc.id] = newData;
+        renderMyOrders();
+        updateMyOrdersNavVisibility();
+      }
+    }, err => console.warn("Order snapshot err:", err));
+    myOrdersUnsubs.push(unsub);
+  } catch(e){}
+}
+
+function initMyOrdersListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+
+  // Clear previous listeners
+  myOrdersUnsubs.forEach(unsub => { try{ unsub(); }catch(e){} });
+  myOrdersUnsubs = [];
+  myOrdersSubscribedIds.clear();
+
+  const orderIds = getCustomerOrderIds();
+  orderIds.forEach(id => subscribeSingleOrder(id));
+
+  // Also query orders matching visitorId
+  const vid = currentVisitorId || localStorage.getItem("fg_vid");
+  if(vid){
+    try {
+      const unsubVid = fb.db.collection("faheemgraphy_orders").where("visitorId", "==", vid).onSnapshot(snapshot => {
+        snapshot.forEach(doc => {
+          registerCustomerOrder(doc.id);
+          myOrdersMap[doc.id] = { id: doc.id, ...doc.data() };
+        });
+        renderMyOrders();
+        updateMyOrdersNavVisibility();
+      }, err => console.warn("Orders vid listener:", err));
+      myOrdersUnsubs.push(unsubVid);
+    } catch(e){}
+  }
+
+  // Also query orders matching current signed-in Google email
+  if(currentVisitorAuth && currentVisitorAuth.email){
+    try {
+      const unsubEmail = fb.db.collection("faheemgraphy_orders").where("customerEmail", "==", currentVisitorAuth.email).onSnapshot(snapshot => {
+        snapshot.forEach(doc => {
+          registerCustomerOrder(doc.id);
+          myOrdersMap[doc.id] = { id: doc.id, ...doc.data() };
+        });
+        renderMyOrders();
+        updateMyOrdersNavVisibility();
+      }, err => console.warn("Orders email listener:", err));
+      myOrdersUnsubs.push(unsubEmail);
+    } catch(e){}
+  }
+
+  updateMyOrdersNavVisibility();
+}
+
+function renderMyOrders(){
+  const listEl = $("myOrdersList");
+  if(!listEl) return;
+
+  const orders = Object.values(myOrdersMap).sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if(!orders.length){
+    listEl.innerHTML = `
+      <div style="text-align:center;padding:48px 16px;color:var(--muted)">
+        <div style="font-size:36px;margin-bottom:10px">🛍️</div>
+        <div style="font-weight:700;color:var(--ink);font-size:15px;margin-bottom:4px">No Orders Placed Yet</div>
+        <div style="font-size:12.5px;max-width:320px;margin:0 auto">Once you submit an artwork commission or custom order, its live progress will track here.</div>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = orders.map(o => {
+    const ref = esc(o.orderId || o.id);
+    const title = esc(o.artworkTitle || "Artwork Commission");
+    const type = esc(o.orderType || "Artwork Order");
+    const size = esc(o.size || "Standard");
+    const framing = esc(o.framing || "Standard");
+    const qty = o.quantity || 1;
+    const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "Recently";
+    
+    // Status Pill
+    const rawStatus = (o.status || "New").toLowerCase().replace(/\s+/g, "");
+    let pillClass = "status-pill-new";
+    let statusLabel = o.status || "New";
+
+    if(rawStatus.includes("confirm")) pillClass = "status-pill-confirmed";
+    else if(rawStatus.includes("progress")) pillClass = "status-pill-inprogress";
+    else if(rawStatus.includes("complete")) pillClass = "status-pill-completed";
+    else if(rawStatus.includes("deliver")) pillClass = "status-pill-delivered";
+    else if(rawStatus.includes("cancel")) pillClass = "status-pill-cancelled";
+
+    // Image fallback
+    let img = o.artworkImage || "";
+    if(!img && o.artworkId && typeof arts !== 'undefined' && Array.isArray(arts)){
+      const a = arts.find(x => String(x.id) === String(o.artworkId));
+      if(a) img = a.img;
+    }
+    if(!img) img = "logo.png";
+
+    // Admin notes (Faheem's note to customer)
+    const adminNoteBlock = o.adminNotes ? `
+      <div class="my-order-admin-note">
+        <div style="font-weight:700;font-size:11.5px;color:var(--accent);margin-bottom:2px;display:flex;align-items:center;gap:6px">
+          <span>🎨 Studio Update from Faheem:</span>
+        </div>
+        <div style="color:var(--ink);font-size:12px;line-height:1.4">${esc(o.adminNotes)}</div>
+      </div>
+    ` : "";
+
+    // Reference photo if customer uploaded one
+    const refImgBlock = o.refImage ? `
+      <div style="margin-top:6px">
+        <span style="font-size:11px;color:var(--muted);font-weight:700">Reference Photo Provided:</span><br>
+        <img src="${esc(o.refImage)}" alt="Reference" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-top:4px;border:1px solid var(--line);cursor:pointer" onclick="showZoom('${esc(o.refImage)}')" title="Click to view reference">
+      </div>
+    ` : "";
+
+    // WhatsApp quick inquiry link
+    const waMsg = `Hi Faheem, I'm checking on the status of my order #${ref} (${title}).`;
+    const waLink = `https://wa.me/${settings.whatsapp || "918921166278"}?text=${encodeURIComponent(waMsg)}`;
+
+    return `
+      <div class="my-order-card" id="my_order_${ref}">
+        <div class="my-order-top-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="my-order-ref">#${ref}</span>
+            <button type="button" onclick="navigator.clipboard.writeText('${ref}'); toast('Order Reference copied!');" style="background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px" title="Copy Order ID">📋</button>
+          </div>
+          <span class="my-order-status ${pillClass}">
+            <span class="pulse-dot ${rawStatus.includes('cancel') ? 'idle' : ''}"></span>
+            ${statusLabel}
+          </span>
+        </div>
+
+        <div class="my-order-main">
+          <img src="${esc(img)}" alt="${title}" class="my-order-thumb" onerror="this.src='logo.png'">
+          <div class="my-order-meta">
+            <div class="my-order-title">${title}</div>
+            <div class="my-order-type">✨ ${type}</div>
+            <div class="my-order-specs">
+              <span><b>Specs:</b> ${size} · ${framing} · Qty: ${qty}</span><br>
+              <span style="color:var(--muted)"><b>Ordered:</b> ${dateStr}</span>
+              ${o.customNotes ? `<div style="margin-top:4px;font-style:italic;color:#6b6b60">"${esc(o.customNotes)}"</div>` : ''}
+              ${refImgBlock}
+            </div>
+          </div>
+        </div>
+
+        ${adminNoteBlock}
+
+        <div class="my-order-actions">
+          <a href="${waLink}" target="_blank" rel="noopener" class="btn wa" style="padding:7px 14px;font-size:11px;display:inline-flex;align-items:center;gap:6px">
+            <span>💬</span> Inquire on WhatsApp
+          </a>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function showZoom(src){
+  if(!src) return;
+  const w = window.open("");
+  if(w) w.document.write(`<img src="${src}" style="max-width:100%;height:auto;display:block;margin:auto">`);
 }
 
 /* =========================================================
@@ -2146,6 +2725,7 @@ function initVisitorSession(){
       isReturning = false;
     }
     currentVisitorId = vid;
+    initMyOrdersListener();
 
     // 2. Session ID (per browsing tab/session)
     let sid = sessionStorage.getItem("fg_sid");
@@ -2190,7 +2770,10 @@ function initVisitorSession(){
             userEmail: user.email || null,
             isAuth: true
           }, { merge: true });
+        } else {
+          currentVisitorAuth = null;
         }
+        initMyOrdersListener();
       });
     }
 
@@ -2331,6 +2914,7 @@ function initSplashScreen(){
 }
 
 initSplashScreen();
+updateMyOrdersNavVisibility();
 init();
 initVisitorSession();
 
