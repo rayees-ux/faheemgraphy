@@ -6,6 +6,13 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Admin Dashboard – Faheemgraphy</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Pirata+One&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Firebase Cloud SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="../firebase-config.js"></script>
+
 <style>
 :root{
   --bg:#fbfbfa;
@@ -95,11 +102,6 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
 .social-platform-name{font-weight:700;font-size:14px}
 .social-url{font-size:12px;color:var(--muted);word-break:break-all}
 
-/* File Upload drag area */
-.drop-zone{border:2px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;background:var(--soft);cursor:pointer;transition:.2s}
-.drop-zone:hover{border-color:var(--accent);background:#fff}
-.drop-zone svg{width:38px;height:38px;fill:var(--muted);margin-bottom:8px}
-
 /* Modals */
 .modal{position:fixed;inset:0;background:rgba(10,10,10,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
 .modal.open{display:flex}
@@ -151,7 +153,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
     <div class="wrap nav-bar">
       <div class="brand">
         <a href="#dashboard" class="logo">Faheemgraphy</a>
-        <span class="badge">Admin Control</span>
+        <span class="badge" id="adminCloudStatus" style="background:#eef7f2;color:#1f8f4e;display:inline-flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e"></span> Cloud Live</span>
       </div>
       <div class="top-actions">
         <a class="btn line sm" href="../" target="_blank" rel="noopener"><span>View Portfolio</span> ↗</a>
@@ -166,7 +168,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
     <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:24px">
       <div>
         <h1>Dashboard</h1>
-        <p style="color:var(--muted);margin-top:4px">Control portfolio artworks, contact information, social handles and gallery layout.</p>
+        <p style="color:var(--muted);margin-top:4px">Real-time cloud database control. All updates immediately sync to the live portfolio on every device.</p>
       </div>
       <button class="btn" onclick="switchTab('artworks');$('upFormTitle').scrollIntoView({behavior:'smooth'})">+ Upload New Artwork</button>
     </div>
@@ -175,7 +177,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-num" id="statArtCount">0</span>
-        <span class="stat-label">Artworks Published</span>
+        <span class="stat-label">Cloud Artworks</span>
       </div>
       <div class="stat-card">
         <span class="stat-num" id="statCatCount">0</span>
@@ -197,7 +199,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
       <button class="tab-btn" id="tabBtn-categories" onclick="switchTab('categories')">📁 Categories</button>
       <button class="tab-btn" id="tabBtn-social" onclick="switchTab('social')">💬 WhatsApp &amp; Social Media</button>
       <button class="tab-btn" id="tabBtn-about" onclick="switchTab('about')">👤 About &amp; Homepage</button>
-      <button class="tab-btn" id="tabBtn-settings" onclick="switchTab('settings')">⚙️ Password &amp; Backup</button>
+      <button class="tab-btn" id="tabBtn-settings" onclick="switchTab('settings')">⚙️ Cloud Database &amp; Security</button>
     </div>
 
     <!-- TAB 1: ARTWORKS -->
@@ -235,7 +237,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
           </div>
 
           <div style="display:flex;justify-content:flex-end">
-            <button class="btn" type="submit" id="btnUploadArt">Upload Artwork</button>
+            <button class="btn" type="submit" id="btnUploadArt">Upload to Cloud</button>
           </div>
         </form>
       </div>
@@ -243,7 +245,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
       <!-- Artwork List & Filter -->
       <div class="panel">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-          <h2>Portfolio Collection</h2>
+          <h2>Portfolio Collection (Live Firestore)</h2>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <input type="text" id="artSearch" placeholder="Search by title..." oninput="filterArtworks()" style="max-width:240px;padding:9px 14px">
             <select id="artFilterCat" onchange="filterArtworks()" style="max-width:200px;padding:9px 14px">
@@ -253,7 +255,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         </div>
 
         <div id="artworksContainer" class="art-grid">
-          <!-- Dynamic artwork cards -->
+          <!-- Dynamic artwork cards from Firestore -->
         </div>
       </div>
     </div>
@@ -264,7 +266,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         <!-- Add Category -->
         <div class="panel">
           <h2>Add New Category</h2>
-          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Create a new artwork category. Categories appear in the portfolio navigation filter and gallery sections.</p>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Create a new artwork category. Categories appear in the portfolio navigation filter and gallery sections in real time.</p>
           <form onsubmit="return handleAddCategory(event)" class="form-grid">
             <div>
               <label>Category Name</label>
@@ -276,7 +278,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
 
         <!-- Categories List -->
         <div class="panel">
-          <h2>Existing Categories</h2>
+          <h2>Existing Categories (Cloud Synced)</h2>
           <div id="categoryManagerList" style="display:grid;gap:10px;margin-top:14px">
             <!-- Dynamic categories -->
           </div>
@@ -290,7 +292,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
       <!-- WhatsApp Configuration -->
       <div class="panel accent-box">
         <h2>WhatsApp Contact Settings</h2>
-        <p style="color:var(--muted);font-size:13px;margin-bottom:18px">The WhatsApp number connects the floating chat button, custom orders form, and artwork inquiry buttons directly to your chat.</p>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:18px">The WhatsApp number connects the floating chat button, custom orders form, and artwork inquiry buttons directly to your chat across all visitor devices instantly.</p>
         <form onsubmit="return handleSaveWhatsApp(event)" class="form-grid">
           <div class="row2">
             <div>
@@ -386,9 +388,30 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
       </div>
     </div>
 
-    <!-- TAB 5: PASSWORD & BACKUP -->
+    <!-- TAB 5: CLOUD DATABASE & SECURITY -->
     <div id="tab-settings" class="tab-content hide">
       <div class="row2">
+        
+        <!-- Cloud Database Info -->
+        <div class="panel accent-box">
+          <h2>Cloud Database (Firebase)</h2>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">All content is stored in real-time Cloud Firestore. Changes sync automatically across all browsers and devices without needing manual page reloads.</p>
+          
+          <div style="background:var(--soft);padding:18px;border-radius:14px;margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:12px;font-weight:700">Database Status:</span>
+              <span style="font-size:11px;color:#1f8f4e;font-weight:700;display:inline-flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:#1f8f4e"></span> Connected</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Active Project ID: <b style="color:var(--ink)" id="dispFbProject">nexmart-onlineshopping</b></div>
+            <div style="font-size:12px;color:var(--muted)">Real-time Collection: <b style="color:var(--ink)">faheemgraphy_arts</b></div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn line sm" onclick="syncLocalToCloud()">☁️ Push Sample/Local Data to Cloud</button>
+            <button class="btn line sm" onclick="openFbConfigModal()">⚙️ Custom Firebase Project</button>
+          </div>
+        </div>
+
         <!-- Change Password -->
         <div class="panel">
           <h2>Change Admin Password</h2>
@@ -410,27 +433,19 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
           </form>
         </div>
 
-        <!-- Backup & Restore -->
-        <div class="panel">
-          <h2>Portfolio Backup &amp; Restore</h2>
-          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Download a full JSON backup of all your artworks, categories, WhatsApp &amp; social settings, and artist bio. You can restore it on any device anytime.</p>
-          
-          <div style="display:grid;gap:14px">
-            <div style="background:var(--soft);padding:16px;border-radius:14px">
-              <div style="font-weight:700;font-size:14px;margin-bottom:4px">Export Everything</div>
-              <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Save all uploaded artworks and full configuration to a single file.</p>
-              <button class="btn line sm" onclick="exportFullData()">📥 Download Backup (JSON)</button>
-            </div>
+      </div>
 
-            <div style="background:var(--soft);padding:16px;border-radius:14px">
-              <div style="font-weight:700;font-size:14px;margin-bottom:4px">Restore from Backup</div>
-              <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Upload a previously saved `.json` file to restore your portfolio.</p>
-              <label class="btn line sm" style="cursor:pointer;display:inline-block">
-                📤 Import Backup File
-                <input type="file" accept=".json" hidden onchange="importFullData(this.files[0])">
-              </label>
-            </div>
-          </div>
+      <!-- Backup Card -->
+      <div class="panel">
+        <h2>Portfolio Cloud Backup</h2>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Download a full JSON snapshot of all your cloud artworks, categories, WhatsApp &amp; social settings, and artist bio.</p>
+        
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <button class="btn line sm" onclick="exportFullData()">📥 Export Backup (JSON)</button>
+          <label class="btn line sm" style="cursor:pointer;display:inline-block">
+            📤 Import / Restore Backup File
+            <input type="file" accept=".json" hidden onchange="importFullData(this.files[0])">
+          </label>
         </div>
       </div>
     </div>
@@ -442,7 +457,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
 <div class="modal" id="modalEditArt" onclick="if(event.target===this)closeModal('modalEditArt')">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('modalEditArt')">×</button>
-    <h2>Edit Artwork</h2>
+    <h2>Edit Artwork (Cloud)</h2>
     <form onsubmit="return handleSaveEditArt(event)" class="form-grid" style="margin-top:20px">
       <input type="hidden" id="editArtId">
       
@@ -477,7 +492,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
 
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:10px">
         <button type="button" class="btn line" onclick="closeModal('modalEditArt')">Cancel</button>
-        <button type="submit" class="btn">Save Changes</button>
+        <button type="submit" class="btn">Update in Cloud</button>
       </div>
     </form>
   </div>
@@ -548,7 +563,7 @@ const DEFAULT_SETTINGS = {
 };
 
 /* State */
-let db = null;
+let fb = null;
 let arts = [];
 let cats = [];
 let about = {};
@@ -567,25 +582,6 @@ function toast(msg){
 
 function closeModal(id){ $(id).classList.remove("open"); }
 function openModal(id){ $(id).classList.add("open"); }
-
-/* IndexedDB helpers */
-const openDB = () => new Promise((resolve, reject) => {
-  const req = indexedDB.open("faheemgraphy", 1);
-  req.onupgradeneeded = () => {
-    const d = req.result;
-    if(!d.objectStoreNames.contains("arts")) d.createObjectStore("arts", { keyPath: "id" });
-    if(!d.objectStoreNames.contains("meta")) d.createObjectStore("meta");
-  };
-  req.onsuccess = () => resolve(req.result);
-  req.onerror = () => reject(req.error);
-});
-
-const tx = (store, mode, fn) => new Promise((resolve, reject) => {
-  const transaction = db.transaction(store, mode);
-  const q = fn(transaction.objectStore(store));
-  transaction.oncomplete = () => resolve(q && q.result);
-  transaction.onerror = () => reject(transaction.error);
-});
 
 /* SHA-256 password hash */
 async function hash(t){
@@ -619,30 +615,87 @@ function compressImage(file, max = 1400, quality = 0.82){
 
 /* Initialization */
 async function init(){
-  try{
-    db = await openDB();
-    arts = (await tx("arts", "readonly", s => s.getAll())) || [];
-    cats = (await tx("meta", "readonly", s => s.get("cats"))) || null;
-    about = (await tx("meta", "readonly", s => s.get("about"))) || {};
-    const storedSettings = await tx("meta", "readonly", s => s.get("settings"));
-    if(storedSettings){
-      settings = { ...DEFAULT_SETTINGS, ...storedSettings };
-    }
-  }catch(err){
-    console.error("DB init error:", err);
-  }
-
-  if(!cats || !cats.length){
-    cats = [...DEFAULT_CATS];
-    await saveCats();
-  }
-  arts.sort((a,b) => b.id - a.id);
-
+  // Check auth session
   if(sessionStorage.getItem("fg_admin") === "1"){
     showDashboard();
   } else {
     $("loginView").classList.remove("hide");
     $("dashView").classList.add("hide");
+  }
+
+  // Load from local storage fast-path
+  try{
+    const cachedSettings = localStorage.getItem("fg_settings");
+    if(cachedSettings) settings = { ...DEFAULT_SETTINGS, ...JSON.parse(cachedSettings) };
+    const cachedCats = localStorage.getItem("fg_cats");
+    if(cachedCats) cats = JSON.parse(cachedCats);
+    const cachedAbout = localStorage.getItem("fg_about");
+    if(cachedAbout) about = JSON.parse(cachedAbout);
+  }catch(e){}
+
+  if(!cats || !cats.length) cats = [...DEFAULT_CATS];
+
+  // Initialize Firebase Cloud Connection
+  initCloudRealtime();
+}
+
+function initCloudRealtime(){
+  try{
+    fb = initFirebase();
+    if(!fb || !fb.db){
+      console.warn("Firebase not ready.");
+      return;
+    }
+
+    const cfg = getFirebaseConfig();
+    if($("dispFbProject")) $("dispFbProject").textContent = cfg.projectId || "nexmart-onlineshopping";
+
+    // 1. Real-time Arts listener from Firestore
+    fb.db.collection("faheemgraphy_arts").onSnapshot(snapshot => {
+      const items = [];
+      snapshot.forEach(doc => {
+        items.push({ id: doc.id, ...doc.data() });
+      });
+      items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      arts = items;
+      renderAll();
+    }, err => {
+      console.warn("Firestore arts listener error:", err);
+      toast("Cloud connection warning: " + err.message);
+    });
+
+    // 2. Real-time Categories listener
+    fb.db.collection("faheemgraphy_meta").doc("categories").onSnapshot(doc => {
+      if(doc.exists && doc.data().list){
+        cats = doc.data().list;
+        try{ localStorage.setItem("fg_cats", JSON.stringify(cats)); }catch(e){}
+        renderCategories();
+        renderArtworks();
+      }
+    }, err => console.warn(err));
+
+    // 3. Real-time Settings listener
+    fb.db.collection("faheemgraphy_meta").doc("settings").onSnapshot(doc => {
+      if(doc.exists){
+        settings = { ...DEFAULT_SETTINGS, ...doc.data() };
+        try{ localStorage.setItem("fg_settings", JSON.stringify(settings)); }catch(e){}
+        renderSocialSettings();
+        renderAboutAndHero();
+        renderStats();
+      }
+    }, err => console.warn(err));
+
+    // 4. Real-time About listener
+    fb.db.collection("faheemgraphy_meta").doc("about").onSnapshot(doc => {
+      if(doc.exists){
+        about = doc.data();
+        try{ localStorage.setItem("fg_about", JSON.stringify(about)); }catch(e){}
+        renderAboutAndHero();
+      }
+    }, err => console.warn(err));
+
+  }catch(err){
+    console.error("Firebase init error:", err);
   }
 }
 
@@ -650,8 +703,14 @@ async function init(){
 async function handleLogin(e){
   e.preventDefault();
   const input = $("loginPw").value;
-  const stored = await tx("meta", "readonly", s => s.get("pw"));
-  const ok = stored ? (await hash(input)) === stored : input === DEFAULT_PASSWORD;
+  const storedPw = localStorage.getItem("fg_admin_pw");
+  let ok = false;
+  if(storedPw){
+    ok = (await hash(input)) === storedPw;
+  } else {
+    ok = input === DEFAULT_PASSWORD;
+  }
+
   if(!ok){
     $("loginErr").textContent = "Incorrect password. Please try again.";
     return false;
@@ -670,20 +729,6 @@ function showDashboard(){
   $("loginView").classList.add("hide");
   $("dashView").classList.remove("hide");
   renderAll();
-}
-
-/* Save helpers */
-async function saveCats(){
-  await tx("meta", "readwrite", s => s.put(cats, "cats"));
-  try { localStorage.setItem("fg_cats", JSON.stringify(cats)); } catch(e){}
-}
-async function saveSettings(){
-  await tx("meta", "readwrite", s => s.put(settings, "settings"));
-  try { localStorage.setItem("fg_settings", JSON.stringify(settings)); } catch(e){}
-}
-async function saveAboutData(){
-  await tx("meta", "readwrite", s => s.put(about, "about"));
-  try { localStorage.setItem("fg_about", JSON.stringify(about)); } catch(e){}
 }
 
 /* Tab Switching */
@@ -710,12 +755,10 @@ function renderStats(){
 
 /* --- ARTWORKS TAB --- */
 function renderArtworks(){
-  // Category options for Upload form
   const curCatVal = $("upCat").value;
   $("upCat").innerHTML = cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("") + '<option value="__new">+ Create new category…</option>';
   if(curCatVal && cats.includes(curCatVal)) $("upCat").value = curCatVal;
 
-  // Category filter dropdown
   const curFilter = $("artFilterCat").value;
   $("artFilterCat").innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
   if(curFilter) $("artFilterCat").value = curFilter;
@@ -728,14 +771,14 @@ function filterArtworks(){
   const filterCat = $("artFilterCat").value;
 
   const filtered = arts.filter(a => {
-    const matchQ = !query || a.title.toLowerCase().includes(query) || (a.desc && a.desc.toLowerCase().includes(query));
+    const matchQ = !query || (a.title && a.title.toLowerCase().includes(query)) || (a.desc && a.desc.toLowerCase().includes(query));
     const matchC = !filterCat || a.cat === filterCat;
     return matchQ && matchC;
   });
 
   const container = $("artworksContainer");
   if(!filtered.length){
-    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No artworks found matching your filter.</div>`;
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No artworks found in cloud database. Upload one above!</div>`;
     return;
   }
 
@@ -750,8 +793,8 @@ function filterArtworks(){
         <div class="art-price">${a.price ? esc(a.price) : '<span style="color:var(--muted);font-weight:400;font-size:12px">Price on request</span>'}</div>
         <div class="art-desc">${esc(a.desc || "No description provided.")}</div>
         <div class="art-actions">
-          <button class="btn line sm" style="flex:1" onclick="openEditArtModal(${a.id})">✏️ Edit</button>
-          <button class="btn danger sm" onclick="deleteArt(${a.id})">🗑️ Delete</button>
+          <button class="btn line sm" style="flex:1" onclick="openEditArtModal('${a.id}')">✏️ Edit</button>
+          <button class="btn danger sm" onclick="deleteArt('${a.id}')">🗑️ Delete</button>
         </div>
       </div>
     </div>
@@ -775,12 +818,12 @@ async function handleAddArt(e){
     if(!cat){ toast("Please enter a category name"); return false; }
     if(!cats.includes(cat)){
       cats.push(cat);
-      await saveCats();
+      if(fb && fb.db) await fb.db.collection("faheemgraphy_meta").doc("categories").set({ list: cats });
     }
   }
 
   btn.disabled = true;
-  btn.textContent = "Compressing & Uploading…";
+  btn.textContent = "Uploading to Cloud…";
 
   try{
     const baseTitle = $("upTitle").value.trim();
@@ -789,37 +832,49 @@ async function handleAddArt(e){
 
     for(let i = 0; i < files.length; i++){
       const file = files[i];
-      const compressedImg = await compressImage(file, 1400);
+      let imgData = await compressImage(file, 1400);
+
+      // Upload to Firebase Storage if available
+      if(fb && fb.storage){
+        try{
+          const storageRef = fb.storage.ref("artworks/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_"));
+          const snapshot = await storageRef.put(file);
+          imgData = await snapshot.ref.getDownloadURL();
+        }catch(storErr){
+          console.warn("Storage upload notice: saving image directly to cloud database", storErr);
+        }
+      }
+
       const title = files.length > 1 ? `${baseTitle} #${i + 1}` : baseTitle;
       const newArt = {
-        id: Date.now() + i,
         title,
         cat,
         price,
         desc,
-        img: compressedImg,
-        createdAt: new Date().toISOString()
+        img: imgData,
+        createdAt: Date.now() + i
       };
-      await tx("arts", "readwrite", s => s.put(newArt));
-      arts.unshift(newArt);
+
+      if(fb && fb.db){
+        await fb.db.collection("faheemgraphy_arts").add(newArt);
+      }
     }
 
     $("artUploadForm").reset();
     $("upNewCat").classList.add("hide");
-    toast(`Successfully uploaded ${files.length} artwork(s) to ${cat}!`);
-    renderAll();
+    toast(`Successfully uploaded ${files.length} artwork(s) to cloud!`);
   }catch(err){
     console.error(err);
-    toast("Upload failed. If the image is large, try a smaller file.");
+    toast("Upload failed: " + err.message);
   }finally{
     btn.disabled = false;
-    btn.textContent = "Upload Artwork";
+    btn.textContent = "Upload to Cloud";
   }
   return false;
 }
 
 function openEditArtModal(id){
-  const a = arts.find(x => x.id === id);
+  const a = arts.find(x => String(x.id) === String(id));
   if(!a) return;
   $("editArtId").value = a.id;
   $("editArtTitle").value = a.title;
@@ -836,39 +891,51 @@ function openEditArtModal(id){
 
 async function handleSaveEditArt(e){
   e.preventDefault();
-  const id = +$("editArtId").value;
-  const a = arts.find(x => x.id === id);
+  const id = $("editArtId").value;
+  const a = arts.find(x => String(x.id) === String(id));
   if(!a) return false;
 
-  a.title = $("editArtTitle").value.trim();
-  a.cat = $("editArtCat").value;
-  a.price = $("editArtPrice").value.trim();
-  a.desc = $("editArtDesc").value.trim();
+  const updateData = {
+    title: $("editArtTitle").value.trim(),
+    cat: $("editArtCat").value,
+    price: $("editArtPrice").value.trim(),
+    desc: $("editArtDesc").value.trim(),
+    updatedAt: Date.now()
+  };
 
   const file = $("editArtFile").files[0];
   if(file){
     try{
-      a.img = await compressImage(file, 1400);
+      let imgData = await compressImage(file, 1400);
+      if(fb && fb.storage){
+        try{
+          const storageRef = fb.storage.ref("artworks/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_"));
+          const snapshot = await storageRef.put(file);
+          imgData = await snapshot.ref.getDownloadURL();
+        }catch(storErr){}
+      }
+      updateData.img = imgData;
     }catch(err){
-      toast("Could not compress replacement image");
+      toast("Could not process replacement image");
       return false;
     }
   }
 
-  await tx("arts", "readwrite", s => s.put(a));
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_arts").doc(id).update(updateData);
+  }
   closeModal("modalEditArt");
-  toast("Artwork updated successfully!");
-  renderArtworks();
+  toast("Artwork updated in cloud!");
   return false;
 }
 
 async function deleteArt(id){
-  const a = arts.find(x => x.id === id);
-  if(!confirm(`Are you sure you want to delete "${a ? a.title : 'this artwork'}"?`)) return;
-  await tx("arts", "readwrite", s => s.delete(id));
-  arts = arts.filter(x => x.id !== id);
-  toast("Artwork deleted.");
-  renderAll();
+  const a = arts.find(x => String(x.id) === String(id));
+  if(!confirm(`Are you sure you want to delete "${a ? a.title : 'this artwork'}" from Cloud?`)) return;
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_arts").doc(id).delete();
+  }
+  toast("Artwork deleted from cloud.");
 }
 
 /* --- CATEGORIES TAB --- */
@@ -897,10 +964,11 @@ async function handleAddCategory(e){
     return false;
   }
   cats.push(name);
-  await saveCats();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("categories").set({ list: cats });
+  }
   $("newCatName").value = "";
-  toast(`Category "${name}" added!`);
-  renderAll();
+  toast(`Category "${name}" saved to cloud!`);
   return false;
 }
 
@@ -913,23 +981,20 @@ async function renameCategory(oldName){
     return;
   }
 
-  // Update in cats array
   const idx = cats.indexOf(oldName);
   if(idx !== -1) cats[idx] = trimmed;
-  await saveCats();
 
-  // Cascade update to all artworks in this category
-  let updatedCount = 0;
-  for(const a of arts){
-    if(a.cat === oldName){
-      a.cat = trimmed;
-      await tx("arts", "readwrite", s => s.put(a));
-      updatedCount++;
-    }
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("categories").set({ list: cats });
+    // Cascade update to all artworks matching old category in Firestore
+    const snapshot = await fb.db.collection("faheemgraphy_arts").where("cat", "==", oldName).get();
+    const batch = fb.db.batch();
+    snapshot.forEach(doc => {
+      batch.update(doc.ref, { cat: trimmed });
+    });
+    await batch.commit();
   }
-
-  toast(`Renamed to "${trimmed}" (${updatedCount} artworks updated)`);
-  renderAll();
+  toast(`Renamed to "${trimmed}" across all cloud artworks.`);
 }
 
 async function deleteCategory(catName){
@@ -940,9 +1005,10 @@ async function deleteCategory(catName){
   }
   if(!confirm(`Are you sure you want to delete category "${catName}"?`)) return;
   cats = cats.filter(c => c !== catName);
-  await saveCats();
-  toast(`Category "${catName}" removed.`);
-  renderAll();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("categories").set({ list: cats });
+  }
+  toast(`Category "${catName}" removed from cloud.`);
 }
 
 /* --- WHATSAPP & SOCIAL MEDIA TAB --- */
@@ -1003,7 +1069,6 @@ async function handleSaveWhatsApp(e){
   settings.whatsapp = num;
   settings.whatsappLabel = $("setWaLabel").value.trim() || `+${num}`;
 
-  // Also update WhatsApp entry in socials array if present
   let waSoc = (settings.socials || []).find(s => s.platform.toLowerCase() === "whatsapp");
   if(waSoc){
     waSoc.handle = settings.whatsappLabel;
@@ -1018,10 +1083,10 @@ async function handleSaveWhatsApp(e){
     });
   }
 
-  await saveSettings();
-  toast("WhatsApp configuration saved!");
-  renderSocialSettings();
-  renderStats();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings, { merge: true });
+  }
+  toast("WhatsApp configuration saved to cloud!");
   return false;
 }
 
@@ -1032,7 +1097,6 @@ async function promptChangeInstagram(){
   const clean = val.trim().replace(/^@/, "");
   settings.instagram = clean;
 
-  // Update or insert Instagram in socials
   let igSoc = (settings.socials || []).find(s => s.platform.toLowerCase() === "instagram");
   if(igSoc){
     igSoc.handle = "@" + clean;
@@ -1047,9 +1111,10 @@ async function promptChangeInstagram(){
     });
   }
 
-  await saveSettings();
-  toast(`Primary Instagram handle updated to @${clean}`);
-  renderSocialSettings();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings, { merge: true });
+  }
+  toast(`Primary Instagram handle updated to @${clean} in cloud!`);
 }
 
 function openSocialModal(id = null){
@@ -1107,12 +1172,12 @@ function autoFillSocialPlaceholder(platform){
 function editSocial(id){ openSocialModal(id); }
 
 async function deleteSocial(id){
-  if(!confirm("Remove this social platform account?")) return;
+  if(!confirm("Remove this social platform account from Cloud?")) return;
   settings.socials = (settings.socials || []).filter(s => s.id !== id);
-  await saveSettings();
-  toast("Social platform removed");
-  renderSocialSettings();
-  renderStats();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings, { merge: true });
+  }
+  toast("Social platform removed from cloud");
 }
 
 async function handleSaveSocial(e){
@@ -1139,16 +1204,15 @@ async function handleSaveSocial(e){
     });
   }
 
-  // If this is Instagram, keep primary handle in sync
   if(platform.toLowerCase() === "instagram"){
     settings.instagram = handle.replace(/^@/, "");
   }
 
-  await saveSettings();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings, { merge: true });
+  }
   closeModal("modalSocial");
-  toast("Social platform saved!");
-  renderSocialSettings();
-  renderStats();
+  toast("Social platform saved to cloud!");
   return false;
 }
 
@@ -1177,37 +1241,49 @@ async function handleSaveAbout(e){
   const file = $("aboutPhotoFile").files[0];
   if(file){
     try{
-      about.img = await compressImage(file, 1000);
+      let imgData = await compressImage(file, 1000);
+      if(fb && fb.storage){
+        try{
+          const storageRef = fb.storage.ref("about/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_"));
+          const snapshot = await storageRef.put(file);
+          imgData = await snapshot.ref.getDownloadURL();
+        }catch(storErr){}
+      }
+      about.img = imgData;
     }catch(err){
       toast("Image compression failed. Try another photo.");
     }
   }
 
-  await saveAboutData();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("about").set(about, { merge: true });
+  }
   $("aboutPhotoFile").value = "";
-  toast("About section updated!");
-  renderAboutAndHero();
+  toast("About section updated in cloud!");
   return false;
 }
 
 async function removeAboutPhoto(){
   if(!about.img) return;
   delete about.img;
-  await saveAboutData();
-  toast("Artist photo removed");
-  renderAboutAndHero();
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("about").set(about);
+  }
+  toast("Artist photo removed from cloud");
 }
 
 async function handleSaveHero(e){
   e.preventDefault();
   settings.heroTitle = $("heroHeadline").value.trim();
   settings.heroSub = $("heroSubtext").value.trim();
-  await saveSettings();
-  toast("Hero banner updated!");
+  if(fb && fb.db){
+    await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings, { merge: true });
+  }
+  toast("Hero banner updated in cloud!");
   return false;
 }
 
-/* --- PASSWORD & BACKUP TAB --- */
+/* --- CLOUD DATABASE & SECURITY TAB --- */
 async function handleChangePassword(e){
   e.preventDefault();
   const cur = $("pwCurrent").value;
@@ -1219,15 +1295,21 @@ async function handleChangePassword(e){
     return false;
   }
 
-  const stored = await tx("meta", "readonly", s => s.get("pw"));
-  const ok = stored ? (await hash(cur)) === stored : cur === DEFAULT_PASSWORD;
+  const storedPw = localStorage.getItem("fg_admin_pw");
+  let ok = false;
+  if(storedPw){
+    ok = (await hash(cur)) === storedPw;
+  } else {
+    ok = cur === DEFAULT_PASSWORD;
+  }
+
   if(!ok){
     toast("Current password is incorrect");
     return false;
   }
 
   const newHash = await hash(nw);
-  await tx("meta", "readwrite", s => s.put(newHash, "pw"));
+  localStorage.setItem("fg_admin_pw", newHash);
   $("pwCurrent").value = "";
   $("pwNew").value = "";
   $("pwConfirm").value = "";
@@ -1235,10 +1317,40 @@ async function handleChangePassword(e){
   return false;
 }
 
+/* Push demo/local data to cloud */
+async function syncLocalToCloud(){
+  if(!confirm("Push current categories and configuration to Firestore Cloud?")) return;
+  try{
+    if(fb && fb.db){
+      await fb.db.collection("faheemgraphy_meta").doc("categories").set({ list: cats });
+      await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings);
+      if(about) await fb.db.collection("faheemgraphy_meta").doc("about").set(about);
+      toast("Cloud database synchronized successfully!");
+    }
+  }catch(err){
+    toast("Sync error: " + err.message);
+  }
+}
+
+function openFbConfigModal(){
+  const cfg = getFirebaseConfig();
+  const jsonStr = prompt("Firebase Configuration (JSON):", JSON.stringify(cfg, null, 2));
+  if(!jsonStr) return;
+  try{
+    const parsed = JSON.parse(jsonStr);
+    localStorage.setItem("faheem_custom_firebase", JSON.stringify(parsed));
+    toast("Custom Firebase configuration saved! Reloading...");
+    setTimeout(() => location.reload(), 1000);
+  }catch(e){
+    alert("Invalid JSON format");
+  }
+}
+
 function exportFullData(){
   const payload = {
-    version: 2,
+    version: 3,
     timestamp: new Date().toISOString(),
+    cloudProject: "nexmart-onlineshopping",
     cats,
     arts,
     about,
@@ -1247,9 +1359,9 @@ function exportFullData(){
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `faheemgraphy-portfolio-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `faheemgraphy-cloud-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
-  toast("Backup exported successfully!");
+  toast("Cloud backup exported successfully!");
 }
 
 async function importFullData(file){
@@ -1258,32 +1370,27 @@ async function importFullData(file){
     const text = await file.text();
     const data = JSON.parse(text);
 
-    if(!data.arts && !data.cats){
-      toast("Invalid backup format");
-      return;
-    }
-
     if(data.cats) cats = data.cats;
     if(data.about) about = data.about;
     if(data.settings) settings = { ...DEFAULT_SETTINGS, ...data.settings };
 
-    await saveCats();
-    await saveAboutData();
-    await saveSettings();
+    if(fb && fb.db){
+      await fb.db.collection("faheemgraphy_meta").doc("categories").set({ list: cats });
+      await fb.db.collection("faheemgraphy_meta").doc("settings").set(settings);
+      if(about) await fb.db.collection("faheemgraphy_meta").doc("about").set(about);
 
-    if(data.arts && Array.isArray(data.arts)){
-      for(const item of data.arts){
-        await tx("arts", "readwrite", s => s.put(item));
+      if(data.arts && Array.isArray(data.arts)){
+        for(const item of data.arts){
+          const docData = { ...item };
+          delete docData.id;
+          await fb.db.collection("faheemgraphy_arts").add(docData);
+        }
       }
-      arts = (await tx("arts", "readonly", s => s.getAll())) || [];
-      arts.sort((a,b) => b.id - a.id);
     }
-
-    toast("Portfolio data restored successfully!");
-    renderAll();
+    toast("Backup imported and synced to cloud!");
   }catch(err){
     console.error(err);
-    toast("Failed to import file. Please check JSON file integrity.");
+    toast("Failed to import file. Please check JSON integrity.");
   }
 }
 

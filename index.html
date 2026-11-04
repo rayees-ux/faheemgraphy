@@ -7,6 +7,13 @@
 <title>Faheemgraphy – Studio &amp; Gallery</title>
 <meta name="description" content="Custom portraits, calligraphy and handmade artworks by Faheemgraphy.">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Pirata+One&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Firebase Cloud SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+
 <style>
 :root{--bg:#fff;--ink:#141414;--muted:#8a8a78;--accent:#c8643c;--line:#ebebe6;--soft:#f7f5f0}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -153,7 +160,10 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 
 <header>
 <div class="wrap"><nav>
-<a href="#top" class="logo" id="navLogo">Faheemgraphy</a>
+<div style="display:flex;align-items:center;gap:14px">
+  <a href="#top" class="logo" id="navLogo">Faheemgraphy</a>
+  <span id="cloudStatus" style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#1f8f4e;font-weight:700;display:inline-flex;align-items:center;gap:5px;background:#eef7f2;padding:4px 10px;border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e"></span> Cloud Live</span>
+</div>
 <button class="menu" onclick="document.getElementById('lk').classList.toggle('open')" aria-label="Menu">☰</button>
 <div class="links" id="lk" onclick="this.classList.remove('open')">
 <a href="#categories">Categories</a>
@@ -287,59 +297,102 @@ const DEFAULT_SETTINGS = {
 const DEFAULT_CATS = ["Calligraphy","Portraits","Pencil Sketch","Painting","Digital Art"];
 
 const $ = id => document.getElementById(id);
-let arts = [], cats = [], db, about = null;
+let arts = [], cats = [], about = null;
 let settings = { ...DEFAULT_SETTINGS };
+let cloudConnected = false;
 
-/* IndexedDB storage */
-const open = () => new Promise((res, rej) => {
-  const r = indexedDB.open("faheemgraphy", 1);
-  r.onupgradeneeded = () => {
-    const d = r.result;
-    if(!d.objectStoreNames.contains("arts")) d.createObjectStore("arts", {keyPath:"id"});
-    if(!d.objectStoreNames.contains("meta")) d.createObjectStore("meta");
-  };
-  r.onsuccess = () => res(r.result);
-  r.onerror = () => rej(r.error);
-});
-const tx = (s, m, fn) => new Promise((res, rej) => {
-  const t = db.transaction(s, m);
-  const q = fn(t.objectStore(s));
-  t.oncomplete = () => res(q && q.result);
-  t.onerror = () => rej(t.error);
-});
-const saveCats = () => tx("meta","readwrite", s => s.put(cats,"cats"));
+function setCloudLive(active){
+  cloudConnected = active;
+  const badge = $("cloudStatus");
+  if(!badge) return;
+  if(active){
+    badge.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e;box-shadow:0 0 6px #1f8f4e"></span> Cloud Live`;
+    badge.style.color = "#1f8f4e";
+    badge.style.background = "#eef7f2";
+  } else {
+    badge.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#c8643c"></span> Offline Mode`;
+    badge.style.color = "#c8643c";
+    badge.style.background = "#fdf3ee";
+  }
+}
 
 async function init(){
   $("yr").textContent = new Date().getFullYear();
 
-  // Try fast-path localStorage
+  // 1. Initial fast local cache load
   try{
     const cachedSettings = localStorage.getItem("fg_settings");
     if(cachedSettings) settings = { ...DEFAULT_SETTINGS, ...JSON.parse(cachedSettings) };
+    const cachedCats = localStorage.getItem("fg_cats");
+    if(cachedCats) cats = JSON.parse(cachedCats);
+    const cachedAbout = localStorage.getItem("fg_about");
+    if(cachedAbout) about = JSON.parse(cachedAbout);
   }catch(e){}
 
-  try{
-    db = await open();
-    arts = (await tx("arts","readonly", s => s.getAll())) || [];
-    cats = (await tx("meta","readonly", s => s.get("cats"))) || null;
-    about = await tx("meta","readonly", s => s.get("about"));
-    const storedSettings = await tx("meta","readonly", s => s.get("settings"));
-    if(storedSettings){
-      settings = { ...DEFAULT_SETTINGS, ...storedSettings };
-    }
-  }catch(e){
-    console.warn("Database load warning:", e);
-  }
-
-  if(!cats || !cats.length){
-    cats = [...DEFAULT_CATS];
-    try{ await saveCats(); }catch(e){}
-  }
-  arts.sort((a,b) => b.id - a.id);
-
+  if(!cats || !cats.length) cats = [...DEFAULT_CATS];
   applySettings();
   render();
   renderAbout();
+
+  // 2. Initialize Real-Time Firebase Cloud Listeners
+  initCloudRealtime();
+}
+
+function initCloudRealtime(){
+  try{
+    const fb = initFirebase();
+    if(!fb || !fb.db){
+      console.warn("Firebase not ready. Using offline mode.");
+      setCloudLive(false);
+      return;
+    }
+
+    // Realtime Listener 1: Artworks
+    fb.db.collection("faheemgraphy_arts").onSnapshot(snapshot => {
+      const items = [];
+      snapshot.forEach(doc => {
+        items.push({ id: doc.id, ...doc.data() });
+      });
+      items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      arts = items;
+      render();
+      setCloudLive(true);
+    }, err => {
+      console.warn("Firestore arts onSnapshot error:", err);
+      setCloudLive(false);
+    });
+
+    // Realtime Listener 2: Categories
+    fb.db.collection("faheemgraphy_meta").doc("categories").onSnapshot(doc => {
+      if(doc.exists && doc.data().list){
+        cats = doc.data().list;
+        try{ localStorage.setItem("fg_cats", JSON.stringify(cats)); }catch(e){}
+        render();
+      }
+    }, err => console.warn("Firestore categories error:", err));
+
+    // Realtime Listener 3: Settings (WhatsApp, Socials, Hero)
+    fb.db.collection("faheemgraphy_meta").doc("settings").onSnapshot(doc => {
+      if(doc.exists){
+        settings = { ...DEFAULT_SETTINGS, ...doc.data() };
+        try{ localStorage.setItem("fg_settings", JSON.stringify(settings)); }catch(e){}
+        applySettings();
+      }
+    }, err => console.warn("Firestore settings error:", err));
+
+    // Realtime Listener 4: About
+    fb.db.collection("faheemgraphy_meta").doc("about").onSnapshot(doc => {
+      if(doc.exists){
+        about = doc.data();
+        try{ localStorage.setItem("fg_about", JSON.stringify(about)); }catch(e){}
+        renderAbout();
+      }
+    }, err => console.warn("Firestore about error:", err));
+
+  }catch(err){
+    console.error("Firebase initialization failed:", err);
+    setCloudLive(false);
+  }
 }
 
 function getPlatformClass(platform){
@@ -384,7 +437,7 @@ function applySettings(){
   // Floating Action Button
   $("fab").href = `${waUrl}?text=${encodeURIComponent("Hi Faheemgraphy, I'd like to know more about your artworks.")}`;
 
-  // Contact Section: Render all connected social platforms!
+  // Contact Section: Render all connected social platforms in real time!
   const contactBox = $("contactBox");
   const socials = settings.socials || [];
   let contactHtml = "";
@@ -417,7 +470,7 @@ function applySettings(){
 }
 
 function card(a){
-  return `<div class="card" onclick="show(${a.id})"><div class="im"><img src="${a.img}" alt="${esc(a.title)}" loading="lazy"></div>${a.price?`<span class="p">${esc(a.price)}</span>`:''}<h3>${esc(a.title)}</h3><small>${esc(a.cat)}</small></div>`;
+  return `<div class="card" onclick="show('${a.id}')"><div class="im"><img src="${a.img}" alt="${esc(a.title)}" loading="lazy"></div>${a.price?`<span class="p">${esc(a.price)}</span>`:''}<h3>${esc(a.title)}</h3><small>${esc(a.cat)}</small></div>`;
 }
 
 function render(){
@@ -470,7 +523,7 @@ function closeM(id){ $(id).classList.remove("open"); }
 
 /* Viewer + inquiries */
 function show(id){
-  const a = arts.find(x => x.id === id);
+  const a = arts.find(x => String(x.id) === String(id));
   if(!a) return;
   $("vImg").src = a.img;
   $("vCat").textContent = a.cat;
