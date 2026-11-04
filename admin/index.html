@@ -537,6 +537,224 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
   .row2,.row3{grid-template-columns:1fr}
 }
 
+/* Live Orders Engine Styles */
+.live-order-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow .2s ease, border-color .2s ease;
+  position: relative;
+}
+.live-order-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  border-color: #d8d3c7;
+}
+.live-order-card.is-new {
+  border-left: 4px solid #e74c3c;
+  background: linear-gradient(180deg, #fffcfb 0%, #ffffff 100%);
+}
+.order-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.status-new { background: #fdf2f2; color: #e74c3c; border: 1px solid #f9caca; }
+.status-confirmed { background: #fef5e7; color: #e67e22; border: 1px solid #fad7a0; }
+.status-inprogress { background: #fef9e7; color: #d4ac0d; border: 1px solid #f9e79f; }
+.status-completed { background: #ebf5fb; color: #2980b9; border: 1px solid #aed6f1; }
+.status-delivered { background: #eafaf1; color: #27ae60; border: 1px solid #a9dfbf; }
+.status-cancelled { background: #f2f4f4; color: #7f8c8d; border: 1px solid #d5d8dc; }
+
+.order-body-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1.3fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media(max-width: 900px){
+  .order-body-grid { grid-template-columns: 1fr; gap: 16px; }
+  .live-order-card { padding: 16px; border-radius: 14px; }
+}
+
+.order-art-cell {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.order-art-thumb {
+  width: 72px;
+  height: 90px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--soft);
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+}
+.order-art-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.order-art-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.order-meta-pill {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.order-customer-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+.order-customer-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.order-customer-phone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.order-customer-addr {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.order-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+.order-status-select {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  background: #faf9f6;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* Floating Live Order Alert Banner Popup */
+.live-order-alert-popup {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  max-width: 420px;
+  width: calc(100% - 48px);
+  background: #1c1c1a;
+  color: #fff;
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 20px 45px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.1);
+  z-index: 9999;
+  transform: translateY(-30px);
+  opacity: 0;
+  transition: all .35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+.live-order-alert-popup.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+.live-order-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.live-order-alert-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(200,100,60,.4);
+}
+.live-order-alert-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+}
+.live-order-alert-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+.live-order-alert-btn {
+  background: #fff;
+  color: var(--ink);
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .15s ease, background .15s ease;
+}
+.live-order-alert-btn:hover {
+  background: #f0eee8;
+  transform: scale(1.04);
+}
+.live-order-alert-close {
+  background: none;
+  border: 0;
+  color: rgba(255,255,255,.6);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.live-order-alert-close:hover {
+  color: #fff;
+}
+
 /* Live Visitors & Analytics Radar Styles */
 @keyframes radarPulse {
   0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(31,143,78,0.7); }
@@ -853,12 +1071,12 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
 
       <div class="nav-section-label">Orders &amp; Interactions</div>
 
-      <!-- Artwork Orders -->
-      <button class="nav-item" data-tab="orders" onclick="switchTab('orders')" title="Artwork Orders">
+      <!-- Live Orders -->
+      <button class="nav-item" data-tab="orders" onclick="switchTab('orders')" title="Live Orders">
         <span class="nav-icon">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
         </span>
-        <span class="nav-label">Artwork Orders</span>
+        <span class="nav-label">Live Orders</span>
         <span class="nav-badge" id="sideBadgeOrders" style="background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3">0</span>
       </button>
 
@@ -1393,17 +1611,20 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
       </div>
 
       <!-- ==============================================
-           TAB: ARTWORK ORDERS
+           TAB: LIVE ORDERS
            ============================================== -->
       <div id="tab-orders" class="tab-content hide">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
           <div>
-            <h1>Artwork Orders</h1>
-            <p style="color:var(--muted);margin-top:4px">Customer commission inquiries, selected sizes, framing choices, custom notes, and WhatsApp connection.</p>
+            <h1>Live Orders</h1>
+            <p style="color:var(--muted);margin-top:4px">Real-time incoming artwork orders, customer details, custom requests, and instant WhatsApp connection.</p>
           </div>
-          <span style="display:inline-flex;align-items:center;gap:7px;background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700">
-            <span class="pulse-dot"></span> Real-Time Cloud Orders
-          </span>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button class="btn line sm" id="btnToggleOrderSound" onclick="toggleOrderSound()" style="border-radius:999px;font-size:12px;padding:6px 14px">🔔 Sound: ON</button>
+            <span style="display:inline-flex;align-items:center;gap:7px;background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700">
+              <span class="pulse-dot"></span> Real-Time Cloud Orders
+            </span>
+          </div>
         </div>
 
         <!-- ORDER KPI CARDS -->
@@ -1412,16 +1633,16 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
             <span class="stat-num" id="orderKpiTotal">0</span>
             <span class="stat-label">Total Artwork Orders</span>
           </div>
-          <div class="stat-card" style="border-left:4px solid #1f8f4e">
-            <span class="stat-num" style="color:#1f8f4e" id="orderKpiNew">0</span>
-            <span class="stat-label">New / Pending Orders</span>
+          <div class="stat-card" style="border-left:4px solid #e74c3c">
+            <span class="stat-num" style="color:#e74c3c" id="orderKpiNew">0</span>
+            <span class="stat-label">New Unprocessed Orders</span>
           </div>
-          <div class="stat-card">
-            <span class="stat-num" style="color:var(--accent)" id="orderKpiActive">0</span>
+          <div class="stat-card" style="border-left:4px solid #e67e22">
+            <span class="stat-num" style="color:#e67e22" id="orderKpiActive">0</span>
             <span class="stat-label">Confirmed &amp; In Progress</span>
           </div>
-          <div class="stat-card">
-            <span class="stat-num" id="orderKpiDone">0</span>
+          <div class="stat-card" style="border-left:4px solid #27ae60">
+            <span class="stat-num" style="color:#27ae60" id="orderKpiDone">0</span>
             <span class="stat-label">Completed &amp; Delivered</span>
           </div>
         </div>
@@ -1430,17 +1651,17 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         <div class="panel">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:20px">
             <div>
-              <h2 style="margin-bottom:2px">Customer Order Records</h2>
-              <p style="font-size:12px;color:var(--muted)">Manage status, review reference photos, save notes, and contact buyers via WhatsApp.</p>
+              <h2 style="margin-bottom:2px">Live Customer Orders</h2>
+              <p style="font-size:12px;color:var(--muted)">Manage status, review reference photos, save internal notes, and chat with buyers via WhatsApp.</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap">
               <button class="visitor-filter-btn active" data-order-filter="all" onclick="setOrderFilter('all')">All (<span id="countOrderAll">0</span>)</button>
-              <button class="visitor-filter-btn" data-order-filter="New" onclick="setOrderFilter('New')">New (<span id="countOrderNew">0</span>)</button>
-              <button class="visitor-filter-btn" data-order-filter="Confirmed" onclick="setOrderFilter('Confirmed')">Confirmed</button>
-              <button class="visitor-filter-btn" data-order-filter="In Progress" onclick="setOrderFilter('In Progress')">In Progress</button>
-              <button class="visitor-filter-btn" data-order-filter="Completed" onclick="setOrderFilter('Completed')">Completed</button>
-              <button class="visitor-filter-btn" data-order-filter="Delivered" onclick="setOrderFilter('Delivered')">Delivered</button>
-              <button class="visitor-filter-btn" data-order-filter="Cancelled" onclick="setOrderFilter('Cancelled')">Cancelled</button>
+              <button class="visitor-filter-btn" data-order-filter="New" onclick="setOrderFilter('New')" style="border-left:3px solid #e74c3c">New (<span id="countOrderNew">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="Confirmed" onclick="setOrderFilter('Confirmed')">Confirmed (<span id="countOrderConfirmed">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="In Progress" onclick="setOrderFilter('In Progress')">In Progress (<span id="countOrderInProgress">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="Completed" onclick="setOrderFilter('Completed')">Completed (<span id="countOrderCompleted">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="Delivered" onclick="setOrderFilter('Delivered')">Delivered (<span id="countOrderDelivered">0</span>)</button>
+              <button class="visitor-filter-btn" data-order-filter="Cancelled" onclick="setOrderFilter('Cancelled')">Cancelled (<span id="countOrderCancelled">0</span>)</button>
             </div>
           </div>
 
@@ -1985,6 +2206,98 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         <button class="btn" type="submit">Save Platform</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Order Detail & Management Modal -->
+<div id="modalOrderDetail" class="modal" onclick="if(event.target===this)closeModal('modalOrderDetail')">
+  <div class="modal-box" style="max-width:760px">
+    <button class="modal-close" onclick="closeModal('modalOrderDetail')">&times;</button>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px;padding-right:30px">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Order Details</div>
+        <h2 id="modalOrderRef" style="font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.5px;margin:2px 0 4px">#ORD-000000</h2>
+        <div id="modalOrderTime" style="font-size:12px;color:var(--muted)">Submitted: -</div>
+      </div>
+      <div id="modalOrderStatusBadgeContainer"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <!-- Left: Artwork & Specs -->
+      <div class="panel" style="background:#faf9f6;padding:20px;border-radius:16px">
+        <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px">Artwork Ordered</h4>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <img id="modalOrderArtImg" src="" style="width:80px;height:100px;border-radius:10px;object-fit:cover;background:#eee;border:1px solid var(--line)" alt="">
+          <div>
+            <div id="modalOrderArtTitle" style="font-weight:700;font-size:16px;color:var(--ink)">-</div>
+            <div id="modalOrderArtCat" style="font-size:12px;color:var(--accent);font-weight:700;margin-top:2px">-</div>
+            <div id="modalOrderType" style="font-size:12px;color:var(--muted);margin-top:4px">-</div>
+            <div id="modalOrderSpecs" style="font-size:12px;color:var(--ink);margin-top:6px;font-weight:600">-</div>
+          </div>
+        </div>
+        <div id="modalOrderRefPhotoBox" style="margin-top:16px;display:none">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Customer Reference Photo:</div>
+          <img id="modalOrderRefImg" src="" onclick="zoomPhoto(this.src)" style="max-width:140px;max-height:100px;border-radius:8px;cursor:pointer;border:1px solid var(--line)" title="Click to enlarge" alt="Reference">
+        </div>
+      </div>
+
+      <!-- Right: Customer Info -->
+      <div class="panel" style="background:#faf9f6;padding:20px;border-radius:16px">
+        <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px">Customer Contact</h4>
+        <div style="display:grid;gap:8px;font-size:13px">
+          <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em">Name:</span> <b id="modalOrderCustName" style="color:var(--ink);font-size:14px">-</b></div>
+          <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em">Phone:</span> <span id="modalOrderCustPhone">-</span></div>
+          <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em">Email:</span> <span id="modalOrderCustEmail">-</span></div>
+          <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em">Delivery Address:</span> <div id="modalOrderCustAddr" style="font-weight:500;color:var(--ink);line-height:1.4;margin-top:2px">-</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <a id="modalOrderWaBtn" href="#" target="_blank" rel="noopener" class="btn sm" style="background:#25D366;color:#fff;display:inline-flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.584 1.961.949 2.801.949 3.18 0 5.765-2.586 5.766-5.766.001-3.18-2.585-5.766-5.771-5.766zm0 10.375c-.78 0-1.637-.258-2.345-.713l-.168-.108-1.748.459.467-1.704-.112-.178c-.538-.854-.85-1.698-.85-2.365 0-2.519 2.05-4.568 4.756-4.568 2.52 0 4.568 2.049 4.568 4.568 0 2.52-2.048 4.569-4.567 4.569z"/></svg>
+            <span>Chat on WhatsApp</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Notes from customer -->
+    <div id="modalOrderNotesBox" style="margin-bottom:20px;display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Customer's Customization Notes:</div>
+      <div id="modalOrderCustNotes" style="background:#faf9f6;padding:12px 16px;border-radius:12px;font-size:13px;line-height:1.5;color:var(--ink)"></div>
+    </div>
+
+    <!-- Status Changer & Internal Admin Notes -->
+    <div style="background:#faf9f6;padding:20px;border-radius:16px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+        <label style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Update Order Status</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="btn line sm" onclick="changeActiveModalStatus('Confirmed')">Confirm</button>
+          <button type="button" class="btn line sm" onclick="changeActiveModalStatus('In Progress')">In Progress</button>
+          <button type="button" class="btn line sm" onclick="changeActiveModalStatus('Completed')">Completed</button>
+          <button type="button" class="btn line sm" onclick="changeActiveModalStatus('Delivered')">Delivered</button>
+          <button type="button" class="btn line sm" style="color:var(--danger)" onclick="changeActiveModalStatus('Cancelled')">Cancel</button>
+        </div>
+      </div>
+      <select id="modalOrderStatusSelect" onchange="changeActiveModalStatus(this.value)" style="margin-bottom:16px;background:#fff">
+        <option value="New">● New</option>
+        <option value="Confirmed">● Confirmed</option>
+        <option value="In Progress">● In Progress</option>
+        <option value="Completed">● Completed</option>
+        <option value="Delivered">● Delivered</option>
+        <option value="Cancelled">● Cancelled</option>
+      </select>
+
+      <label style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:6px">Internal Studio Notes (Private to Admin)</label>
+      <textarea id="modalOrderAdminNotes" rows="3" placeholder="Add tracking number, delivery date, client requests, framing notes..." style="background:#fff"></textarea>
+      <div style="margin-top:10px;display:flex;justify-content:flex-end">
+        <button type="button" class="btn sm" onclick="saveActiveModalNotes()">Save Internal Notes</button>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:16px">
+      <button type="button" class="btn line sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteActiveModalOrder()">Delete Order Record</button>
+      <button type="button" class="btn line sm" onclick="closeModal('modalOrderDetail')">Close</button>
+    </div>
   </div>
 </div>
 
@@ -2732,6 +3045,436 @@ async function cleanExpiredSessions(){
     console.error("Cleanup error:", err);
     toast("Cleanup error: " + err.message);
   }
+}
+
+/* =========================================================
+   REAL-TIME LIVE ORDER SYSTEM & AUDIO CHIME NOTIFICATIONS
+   ========================================================= */
+let adminOrders = [];
+let currentOrderFilter = "all";
+let adminOrdersUnsub = null;
+let ordersInitialLoadDone = false;
+let orderAudioEnabled = true;
+let activeModalOrderId = null;
+
+function toggleOrderSound(){
+  orderAudioEnabled = !orderAudioEnabled;
+  const btn = $("btnToggleOrderSound");
+  if(btn){
+    btn.textContent = orderAudioEnabled ? "🔔 Sound: ON" : "🔕 Sound: OFF";
+    btn.style.color = orderAudioEnabled ? "var(--ink)" : "var(--muted)";
+  }
+  toast(orderAudioEnabled ? "Order notification chime enabled 🔔" : "Order chime muted 🔕");
+}
+
+function playOrderSound(){
+  if(!orderAudioEnabled) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    
+    const playTone = (freq, start, duration) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + start);
+      gain.gain.setValueAtTime(0.25, now + start);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + start + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + start);
+      osc.stop(now + start + duration);
+    };
+
+    playTone(659.25, 0, 0.35);    // E5
+    playTone(987.77, 0.12, 0.45); // B5
+    playTone(1318.51, 0.24, 0.7); // E6
+  } catch(e) {
+    console.warn("Audio chime:", e);
+  }
+}
+
+function showLiveOrderPopup(order){
+  const popup = document.createElement("div");
+  popup.className = "live-order-alert-popup";
+  popup.innerHTML = `
+    <div class="live-order-alert-content">
+      <div class="live-order-alert-icon">🛍️</div>
+      <div style="flex:1;min-width:0">
+        <div class="live-order-alert-title">New Artwork Order Received!</div>
+        <div class="live-order-alert-desc"><b>${escapeHtml(order.customerName)}</b> ordered <b>${escapeHtml(order.artworkTitle)}</b></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px">Ref: #${escapeHtml(order.orderId || order.id)} · Just now</div>
+      </div>
+      <button class="live-order-alert-btn" onclick="openOrderModalById('${order.id}'); this.closest('.live-order-alert-popup').remove();">View</button>
+      <button class="live-order-alert-close" onclick="this.closest('.live-order-alert-popup').remove();">✕</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.classList.add("visible"), 20);
+  setTimeout(() => {
+    if(popup.parentNode){
+      popup.classList.remove("visible");
+      setTimeout(() => popup.remove(), 400);
+    }
+  }, 9000);
+}
+
+function initAdminOrdersListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    console.warn("Firebase not ready for orders listener");
+    return;
+  }
+  if(adminOrdersUnsub){
+    try{ adminOrdersUnsub(); }catch(e){}
+  }
+
+  adminOrdersUnsub = fb.db.collection("faheemgraphy_orders").onSnapshot(snapshot => {
+    const docs = [];
+    snapshot.forEach(doc => {
+      docs.push({ id: doc.id, ...doc.data() });
+    });
+    docs.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    if(ordersInitialLoadDone){
+      snapshot.docChanges().forEach(change => {
+        if(change.type === "added"){
+          const newDoc = { id: change.doc.id, ...change.doc.data() };
+          playOrderSound();
+          showLiveOrderPopup(newDoc);
+          toast(`New order from ${newDoc.customerName || "Customer"}! 🛍️`);
+        }
+      });
+    } else {
+      ordersInitialLoadDone = true;
+    }
+
+    adminOrders = docs;
+    renderAdminOrders();
+    updateOrderBadges();
+  }, err => {
+    console.warn("Orders listener error:", err);
+  });
+}
+
+function updateOrderBadges(){
+  const newCount = adminOrders.filter(o => o.status === "New").length;
+  const activeCount = adminOrders.filter(o => o.status === "Confirmed" || o.status === "In Progress").length;
+  const doneCount = adminOrders.filter(o => o.status === "Completed" || o.status === "Delivered").length;
+
+  if($("sideBadgeOrders")){
+    $("sideBadgeOrders").textContent = newCount;
+    $("sideBadgeOrders").style.background = newCount > 0 ? "#fdf2f2" : "#eef7f2";
+    $("sideBadgeOrders").style.color = newCount > 0 ? "#e74c3c" : "#1f8f4e";
+    $("sideBadgeOrders").style.borderColor = newCount > 0 ? "#f9caca" : "#c7ebd3";
+  }
+  if($("statPendingOrders")) $("statPendingOrders").textContent = `${newCount} New`;
+  if($("statOrderCount")) $("statOrderCount").textContent = adminOrders.length;
+  if($("statTotalOrders")) $("statTotalOrders").textContent = adminOrders.length;
+  if($("orderKpiTotal")) $("orderKpiTotal").textContent = adminOrders.length;
+  if($("orderKpiNew")) $("orderKpiNew").textContent = newCount;
+  if($("orderKpiActive")) $("orderKpiActive").textContent = activeCount;
+  if($("orderKpiDone")) $("orderKpiDone").textContent = doneCount;
+
+  // Filter button counts
+  if($("countOrderAll")) $("countOrderAll").textContent = adminOrders.length;
+  if($("countOrderNew")) $("countOrderNew").textContent = newCount;
+  if($("countOrderConfirmed")) $("countOrderConfirmed").textContent = adminOrders.filter(o => o.status === "Confirmed").length;
+  if($("countOrderInProgress")) $("countOrderInProgress").textContent = adminOrders.filter(o => o.status === "In Progress").length;
+  if($("countOrderCompleted")) $("countOrderCompleted").textContent = adminOrders.filter(o => o.status === "Completed").length;
+  if($("countOrderDelivered")) $("countOrderDelivered").textContent = adminOrders.filter(o => o.status === "Delivered").length;
+  if($("countOrderCancelled")) $("countOrderCancelled").textContent = adminOrders.filter(o => o.status === "Cancelled").length;
+}
+
+function setOrderFilter(filter){
+  currentOrderFilter = filter;
+  document.querySelectorAll("[data-order-filter]").forEach(b => {
+    b.classList.toggle("active", b.dataset.orderFilter === filter);
+  });
+  renderAdminOrders();
+}
+
+function getStatusBadgeClass(status){
+  switch(status){
+    case "New": return "status-new";
+    case "Confirmed": return "status-confirmed";
+    case "In Progress": return "status-inprogress";
+    case "Completed": return "status-completed";
+    case "Delivered": return "status-delivered";
+    case "Cancelled": return "status-cancelled";
+    default: return "status-new";
+  }
+}
+
+function renderAdminOrders(){
+  const container = $("adminOrdersList");
+  if(!container) return;
+
+  let list = adminOrders;
+  if(currentOrderFilter !== "all"){
+    list = list.filter(o => (o.status || "New") === currentOrderFilter);
+  }
+
+  if(list.length === 0){
+    container.innerHTML = `
+      <div style="text-align:center;padding:50px 20px;color:var(--muted);background:#fff;border-radius:18px;border:1px solid var(--line)">
+        <div style="font-size:40px;margin-bottom:12px">🛍️</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink)">No ${currentOrderFilter === "all" ? "" : currentOrderFilter + " "}orders found</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">When customers order artworks from your portfolio, they will instantly appear here with real-time sound and visual alert.</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(o => {
+    const isNew = o.status === "New";
+    const statusClass = getStatusBadgeClass(o.status || "New");
+    const formattedDate = o.createdAt ? new Date(o.createdAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Just now";
+    const waPhone = (o.customerPhone || "").replace(/[^0-9]/g, "");
+    const waMsg = `Hi ${o.customerName || "there"}, this is Faheem from Faheemgraphy regarding your order #${o.orderId || o.id} for "${o.artworkTitle}".`;
+    const waUrl = waPhone ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}` : "#";
+
+    return `
+      <div class="live-order-card ${isNew ? 'is-new' : ''}" id="orderCard_${o.id}">
+        <div class="order-header-row">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="order-status-badge ${statusClass}">● ${escapeHtml(o.status || "New")}</span>
+            <b style="font-size:14px;color:var(--ink);letter-spacing:.05em">#${escapeHtml(o.orderId || o.id)}</b>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:var(--muted)">
+            <span>🕒 ${formattedDate}</span>
+          </div>
+        </div>
+
+        <div class="order-body-grid">
+          <!-- Artwork Info -->
+          <div class="order-art-cell">
+            <img class="order-art-thumb" src="${escapeHtml(o.artworkImage || '../logo.png')}" alt="${escapeHtml(o.artworkTitle)}" onerror="this.src='../logo.png'">
+            <div class="order-art-info">
+              <div class="order-art-title">${escapeHtml(o.artworkTitle || "Custom Artwork")}</div>
+              <div style="font-size:11px;color:var(--accent);font-weight:700">${escapeHtml(o.artworkCat || "Artwork")}</div>
+              <div class="order-meta-pill"><b>Type:</b> ${escapeHtml(o.orderType || "Exact Same Artwork")}</div>
+              <div class="order-meta-pill"><b>Size:</b> ${escapeHtml(o.size || "Standard")} · <b>Qty:</b> ${escapeHtml(o.quantity || 1)}</div>
+              ${o.framing ? `<div class="order-meta-pill"><b>Framing:</b> ${escapeHtml(o.framing)}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Customer Info -->
+          <div class="order-customer-box">
+            <div class="order-customer-name">
+              <span>👤 ${escapeHtml(o.customerName || "Valued Customer")}</span>
+            </div>
+            <div class="order-customer-phone">
+              <span>📞 ${escapeHtml(o.customerPhone || "Not specified")}</span>
+              ${waPhone ? `<a href="${waUrl}" target="_blank" rel="noopener" style="background:#eafaf1;color:#27ae60;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-decoration:none;border:1px solid #c7ebd3">WhatsApp ↗</a>` : ''}
+            </div>
+            ${o.customerEmail ? `<div style="font-size:12px;color:var(--muted)">✉️ ${escapeHtml(o.customerEmail)}</div>` : ''}
+            <div class="order-customer-addr">
+              <b>📍 Delivery Address:</b><br>${escapeHtml(o.customerAddress || "To be confirmed via WhatsApp/Call")}
+            </div>
+          </div>
+
+          <!-- Custom Notes & Ref photo -->
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${o.customNotes ? `
+              <div style="font-size:12px;color:var(--ink);background:#faf9f6;padding:10px 12px;border-radius:10px;border:1px solid var(--line);line-height:1.4">
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px">Customer Notes:</span>
+                ${escapeHtml(o.customNotes)}
+              </div>
+            ` : `<div style="font-size:12px;color:var(--muted);font-style:italic">No customization notes</div>`}
+
+            ${o.refImage ? `
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                <img src="${o.refImage}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid var(--line)" onclick="zoomPhoto(this.src)" title="Click to view reference image">
+                <span style="font-size:11px;color:var(--accent);font-weight:700;cursor:pointer" onclick="zoomPhoto('${o.refImage}')">View Reference Photo ↗</span>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <div class="order-actions-bar">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Status:</span>
+            <select class="order-status-select" onchange="updateOrderStatus('${o.id}', this.value)">
+              <option value="New" ${o.status==='New'?'selected':''}>● New</option>
+              <option value="Confirmed" ${o.status==='Confirmed'?'selected':''}>● Confirmed</option>
+              <option value="In Progress" ${o.status==='In Progress'?'selected':''}>● In Progress</option>
+              <option value="Completed" ${o.status==='Completed'?'selected':''}>● Completed</option>
+              <option value="Delivered" ${o.status==='Delivered'?'selected':''}>● Delivered</option>
+              <option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>● Cancelled</option>
+            </select>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${isNew ? `
+              <button class="btn sm" onclick="updateOrderStatus('${o.id}', 'Confirmed')" style="background:#27ae60">Confirm Order</button>
+            ` : ''}
+            <button class="btn line sm" onclick="openOrderModalById('${o.id}')">View Details &amp; Notes</button>
+            ${waPhone ? `
+              <a href="${waUrl}" target="_blank" rel="noopener" class="btn sm" style="background:#25D366;color:#fff;display:inline-flex;align-items:center;gap:6px">
+                <span>WhatsApp</span>
+              </a>
+            ` : ''}
+            <button class="btn line sm" style="color:var(--danger);border-color:transparent" onclick="deleteOrderDoc('${o.id}')" title="Delete Order">🗑</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function updateOrderStatus(orderId, newStatus){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    await fb.db.collection("faheemgraphy_orders").doc(orderId).update({
+      status: newStatus,
+      updatedAt: Date.now()
+    });
+    toast(`Order status updated to "${newStatus}"! ✅`);
+  } catch(err){
+    console.error("Order status update error:", err);
+    toast("Status update error: " + err.message);
+  }
+}
+
+async function deleteOrderDoc(orderId){
+  if(!confirm("Are you sure you want to permanently delete this order record?")) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    await fb.db.collection("faheemgraphy_orders").doc(orderId).delete();
+    toast("Order record deleted successfully.");
+  } catch(err){
+    console.error("Delete order error:", err);
+    toast("Delete error: " + err.message);
+  }
+}
+
+function openOrderModalById(id){
+  const order = adminOrders.find(o => o.id === id);
+  if(!order) return;
+  activeModalOrderId = id;
+
+  if($("modalOrderRef")) $("modalOrderRef").textContent = `#${order.orderId || order.id}`;
+  if($("modalOrderTime")) $("modalOrderTime").textContent = `Submitted: ${order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}`;
+  
+  const statusContainer = $("modalOrderStatusBadgeContainer");
+  if(statusContainer){
+    const sClass = getStatusBadgeClass(order.status || "New");
+    statusContainer.innerHTML = `<span class="order-status-badge ${sClass}">● ${escapeHtml(order.status || "New")}</span>`;
+  }
+
+  if($("modalOrderArtImg")) $("modalOrderArtImg").src = order.artworkImage || "../logo.png";
+  if($("modalOrderArtTitle")) $("modalOrderArtTitle").textContent = order.artworkTitle || "Artwork";
+  if($("modalOrderArtCat")) $("modalOrderArtCat").textContent = order.artworkCat || "Artwork";
+  if($("modalOrderType")) $("modalOrderType").textContent = `Type: ${order.orderType || "Exact Same Artwork"}`;
+  if($("modalOrderSpecs")) $("modalOrderSpecs").textContent = `Size: ${order.size || "Standard"} · Qty: ${order.quantity || 1} ${order.framing ? '· ' + order.framing : ''}`;
+
+  if(order.refImage){
+    if($("modalOrderRefPhotoBox")) $("modalOrderRefPhotoBox").style.display = "block";
+    if($("modalOrderRefImg")) $("modalOrderRefImg").src = order.refImage;
+  } else {
+    if($("modalOrderRefPhotoBox")) $("modalOrderRefPhotoBox").style.display = "none";
+  }
+
+  if($("modalOrderCustName")) $("modalOrderCustName").textContent = order.customerName || "Customer";
+  if($("modalOrderCustPhone")) $("modalOrderCustPhone").textContent = order.customerPhone || "Not specified";
+  if($("modalOrderCustEmail")) $("modalOrderCustEmail").textContent = order.customerEmail || "Not provided";
+  if($("modalOrderCustAddr")) $("modalOrderCustAddr").textContent = order.customerAddress || "To be confirmed via WhatsApp/Call";
+
+  const waPhone = (order.customerPhone || "").replace(/[^0-9]/g, "");
+  const waBtn = $("modalOrderWaBtn");
+  if(waBtn){
+    if(waPhone){
+      waBtn.style.display = "inline-flex";
+      const waMsg = `Hi ${order.customerName || "there"}, this is Faheem from Faheemgraphy regarding your order #${order.orderId || order.id} for "${order.artworkTitle}".`;
+      waBtn.href = `https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`;
+    } else {
+      waBtn.style.display = "none";
+    }
+  }
+
+  if(order.customNotes){
+    if($("modalOrderNotesBox")) $("modalOrderNotesBox").style.display = "block";
+    if($("modalOrderCustNotes")) $("modalOrderCustNotes").textContent = order.customNotes;
+  } else {
+    if($("modalOrderNotesBox")) $("modalOrderNotesBox").style.display = "none";
+  }
+
+  if($("modalOrderStatusSelect")) $("modalOrderStatusSelect").value = order.status || "New";
+  if($("modalOrderAdminNotes")) $("modalOrderAdminNotes").value = order.adminNotes || "";
+
+  openModal("modalOrderDetail");
+}
+
+async function changeActiveModalStatus(newStatus){
+  if(!activeModalOrderId) return;
+  if($("modalOrderStatusSelect")) $("modalOrderStatusSelect").value = newStatus;
+  await updateOrderStatus(activeModalOrderId, newStatus);
+  const order = adminOrders.find(o => o.id === activeModalOrderId);
+  if(order){
+    order.status = newStatus;
+    const statusContainer = $("modalOrderStatusBadgeContainer");
+    if(statusContainer){
+      const sClass = getStatusBadgeClass(newStatus);
+      statusContainer.innerHTML = `<span class="order-status-badge ${sClass}">● ${escapeHtml(newStatus)}</span>`;
+    }
+  }
+}
+
+async function saveActiveModalNotes(){
+  if(!activeModalOrderId) return;
+  const notes = $("modalOrderAdminNotes") ? $("modalOrderAdminNotes").value : "";
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    await fb.db.collection("faheemgraphy_orders").doc(activeModalOrderId).update({
+      adminNotes: notes,
+      updatedAt: Date.now()
+    });
+    toast("Internal studio notes saved! 📝");
+  } catch(err){
+    toast("Error saving notes: " + err.message);
+  }
+}
+
+async function deleteActiveModalOrder(){
+  if(!activeModalOrderId) return;
+  await deleteOrderDoc(activeModalOrderId);
+  closeModal("modalOrderDetail");
+}
+
+function zoomPhoto(src){
+  if(!src) return;
+  if($("zoomModalImg")) $("zoomModalImg").src = src;
+  openModal("modalPhotoZoom");
+}
+
+/* Safe fallback listeners for Comments & Likes */
+function initAdminCommentsListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  fb.db.collection("faheemgraphy_comments").onSnapshot(snapshot => {
+    const count = snapshot.size;
+    if($("sideBadgeComments")) $("sideBadgeComments").textContent = count;
+    if($("statTotalComments")) $("statTotalComments").textContent = count;
+    if($("commentKpiTotal")) $("commentKpiTotal").textContent = count;
+  }, err => console.warn("Comments listener:", err));
+}
+
+function initAdminLikesListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  fb.db.collection("faheemgraphy_likes").onSnapshot(snapshot => {
+    let total = 0;
+    snapshot.forEach(doc => { total += (doc.data().count || 0); });
+    if($("sideBadgeLikes")) $("sideBadgeLikes").textContent = total;
+    if($("statTotalLikes")) $("statTotalLikes").textContent = total;
+    if($("likesKpiTotal")) $("likesKpiTotal").textContent = total;
+  }, err => console.warn("Likes listener:", err));
 }
 
 /* Login & Logout */
