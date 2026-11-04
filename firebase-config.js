@@ -40,3 +40,4 @@ function initFirebase() {
   }
   return { app: fbApp, db: fbDb, storage: fbStorage };
 }
+

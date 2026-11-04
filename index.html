@@ -7,6 +7,8 @@
 <title>Faheemgraphy – Studio &amp; Gallery</title>
 <meta name="description" content="Custom portraits, calligraphy and handmade artworks by Faheemgraphy.">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Pirata+One&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <!-- Firebase Cloud SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -161,7 +163,10 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 <header>
 <div class="wrap"><nav>
 <div style="display:flex;align-items:center;gap:14px">
-  <a href="#top" class="logo" id="navLogo">Faheemgraphy</a>
+  <a href="#top" style="display:flex;align-items:center;gap:12px">
+    <img src="logo.png" alt="Faheemgraphy Logo" style="width:38px;height:38px;border-radius:10px;object-fit:contain;background:#000;border:1px solid #222;display:block">
+    <span class="logo" id="navLogo">Faheemgraphy</span>
+  </a>
   <span id="cloudStatus" style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#1f8f4e;font-weight:700;display:inline-flex;align-items:center;gap:5px;background:#eef7f2;padding:4px 10px;border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e"></span> Cloud Live</span>
 </div>
 <button class="menu" onclick="document.getElementById('lk').classList.toggle('open')" aria-label="Menu">☰</button>
@@ -246,6 +251,10 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 <footer><div class="wrap">
 <div class="f-top">
 <div>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+  <img src="logo.png" alt="Faheemgraphy Logo" style="width:44px;height:44px;border-radius:12px;border:1px solid #333;background:#000;object-fit:contain">
+  <span style="font-family:'Pirata One',serif;font-size:30px;letter-spacing:.5px;color:#fff">Faheemgraphy</span>
+</div>
 <div class="f-cta">Have an idea? Let's turn it into something you can keep forever.</div>
 <a class="btn" href="#custom">Start a commission →</a>
 </div>
