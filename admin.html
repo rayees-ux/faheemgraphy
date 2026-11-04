@@ -11,7 +11,6 @@
 <!-- Firebase Cloud SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
 
 <style>
@@ -232,7 +231,8 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
             </div>
             <div>
               <label>Select Artwork Images (Single or Multi-upload) *</label>
-              <input type="file" id="upFiles" accept="image/*" multiple required>
+              <input type="file" id="upFiles" accept="image/*" multiple required onchange="previewUploadFiles(this)">
+              <div id="upFilesPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
             </div>
           </div>
 
@@ -598,24 +598,72 @@ async function hash(t){
   }
 }
 
-/* Image compressor using HTML5 canvas */
-function compressImage(file, max = 1400, quality = 0.82){
+/* Fast, high-quality image compressor using HTML5 Canvas & WebP/JPEG */
+function compressImage(file, max = 1200, quality = 0.82){
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const k = Math.min(1, max / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * k);
-      canvas.height = Math.round(img.height * k);
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL("image/jpeg", quality));
+    if(!file || !(file instanceof Blob)){
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Failed to read image file"));
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Invalid image format"));
+      img.onload = () => {
+        try {
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+          const scale = Math.min(1, max / Math.max(w, h));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(w * scale));
+          canvas.height = Math.max(1, Math.round(h * scale));
+          const ctx = canvas.getContext("2d", { alpha: false });
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          let dataUrl = "";
+          try {
+            dataUrl = canvas.toDataURL("image/webp", quality);
+          } catch(err){}
+          if(!dataUrl || !dataUrl.startsWith("data:image/webp")){
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+          }
+          if(dataUrl.length > 950000){
+            dataUrl = canvas.toDataURL("image/jpeg", 0.70);
+          }
+          resolve(dataUrl);
+        } catch(err) {
+          reject(err);
+        }
+      };
+      img.src = e.target.result;
     };
-    img.onerror = reject;
-    img.src = url;
+    reader.readAsDataURL(file);
   });
+}
+
+function previewUploadFiles(input){
+  const container = $("upFilesPreview");
+  if(!container) return;
+  container.innerHTML = "";
+  const files = [...(input.files || [])];
+  if(!files.length) return;
+  files.slice(0, 6).forEach(f => {
+    const url = URL.createObjectURL(f);
+    const thumb = document.createElement("div");
+    thumb.style.cssText = "width:54px;height:54px;border-radius:8px;background:var(--soft) center/cover no-repeat;border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.06)";
+    thumb.style.backgroundImage = `url(${url})`;
+    container.appendChild(thumb);
+  });
+  if(files.length > 6){
+    const extra = document.createElement("div");
+    extra.style.cssText = "width:54px;height:54px;border-radius:8px;background:var(--soft);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted)";
+    extra.textContent = `+${files.length - 6}`;
+    container.appendChild(extra);
+  }
 }
 
 /* Initialization */
@@ -828,28 +876,19 @@ async function handleAddArt(e){
   }
 
   btn.disabled = true;
-  btn.textContent = "Uploading to Cloud…";
+  btn.style.opacity = "0.75";
+  btn.textContent = `⚡ Fast-Uploading (0/${files.length})…`;
 
   try{
     const baseTitle = $("upTitle").value.trim();
     const price = $("upPrice").value.trim();
     const desc = $("upDesc").value.trim();
+    const now = Date.now();
+    let completed = 0;
 
-    for(let i = 0; i < files.length; i++){
-      const file = files[i];
-      let imgData = await compressImage(file, 1400);
-
-      // Upload to Firebase Storage if available
-      if(fb && fb.storage){
-        try{
-          const storageRef = fb.storage.ref("artworks/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_"));
-          const snapshot = await storageRef.put(file);
-          imgData = await snapshot.ref.getDownloadURL();
-        }catch(storErr){
-          console.warn("Storage upload notice: saving image directly to cloud database", storErr);
-        }
-      }
-
+    // Parallel high-speed processing
+    await Promise.all(files.map(async (file, i) => {
+      const imgData = await compressImage(file, 1200, 0.82);
       const title = files.length > 1 ? `${baseTitle} #${i + 1}` : baseTitle;
       const newArt = {
         title,
@@ -857,22 +896,27 @@ async function handleAddArt(e){
         price,
         desc,
         img: imgData,
-        createdAt: Date.now() + i
+        createdAt: now + (files.length - i)
       };
 
       if(fb && fb.db){
         await fb.db.collection("faheemgraphy_arts").add(newArt);
       }
-    }
+      completed++;
+      btn.textContent = `⚡ Fast-Uploading (${completed}/${files.length})…`;
+    }));
 
     $("artUploadForm").reset();
+    const prev = $("upFilesPreview");
+    if(prev) prev.innerHTML = "";
     $("upNewCat").classList.add("hide");
-    toast(`Successfully uploaded ${files.length} artwork(s) to cloud!`);
+    toast(`⚡ Successfully uploaded ${files.length} artwork(s) instantly!`);
   }catch(err){
     console.error(err);
     toast("Upload failed: " + err.message);
   }finally{
     btn.disabled = false;
+    btn.style.opacity = "";
     btn.textContent = "Upload to Cloud";
   }
   return false;
@@ -900,47 +944,50 @@ async function handleSaveEditArt(e){
   const a = arts.find(x => String(x.id) === String(id));
   if(!a) return false;
 
-  const updateData = {
-    title: $("editArtTitle").value.trim(),
-    cat: $("editArtCat").value,
-    price: $("editArtPrice").value.trim(),
-    desc: $("editArtDesc").value.trim(),
-    updatedAt: Date.now()
-  };
+  const btn = e.target.querySelector("button[type=submit]");
+  if(btn){ btn.disabled = true; btn.textContent = "⚡ Saving..."; }
 
-  const file = $("editArtFile").files[0];
-  if(file){
-    try{
-      let imgData = await compressImage(file, 1400);
-      if(fb && fb.storage){
-        try{
-          const storageRef = fb.storage.ref("artworks/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_"));
-          const snapshot = await storageRef.put(file);
-          imgData = await snapshot.ref.getDownloadURL();
-        }catch(storErr){}
-      }
+  try{
+    const updateData = {
+      title: $("editArtTitle").value.trim(),
+      cat: $("editArtCat").value,
+      price: $("editArtPrice").value.trim(),
+      desc: $("editArtDesc").value.trim(),
+      updatedAt: Date.now()
+    };
+
+    const file = $("editArtFile").files[0];
+    if(file){
+      const imgData = await compressImage(file, 1200, 0.82);
       updateData.img = imgData;
-    }catch(err){
-      toast("Could not process replacement image");
-      return false;
     }
-  }
 
-  if(fb && fb.db){
-    await fb.db.collection("faheemgraphy_arts").doc(id).update(updateData);
+    if(fb && fb.db){
+      await fb.db.collection("faheemgraphy_arts").doc(id).update(updateData);
+    }
+    closeModal("modalEditArt");
+    toast("⚡ Artwork updated in cloud!");
+  }catch(err){
+    console.error(err);
+    toast("Update failed: " + err.message);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = "Save Changes"; }
   }
-  closeModal("modalEditArt");
-  toast("Artwork updated in cloud!");
   return false;
 }
 
 async function deleteArt(id){
   const a = arts.find(x => String(x.id) === String(id));
   if(!confirm(`Are you sure you want to delete "${a ? a.title : 'this artwork'}" from Cloud?`)) return;
-  if(fb && fb.db){
-    await fb.db.collection("faheemgraphy_arts").doc(id).delete();
+  try{
+    if(fb && fb.db){
+      await fb.db.collection("faheemgraphy_arts").doc(id).delete();
+    }
+    toast("⚡ Artwork deleted from cloud.");
+  }catch(err){
+    console.error(err);
+    toast("Delete failed: " + err.message);
   }
-  toast("Artwork deleted from cloud.");
 }
 
 /* --- CATEGORIES TAB --- */
@@ -1240,31 +1287,30 @@ function renderAboutAndHero(){
 
 async function handleSaveAbout(e){
   e.preventDefault();
-  about.name = $("aboutName").value.trim() || "Faheemgraphy";
-  about.text = $("aboutText").value.trim();
+  const btn = e.target.querySelector("button[type=submit]");
+  if(btn){ btn.disabled = true; btn.textContent = "⚡ Saving..."; }
 
-  const file = $("aboutPhotoFile").files[0];
-  if(file){
-    try{
-      let imgData = await compressImage(file, 1000);
-      if(fb && fb.storage){
-        try{
-          const storageRef = fb.storage.ref("about/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_"));
-          const snapshot = await storageRef.put(file);
-          imgData = await snapshot.ref.getDownloadURL();
-        }catch(storErr){}
-      }
+  try{
+    about.name = $("aboutName").value.trim() || "Faheemgraphy";
+    about.text = $("aboutText").value.trim();
+
+    const file = $("aboutPhotoFile").files[0];
+    if(file){
+      const imgData = await compressImage(file, 900, 0.82);
       about.img = imgData;
-    }catch(err){
-      toast("Image compression failed. Try another photo.");
     }
-  }
 
-  if(fb && fb.db){
-    await fb.db.collection("faheemgraphy_meta").doc("about").set(about, { merge: true });
+    if(fb && fb.db){
+      await fb.db.collection("faheemgraphy_meta").doc("about").set(about, { merge: true });
+    }
+    renderAboutAndHero();
+    toast("⚡ Artist profile updated in cloud!");
+  }catch(err){
+    console.error(err);
+    toast("Save failed: " + err.message);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = "Save About Section"; }
   }
-  $("aboutPhotoFile").value = "";
-  toast("About section updated in cloud!");
   return false;
 }
 

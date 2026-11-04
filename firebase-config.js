@@ -33,11 +33,6 @@ function initFirebase() {
     fbApp = firebase.app();
   }
   fbDb = firebase.firestore();
-  try {
-    fbStorage = firebase.storage();
-  } catch(e) {
-    console.warn("Firebase storage not initialized:", e);
-  }
-  return { app: fbApp, db: fbDb, storage: fbStorage };
+  return { app: fbApp, db: fbDb, storage: null };
 }
 
