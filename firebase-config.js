@@ -19,6 +19,7 @@ function getFirebaseConfig() {
 // Initialize Firebase App
 let fbApp = null;
 let fbDb = null;
+let fbAuth = null;
 let fbStorage = null;
 
 function initFirebase() {
@@ -33,6 +34,11 @@ function initFirebase() {
     fbApp = firebase.app();
   }
   fbDb = firebase.firestore();
-  return { app: fbApp, db: fbDb, storage: null };
+  try {
+    if (typeof firebase.auth === "function") {
+      fbAuth = firebase.auth();
+    }
+  } catch(e) {}
+  return { app: fbApp, db: fbDb, auth: fbAuth, storage: null };
 }
 

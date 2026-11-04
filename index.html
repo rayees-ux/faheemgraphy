@@ -13,6 +13,7 @@
 <!-- Firebase Cloud SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 
 <style>
@@ -166,15 +167,28 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
   <span class="logo" id="navLogo">Faheemgraphy</span>
 </a>
 <button class="menu" onclick="document.getElementById('lk').classList.toggle('open')" aria-label="Menu">☰</button>
-<div class="links" id="lk" onclick="this.classList.remove('open')">
-<a href="#categories">Categories</a>
-<a href="#custom">Custom Orders</a>
-<a href="#about">About</a>
-<a href="#contact">Contact</a>
+<div class="links" id="lk">
+<a href="#categories" onclick="document.getElementById('lk').classList.remove('open')">Categories</a>
+<a href="#custom" onclick="document.getElementById('lk').classList.remove('open')">Custom Orders</a>
+<a href="#about" onclick="document.getElementById('lk').classList.remove('open')">About</a>
+<a href="#contact" onclick="document.getElementById('lk').classList.remove('open')">Contact</a>
 <a id="navIgLink" href="https://instagram.com/fa_i_heem" target="_blank" rel="noopener" aria-label="Instagram">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
 </a>
-<a class="btn" href="#custom">Commission Me</a>
+<a class="btn" href="#custom" onclick="document.getElementById('lk').classList.remove('open')">Commission Me</a>
+
+<!-- Optional Voluntary Google Auth -->
+<div id="visitorAuthWrap" style="display:inline-flex;align-items:center;margin-left:4px">
+  <button id="btnGoogleAuth" onclick="handleVisitorGoogleAuth()" style="display:inline-flex;align-items:center;gap:6px;background:#f7f5f0;border:1px solid #e2ded5;color:#444;font-size:11px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;transition:.2s" title="Sign in with Google (optional) to show your profile to the artist">
+    <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+    <span>Sign In</span>
+  </button>
+  <div id="visitorUserBadge" style="display:none;align-items:center;gap:6px;background:#f7f5f0;padding:3px 10px 3px 4px;border-radius:999px;border:1px solid #e2ded5">
+    <img id="visitorUserAvatar" src="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid #c8643c">
+    <span id="visitorUserName" style="font-size:11px;font-weight:700;color:var(--ink)"></span>
+    <button onclick="handleVisitorSignOut()" style="background:none;border:0;color:var(--muted);font-size:11px;cursor:pointer;padding:0 2px" title="Sign Out">✕</button>
+  </div>
+</div>
 </div>
 </nav></div>
 </header>
@@ -513,7 +527,10 @@ function goCat(i){
 window.addEventListener("resize", applyFilter);
 const esc = s => String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(m){ const t=$("toast"); t.textContent=m; t.style.display="block"; setTimeout(()=>t.style.display="none",3200); }
-function closeM(id){ $(id).classList.remove("open"); }
+function closeM(id){ 
+  $(id).classList.remove("open");
+  trackVisitorActivity("Browsing Gallery");
+}
 
 /* Viewer + inquiries */
 function show(id){
@@ -529,10 +546,12 @@ function show(id){
   $("vWa").href = `https://wa.me/${settings.whatsapp || "918921166278"}?text=${encodeURIComponent(msg)}`;
   $("vIg").onclick = () => igSend(msg);
   $("view").classList.add("open");
+  trackVisitorActivity("Viewing Artwork: " + a.title, true);
 }
 
 function igSend(msg){
   const igHandle = settings.instagram || "fa_i_heem";
+  trackVisitorActivity("Tapped Instagram Inquiry Link", true);
   (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject()).then(
     () => toast("Message copied – paste it in the Instagram chat"),
     () => toast("Open the chat and type your message")
@@ -546,6 +565,7 @@ function sendCustom(e, ig){
     toast("Please fill in your name and idea");
     return false;
   }
+  trackVisitorActivity("Custom Commission Inquiry: " + $("ct").value, true);
   const brand = settings.brandName || "Faheemgraphy";
   const msg = `Hi ${brand}, I'm ${$("cn").value}.\nI'd like a custom order.\nType: ${$("ct").value}\nSize: ${$("cs").value || "Not decided"}\nIdea: ${$("cd").value}`;
   if(ig) igSend(msg);
@@ -553,9 +573,234 @@ function sendCustom(e, ig){
   return false;
 }
 
+/* =========================================================
+   LIVE VISITOR TRACKING & VOLUNTARY GOOGLE AUTH
+   ========================================================= */
+const VISITOR_COLLECTION = "faheemgraphy_live_sessions";
+let currentSessionId = null;
+let currentVisitorId = null;
+let currentVisitorAuth = null;
+let lastVisitorUpdate = 0;
+let currentSectionName = "Home";
+let sessionPagesList = ["Home"];
+
+function getDeviceType(){
+  const ua = navigator.userAgent || "";
+  if(/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet";
+  if(/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle/i.test(ua) || window.innerWidth < 768) return "Mobile";
+  return "Desktop";
+}
+
+function getBrowserName(){
+  const ua = navigator.userAgent || "";
+  if(ua.includes("Edg/")) return "Edge";
+  if(ua.includes("Chrome/") && !ua.includes("Edg/")) return "Chrome";
+  if(ua.includes("Safari/") && !ua.includes("Chrome/")) return "Safari";
+  if(ua.includes("Firefox/")) return "Firefox";
+  if(ua.includes("OPR/") || ua.includes("Opera/")) return "Opera";
+  if(ua.includes("SamsungBrowser/")) return "Samsung Internet";
+  return "Browser";
+}
+
+function getOSName(){
+  const ua = navigator.userAgent || "";
+  if(ua.includes("Win")) return "Windows";
+  if(ua.includes("Mac") && !ua.includes("iPhone") && !ua.includes("iPad")) return "macOS";
+  if(ua.includes("Android")) return "Android";
+  if(ua.includes("iPhone") || ua.includes("iPad")) return "iOS";
+  if(ua.includes("Linux")) return "Linux";
+  if(ua.includes("CrOS")) return "ChromeOS";
+  return "Unknown OS";
+}
+
+function initVisitorSession(){
+  try {
+    // 1. Unique Visitor ID (persisted across visits)
+    let vid = localStorage.getItem("fg_vid");
+    let isReturning = true;
+    if(!vid){
+      vid = "v_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+      localStorage.setItem("fg_vid", vid);
+      localStorage.setItem("fg_v_first", Date.now());
+      isReturning = false;
+    }
+    currentVisitorId = vid;
+
+    // 2. Session ID (per browsing tab/session)
+    let sid = sessionStorage.getItem("fg_sid");
+    if(!sid){
+      sid = "s_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+      sessionStorage.setItem("fg_sid", sid);
+    }
+    currentSessionId = sid;
+
+    // 3. Connect to Firestore
+    const fb = initFirebase();
+    if(!fb || !fb.db) return;
+
+    const sessionData = {
+      sessionId: sid,
+      visitorId: vid,
+      isReturning,
+      userName: "Anonymous Visitor",
+      userPhoto: null,
+      isAuth: false,
+      device: getDeviceType(),
+      browser: getBrowserName(),
+      os: getOSName(),
+      currentSection: "Home / Gallery",
+      pagesViewed: ["Home / Gallery"],
+      pageViews: 1,
+      startedAt: Date.now(),
+      lastActive: Date.now(),
+      status: "online",
+      region: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown"
+    };
+
+    // Check Firebase Auth state if voluntary sign-in exists
+    if(fb.auth){
+      fb.auth.onAuthStateChanged(user => {
+        if(user){
+          currentVisitorAuth = user;
+          updateVisitorAuthUI(user);
+          fb.db.collection(VISITOR_COLLECTION).doc(sid).set({
+            userName: user.displayName || user.email.split("@")[0],
+            userPhoto: user.photoURL || null,
+            userEmail: user.email || null,
+            isAuth: true
+          }, { merge: true });
+        }
+      });
+    }
+
+    fb.db.collection(VISITOR_COLLECTION).doc(sid).set(sessionData, { merge: true });
+
+    // 4. Heartbeat: every 25 seconds
+    setInterval(() => {
+      if(document.visibilityState === "visible"){
+        trackVisitorActivity(currentSectionName);
+      }
+    }, 25000);
+
+    // 5. Visibility / Leave events
+    document.addEventListener("visibilitychange", () => {
+      if(!currentSessionId || !fb.db) return;
+      const isOnline = document.visibilityState === "visible";
+      fb.db.collection(VISITOR_COLLECTION).doc(currentSessionId).update({
+        status: isOnline ? "online" : "idle",
+        lastActive: Date.now()
+      }).catch(()=>{});
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if(!currentSessionId || !fb.db) return;
+      fb.db.collection(VISITOR_COLLECTION).doc(currentSessionId).update({
+        status: "left",
+        lastActive: Date.now()
+      }).catch(()=>{});
+    });
+
+  } catch(err) {
+    console.warn("Analytics error:", err);
+  }
+}
+
+function trackVisitorActivity(sectionTitle, isModal = false){
+  const now = Date.now();
+  if(!currentSessionId) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+
+  currentSectionName = sectionTitle;
+  if(!sessionPagesList.includes(sectionTitle)){
+    sessionPagesList.push(sectionTitle);
+  }
+
+  // Throttled update to avoid spamming Firestore
+  if(now - lastVisitorUpdate < 3000 && !isModal) return;
+  lastVisitorUpdate = now;
+
+  fb.db.collection(VISITOR_COLLECTION).doc(currentSessionId).update({
+    currentSection: sectionTitle,
+    pagesViewed: sessionPagesList,
+    pageViews: sessionPagesList.length,
+    lastActive: now,
+    status: "online"
+  }).catch(()=>{});
+}
+
+async function handleVisitorGoogleAuth(){
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const res = await firebase.auth().signInWithPopup(provider);
+    if(res && res.user){
+      updateVisitorAuthUI(res.user);
+      const fb = initFirebase();
+      if(fb && fb.db && currentSessionId){
+        await fb.db.collection(VISITOR_COLLECTION).doc(currentSessionId).update({
+          userName: res.user.displayName || "Google User",
+          userPhoto: res.user.photoURL || null,
+          userEmail: res.user.email || null,
+          isAuth: true
+        });
+      }
+      toast(`Signed in as ${res.user.displayName || "Google User"}`);
+    }
+  } catch(err) {
+    if(err.code !== "auth/popup-closed-by-user"){
+      console.warn("Sign-in:", err.message);
+    }
+  }
+}
+
+function handleVisitorSignOut(){
+  if(firebase.auth){
+    firebase.auth().signOut().then(() => {
+      updateVisitorAuthUI(null);
+      const fb = initFirebase();
+      if(fb && fb.db && currentSessionId){
+        fb.db.collection(VISITOR_COLLECTION).doc(currentSessionId).update({
+          userName: "Anonymous Visitor",
+          userPhoto: null,
+          userEmail: null,
+          isAuth: false
+        });
+      }
+      toast("Signed out. You are now browsing as an Anonymous Visitor.");
+    });
+  }
+}
+
+function updateVisitorAuthUI(user){
+  const btn = $("btnGoogleAuth");
+  const badge = $("visitorUserBadge");
+  const avatar = $("visitorUserAvatar");
+  const nameEl = $("visitorUserName");
+  if(!btn || !badge) return;
+
+  if(user){
+    btn.style.display = "none";
+    badge.style.display = "inline-flex";
+    if(avatar && user.photoURL) avatar.src = user.photoURL;
+    if(nameEl) nameEl.textContent = user.displayName ? user.displayName.split(" ")[0] : "Signed in";
+  } else {
+    btn.style.display = "inline-flex";
+    badge.style.display = "none";
+  }
+}
+
 init();
+initVisitorSession();
+
 const spy = new IntersectionObserver(es => es.forEach(e => {
-  if(e.isIntersecting) document.querySelectorAll('.links a').forEach(a => a.classList.toggle('cur', a.getAttribute('href')==='#'+e.target.id));
+  if(e.isIntersecting){
+    document.querySelectorAll('.links a').forEach(a => a.classList.toggle('cur', a.getAttribute('href')==='#'+e.target.id));
+    const secName = e.target.id === "categories" ? "Categories & Gallery" :
+                    e.target.id === "custom" ? "Custom Orders Section" :
+                    e.target.id === "about" ? "About the Artist" :
+                    e.target.id === "contact" ? "Contact Section" : e.target.id;
+    trackVisitorActivity("Viewing: " + secName);
+  }
 }), {rootMargin:'-45% 0px -50% 0px'});
 document.querySelectorAll('section[id]').forEach(x => spy.observe(x));
 </script>

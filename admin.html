@@ -11,6 +11,7 @@
 <!-- Firebase Cloud SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 
 <style>
@@ -515,6 +516,110 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
   .content-header{padding:0 16px}
   .row2,.row3{grid-template-columns:1fr}
 }
+
+/* Live Visitors & Analytics Radar Styles */
+@keyframes radarPulse {
+  0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(31,143,78,0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(31,143,78,0); }
+  100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(31,143,78,0); }
+}
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #1f8f4e;
+  display: inline-block;
+  box-shadow: 0 0 6px #1f8f4e;
+  animation: radarPulse 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+.pulse-dot.idle {
+  background: #e67e22;
+  box-shadow: 0 0 4px #e67e22;
+  animation: none;
+}
+.pulse-dot.left {
+  background: #a0a090;
+  box-shadow: none;
+  animation: none;
+}
+.visitor-filter-btn {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.visitor-filter-btn:hover {
+  background: #fff;
+  border-color: var(--ink);
+}
+.visitor-filter-btn.active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.visitor-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+.visitor-table th {
+  padding: 12px 14px;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-weight: 700;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.visitor-table td {
+  padding: 14px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.visitor-table tr:hover td {
+  background: rgba(244, 242, 237, 0.45);
+}
+.visitor-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f0eee8;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.progress-track {
+  height: 8px;
+  background: var(--soft);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
 </style>
 </head>
 <body>
@@ -646,7 +751,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
         </span>
         <span class="nav-label">Live Visitors</span>
-        <span style="width:7px;height:7px;border-radius:50%;background:#1f8f4e;box-shadow:0 0 6px #1f8f4e"></span>
+        <span class="nav-badge" id="sideBadgeLiveVisitors" style="background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3">0</span>
       </button>
 
       <!-- 9. Visitor Analytics -->
@@ -1135,55 +1240,99 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
            8. TAB: LIVE VISITORS
            ============================================== -->
       <div id="tab-visitors" class="tab-content hide">
-        <div style="margin-bottom:24px">
-          <h1>Live Visitors</h1>
-          <p style="color:var(--muted);margin-top:4px">Real-time visitor radar and active connections across all devices.</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <h1>Live Visitors</h1>
+            <p style="color:var(--muted);margin-top:4px">Real-time radar of active connections and visitor activity across desktop, tablet, and mobile.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="display:inline-flex;align-items:center;gap:7px;background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700">
+              <span class="pulse-dot"></span> Firestore Real-Time Radar
+            </span>
+            <button class="btn sm line" onclick="cleanExpiredSessions()" title="Clean records older than 48 hours">🧹 Prune Old</button>
+          </div>
         </div>
 
-        <div class="row2">
-          <div class="panel accent-box">
-            <h2>Live Active Pulse</h2>
-            <div style="display:flex;align-items:center;gap:18px;margin:20px 0">
-              <div style="width:72px;height:72px;border-radius:50%;background:#eef7f2;border:2px solid #1f8f4e;display:flex;align-items:center;justify-content:center;font:400 36px 'Anton',sans-serif;color:#1f8f4e" id="liveVisitorBig">3</div>
+        <!-- 4 LIVE METRIC CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card" style="border-left:4px solid #1f8f4e">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="stat-num" style="color:#1f8f4e" id="liveVisitorBig">0</span>
+              <span class="pulse-dot"></span>
+            </div>
+            <span class="stat-label">Currently Viewing Site</span>
+            <span style="font-size:11px;color:var(--muted)">Active heartbeat past 60s</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="liveTodayCount">0</span>
+            <span class="stat-label">Today's Visitors</span>
+            <span style="font-size:11px;color:var(--muted)">Since 12:00 AM midnight</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="liveWeekCount">0</span>
+            <span class="stat-label">This Week's Visitors</span>
+            <span style="font-size:11px;color:var(--muted)">Past 7 days rolling</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="liveMonthCount">0</span>
+            <span class="stat-label">This Month's Visitors</span>
+            <span style="font-size:11px;color:var(--muted)">Past 30 days rolling</span>
+          </div>
+        </div>
+
+        <!-- SUMMARY PILL BANNER -->
+        <div class="panel" style="padding:16px 22px;margin-bottom:24px;background:#fff">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:24px">👁️</span>
               <div>
-                <div style="font-size:16px;font-weight:700">Active Browsers Right Now</div>
-                <div style="font-size:12px;color:#1f8f4e;display:flex;align-items:center;gap:6px">
-                  <span style="width:7px;height:7px;border-radius:50%;background:#1f8f4e;box-shadow:0 0 6px #1f8f4e"></span>
-                  Real-time heartbeat ping active
-                </div>
+                <span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;display:block">Total Page &amp; Artwork Views</span>
+                <span style="font-size:20px;font-weight:700" id="liveTotalViews">0</span>
               </div>
             </div>
-            <p style="font-size:13px;color:var(--muted)">Visitors currently browsing portfolio categories, viewing artwork detail modals, and tapping custom commission WhatsApp links.</p>
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+              <div style="font-size:12.5px"><span style="color:var(--muted)">Returning Visitors:</span> <strong id="liveReturningCount">0</strong></div>
+              <div style="font-size:12.5px"><span style="color:var(--muted)">Google Accounts:</span> <strong id="liveGoogleCount">0</strong></div>
+              <div style="font-size:12.5px"><span style="color:var(--muted)">Anonymous Visitors:</span> <strong id="liveAnonCount">0</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISITOR ACTIVITY TABLE -->
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px">
+            <div>
+              <h2 style="margin-bottom:2px">Live Visitor Activity Table</h2>
+              <p style="font-size:12px;color:var(--muted)">Real-time log of every visitor, current page/artwork being viewed, device, and authentication.</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="visitor-filter-btn active" data-filter="all" onclick="setVisitorFilter('all')">All (<span id="countFilterAll">0</span>)</button>
+              <button class="visitor-filter-btn" data-filter="live" onclick="setVisitorFilter('live')">🟢 Live Now (<span id="countFilterLive">0</span>)</button>
+              <button class="visitor-filter-btn" data-filter="auth" onclick="setVisitorFilter('auth')">Google Accounts (<span id="countFilterAuth">0</span>)</button>
+              <button class="visitor-filter-btn" data-filter="mobile" onclick="setVisitorFilter('mobile')">📱 Mobile (<span id="countFilterMobile">0</span>)</button>
+              <button class="visitor-filter-btn" data-filter="desktop" onclick="setVisitorFilter('desktop')">💻 Desktop (<span id="countFilterDesktop">0</span>)</button>
+            </div>
           </div>
 
-          <div class="panel">
-            <h2>Device Distribution</h2>
-            <div style="display:grid;gap:12px;margin-top:16px">
-              <div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px">
-                  <span>📱 Mobile Devices</span><span>71%</span>
-                </div>
-                <div style="height:8px;background:var(--soft);border-radius:999px;overflow:hidden">
-                  <div style="width:71%;height:100%;background:var(--accent)"></div>
-                </div>
-              </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px">
-                  <span>💻 Desktop Browsers</span><span>24%</span>
-                </div>
-                <div style="height:8px;background:var(--soft);border-radius:999px;overflow:hidden">
-                  <div style="width:24%;height:100%;background:var(--ink)"></div>
-                </div>
-              </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px">
-                  <span>📟 Tablets</span><span>5%</span>
-                </div>
-                <div style="height:8px;background:var(--soft);border-radius:999px;overflow:hidden">
-                  <div style="width:5%;height:100%;background:#8a8a78"></div>
-                </div>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <table class="visitor-table">
+              <thead>
+                <tr>
+                  <th>Visitor Profile</th>
+                  <th>Status &amp; Presence</th>
+                  <th>Current / Last Activity</th>
+                  <th>Device &amp; Browser</th>
+                  <th>Visit Started</th>
+                </tr>
+              </thead>
+              <tbody id="visitorActivityTbody">
+                <tr>
+                  <td colspan="5" style="text-align:center;padding:36px;color:var(--muted)">
+                    Connecting to Cloud Firestore live session radar...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1192,45 +1341,105 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
            9. TAB: VISITOR ANALYTICS
            ============================================== -->
       <div id="tab-analytics" class="tab-content hide">
-        <div style="margin-bottom:24px">
-          <h1>Visitor Analytics</h1>
-          <p style="color:var(--muted);margin-top:4px">Audience overview, inquiry conversions, and traffic origins.</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <h1>Visitor Analytics</h1>
+            <p style="color:var(--muted);margin-top:4px">Audience overview, device breakdown, and artwork popularity derived from real visitor data.</p>
+          </div>
+          <span class="badge" style="background:#eef7f2;color:#1f8f4e;border:1px solid #c7ebd3">Real Data Live</span>
         </div>
 
+        <!-- ANALYTICS KPI CARDS -->
         <div class="stats-grid">
           <div class="stat-card">
-            <span class="stat-num">1,480</span>
-            <span class="stat-label">Total Portfolio Views</span>
+            <span class="stat-num" id="anaTotalVisitors">0</span>
+            <span class="stat-label">Total Unique Visitors</span>
           </div>
           <div class="stat-card">
-            <span class="stat-num">624</span>
-            <span class="stat-label">Unique Art Lovers</span>
+            <span class="stat-num" style="color:var(--accent)" id="anaTotalViews">0</span>
+            <span class="stat-label">Total Page &amp; Art Views</span>
           </div>
           <div class="stat-card">
-            <span class="stat-num">98</span>
-            <span class="stat-label">WhatsApp Inquiries</span>
+            <span class="stat-num" style="color:#1f8f4e" id="anaReturningRate">0%</span>
+            <span class="stat-label">Returning Visitor Rate</span>
           </div>
           <div class="stat-card">
-            <span class="stat-num" style="color:#1f8f4e">15.7%</span>
-            <span class="stat-label">Inquiry Conversion</span>
+            <span class="stat-num" id="anaAvgViews">0.0</span>
+            <span class="stat-label">Avg Views per Session</span>
           </div>
         </div>
 
+        <!-- BREAKDOWNS ROW -->
+        <div class="row2">
+          <!-- DEVICE BREAKDOWN -->
+          <div class="panel">
+            <h2>Device Distribution</h2>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Visitor distribution across hardware categories.</p>
+            <div style="display:grid;gap:16px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700">
+                  <span>📱 Mobile Phones</span>
+                  <span id="anaMobPct">0% (0)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" id="anaMobBar" style="width:0%;background:var(--accent)"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700">
+                  <span>💻 Desktop Computers</span>
+                  <span id="anaDeskPct">0% (0)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" id="anaDeskBar" style="width:0%;background:var(--ink)"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700">
+                  <span>📟 Tablets &amp; iPads</span>
+                  <span id="anaTabPct">0% (0)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" id="anaTabBar" style="width:0%;background:#8a8a78"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Operating Systems Sub-list -->
+            <h3 style="margin-top:26px;margin-bottom:12px;font-size:14px">Operating Systems</h3>
+            <div id="anaOsList" style="display:grid;gap:8px">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <!-- BROWSERS & SOFTWARE -->
+          <div class="panel">
+            <h2>Browsers &amp; Software</h2>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Web browsers used by your portfolio visitors.</p>
+            <div id="anaBrowserList" style="display:grid;gap:10px">
+              <!-- populated by JS -->
+            </div>
+
+            <h3 style="margin-top:26px;margin-bottom:12px;font-size:14px">Visitor Identity Distribution</h3>
+            <div style="display:grid;gap:10px">
+              <div style="background:var(--soft);padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:13px;font-weight:700">Google Verified Sign-ins</span>
+                <span class="badge" style="background:#e8f0fe;color:#1967d2" id="anaGoogleCount">0</span>
+              </div>
+              <div style="background:var(--soft);padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:13px;font-weight:700">Anonymous Guests</span>
+                <span class="badge" style="background:#fff;color:var(--muted)" id="anaGuestCount">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOST VIEWED ARTWORKS & PROJECTS LEADERBOARD -->
         <div class="panel">
-          <h2>Top Referral Sources</h2>
-          <div style="display:grid;gap:12px;margin-top:14px">
-            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--soft);padding:14px 18px;border-radius:12px">
-              <div><b>📸 Instagram Direct &amp; Bio Link (@fa_i_heem)</b></div>
-              <div style="font-weight:700;color:var(--accent)">54% (799 visits)</div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--soft);padding:14px 18px;border-radius:12px">
-              <div><b>💬 WhatsApp Shared Links</b></div>
-              <div style="font-weight:700;color:var(--accent)">28% (414 visits)</div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--soft);padding:14px 18px;border-radius:12px">
-              <div><b>🔍 Direct &amp; Google Search</b></div>
-              <div style="font-weight:700;color:var(--accent)">18% (267 visits)</div>
-            </div>
+          <h2>Most Viewed Artworks &amp; Projects</h2>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Ranked by actual visitor impressions and modal opens.</p>
+          <div id="anaArtLeaderboard" style="display:grid;gap:10px">
+            <div style="text-align:center;padding:24px;color:var(--muted)">Gathering artwork view analytics...</div>
           </div>
         </div>
       </div>
@@ -1728,8 +1937,449 @@ function initCloudRealtime(){
       }
     }, err => console.warn(err));
 
+    // 5. Real-time Live Visitor Radar & Analytics listener
+    initLiveSessionsListener();
+
   }catch(err){
     console.error("Firebase init error:", err);
+  }
+}
+
+/* =========================================================
+   LIVE VISITOR RADAR & ANALYTICS ENGINE
+   ========================================================= */
+let liveSessions = [];
+let currentVisitorFilter = "all";
+let liveSessionsUnsub = null;
+
+function escapeHtml(str){
+  if(str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function initLiveSessionsListener(){
+  if(!fb || !fb.db) return;
+  try {
+    if(liveSessionsUnsub) liveSessionsUnsub();
+    liveSessionsUnsub = fb.db.collection("faheemgraphy_live_sessions")
+      .orderBy("lastActive", "desc")
+      .limit(250)
+      .onSnapshot(snapshot => {
+        const list = [];
+        snapshot.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        liveSessions = list;
+        renderLiveVisitors();
+        renderVisitorAnalytics();
+      }, err => {
+        console.warn("Live sessions snapshot error:", err);
+      });
+  } catch(err) {
+    console.error("Live sessions init failed:", err);
+  }
+}
+
+// Background ticker to keep "Live Now" counts and "X mins ago" relative time fresh
+setInterval(() => {
+  if(liveSessions.length > 0){
+    renderLiveVisitors();
+  }
+}, 10000);
+
+function getSessionStatus(s, now){
+  const age = now - (s.lastActive || 0);
+  if(s.status === "left"){
+    return { label: "Left Website", class: "left", dot: "pulse-dot left", isLive: false };
+  }
+  // Online if within 65 seconds and marked online
+  if(age <= 65000 && s.status === "online"){
+    return { label: "Live Now", class: "live", dot: "pulse-dot", isLive: true };
+  }
+  // Idle if tab in background or within 3 minutes
+  if(age <= 180000){
+    return { label: "Away / Tab Idle", class: "idle", dot: "pulse-dot idle", isLive: false };
+  }
+  // Session ended
+  return { label: "Session Ended", class: "left", dot: "pulse-dot left", isLive: false };
+}
+
+function formatRelativeTime(ts){
+  if(!ts) return "Just now";
+  const now = Date.now();
+  const diffSec = Math.max(0, Math.floor((now - ts) / 1000));
+  if(diffSec < 30) return "Just now";
+  if(diffSec < 60) return `${diffSec}s ago`;
+  const diffMin = Math.floor(diffSec / 60);
+  if(diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if(diffHr < 24) return `${diffHr}h ago`;
+  return new Date(ts).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function setVisitorFilter(filter){
+  currentVisitorFilter = filter;
+  document.querySelectorAll(".visitor-filter-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.filter === filter);
+  });
+  renderLiveVisitors();
+}
+
+function renderLiveVisitors(){
+  const now = Date.now();
+  const startToday = new Date().setHours(0, 0, 0, 0);
+  const startWeek = now - 7 * 86400 * 1000;
+  const startMonth = now - 30 * 86400 * 1000;
+
+  let liveNowCount = 0;
+  const todayVids = new Set();
+  const weekVids = new Set();
+  const monthVids = new Set();
+  const allVids = new Set();
+  const returningVids = new Set();
+  let totalPageViews = 0;
+  let googleAuthCount = 0;
+  let anonCount = 0;
+  let mobileCount = 0;
+  let desktopCount = 0;
+
+  // Process all sessions
+  liveSessions.forEach(s => {
+    const st = getSessionStatus(s, now);
+    const sTime = s.startedAt || s.lastActive || 0;
+    const vid = s.visitorId || s.id;
+
+    if(st.isLive) liveNowCount++;
+    if(sTime >= startToday) todayVids.add(vid);
+    if(sTime >= startWeek) weekVids.add(vid);
+    if(sTime >= startMonth) monthVids.add(vid);
+    allVids.add(vid);
+
+    if(s.isReturning) returningVids.add(vid);
+    if(s.isAuth) googleAuthCount++; else anonCount++;
+
+    const dev = (s.device || "").toLowerCase();
+    if(dev === "mobile") mobileCount++;
+    if(dev === "desktop") desktopCount++;
+
+    const views = Number(s.pageViews) || (Array.isArray(s.pagesViewed) ? s.pagesViewed.length : 1);
+    totalPageViews += views;
+  });
+
+  // Update Metric Card DOM elements
+  if($("liveVisitorBig")) $("liveVisitorBig").textContent = liveNowCount;
+  if($("statLiveVisitors")) $("statLiveVisitors").textContent = liveNowCount;
+  if($("sideBadgeLiveVisitors")) $("sideBadgeLiveVisitors").textContent = `${liveNowCount} live`;
+  if($("liveTodayCount")) $("liveTodayCount").textContent = todayVids.size;
+  if($("liveWeekCount")) $("liveWeekCount").textContent = weekVids.size;
+  if($("liveMonthCount")) $("liveMonthCount").textContent = monthVids.size;
+  if($("liveTotalViews")) $("liveTotalViews").textContent = totalPageViews.toLocaleString();
+  if($("liveReturningCount")) $("liveReturningCount").textContent = returningVids.size;
+  if($("liveGoogleCount")) $("liveGoogleCount").textContent = googleAuthCount;
+  if($("liveAnonCount")) $("liveAnonCount").textContent = anonCount;
+
+  // Update Filter Counters
+  if($("countFilterAll")) $("countFilterAll").textContent = liveSessions.length;
+  if($("countFilterLive")) $("countFilterLive").textContent = liveNowCount;
+  if($("countFilterAuth")) $("countFilterAuth").textContent = googleAuthCount;
+  if($("countFilterMobile")) $("countFilterMobile").textContent = mobileCount;
+  if($("countFilterDesktop")) $("countFilterDesktop").textContent = desktopCount;
+
+  // Filter sessions for the activity table
+  const filtered = liveSessions.filter(s => {
+    const st = getSessionStatus(s, now);
+    if(currentVisitorFilter === "live") return st.isLive;
+    if(currentVisitorFilter === "auth") return s.isAuth === true;
+    if(currentVisitorFilter === "mobile") return (s.device || "").toLowerCase() === "mobile";
+    if(currentVisitorFilter === "desktop") return (s.device || "").toLowerCase() === "desktop";
+    return true;
+  });
+
+  const tbody = $("visitorActivityTbody");
+  if(!tbody) return;
+
+  if(!filtered.length){
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--muted)">No visitors found matching filter &quot;${currentVisitorFilter}&quot;.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(s => {
+    const st = getSessionStatus(s, now);
+    const hasPhoto = s.userPhoto && s.userPhoto.length > 5;
+    const initial = (s.userName || "A").trim().charAt(0).toUpperCase();
+
+    // Visitor identity
+    let avatarHtml = hasPhoto
+      ? `<img src="${escapeHtml(s.userPhoto)}" class="visitor-avatar" alt="User Avatar" onerror="this.outerHTML='<div class=\\'visitor-avatar\\'>${initial}</div>'">`
+      : `<div class="visitor-avatar">${initial}</div>`;
+
+    const identityBadge = s.isAuth
+      ? `<span class="badge" style="background:#e8f0fe;color:#1967d2;font-size:9.5px;padding:2px 8px;display:inline-block">Google Account</span>`
+      : `<span style="font-size:11px;color:var(--muted)">Guest</span>`;
+
+    const retBadge = s.isReturning
+      ? `<span class="badge" style="background:#f4f2ed;color:var(--accent);font-size:9.5px;padding:2px 8px;display:inline-block">Returning</span>`
+      : `<span class="badge" style="background:#f4f2ed;color:#8a8a78;font-size:9.5px;padding:2px 8px;display:inline-block">New</span>`;
+
+    const vidSnippet = (s.visitorId || s.sessionId || "").substring(0, 14);
+
+    // Current activity
+    const sectionName = escapeHtml(s.currentSection || "Home / Gallery");
+    const isArtwork = sectionName.toLowerCase().includes("artwork:");
+    const activityIcon = isArtwork ? "🎨" : (sectionName.toLowerCase().includes("about") ? "👤" : "🖼️");
+    const viewsCount = Number(s.pageViews) || (Array.isArray(s.pagesViewed) ? s.pagesViewed.length : 1);
+
+    // Device
+    const devType = s.device || "Desktop";
+    const devIcon = devType === "Mobile" ? "📱" : (devType === "Tablet" ? "📟" : "💻");
+    const browserStr = `${escapeHtml(s.browser || "Browser")} on ${escapeHtml(s.os || "OS")}`;
+
+    // Timestamp
+    const startedTime = s.startedAt ? new Date(s.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Recently";
+    const startedDate = s.startedAt ? new Date(s.startedAt).toLocaleDateString([], { month: "short", day: "numeric" }) : "";
+
+    return `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:12px">
+            ${avatarHtml}
+            <div>
+              <div style="font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px">
+                ${escapeHtml(s.userName || "Anonymous Visitor")}
+                ${identityBadge}
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+                ${retBadge}
+                <span style="font-size:11px;color:var(--muted);font-family:monospace" title="Visitor ID: ${escapeHtml(s.visitorId || '')}">${vidSnippet}</span>
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span class="${st.dot}"></span>
+            <span style="font-weight:700;font-size:12.5px">${st.label}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Active: ${formatRelativeTime(s.lastActive || s.startedAt)}</div>
+        </td>
+        <td>
+          <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px">
+            <span>${activityIcon}</span>
+            <span>${sectionName}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">
+            ${viewsCount} page ${viewsCount === 1 ? 'view' : 'views'} logged
+          </div>
+        </td>
+        <td>
+          <div style="font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px">
+            <span>${devIcon}</span>
+            <span>${devType}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${browserStr}</div>
+        </td>
+        <td>
+          <div style="font-size:12.5px;font-weight:700">${startedTime}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${startedDate || formatRelativeTime(s.startedAt)}</div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderVisitorAnalytics(){
+  const allVids = new Set();
+  const returningVids = new Set();
+  let totalViews = 0;
+  let mob = 0, desk = 0, tab = 0;
+  const osMap = {};
+  const browserMap = {};
+  const artworkViewsMap = {};
+  let googleCount = 0;
+  let guestCount = 0;
+
+  liveSessions.forEach(s => {
+    const vid = s.visitorId || s.id;
+    allVids.add(vid);
+    if(s.isReturning) returningVids.add(vid);
+
+    if(s.isAuth) googleCount++; else guestCount++;
+
+    const dev = (s.device || "Desktop").toLowerCase();
+    if(dev === "mobile") mob++;
+    else if(dev === "tablet") tab++;
+    else desk++;
+
+    const os = s.os || "Unknown OS";
+    osMap[os] = (osMap[os] || 0) + 1;
+
+    const br = s.browser || "Unknown Browser";
+    browserMap[br] = (browserMap[br] || 0) + 1;
+
+    const views = Number(s.pageViews) || (Array.isArray(s.pagesViewed) ? s.pagesViewed.length : 1);
+    totalViews += views;
+
+    // Tally artwork modal views
+    if(Array.isArray(s.pagesViewed)){
+      s.pagesViewed.forEach(p => {
+        if(typeof p === "string" && p.includes("Viewing Artwork:")){
+          const title = p.replace("Viewing Artwork:", "").trim();
+          artworkViewsMap[title] = (artworkViewsMap[title] || 0) + 1;
+        }
+      });
+    }
+    if(typeof s.currentSection === "string" && s.currentSection.includes("Viewing Artwork:")){
+      const title = s.currentSection.replace("Viewing Artwork:", "").trim();
+      artworkViewsMap[title] = (artworkViewsMap[title] || 0) + 1;
+    }
+  });
+
+  const totalSessions = liveSessions.length || 1;
+  const uniqueVisitorsCount = allVids.size;
+  const retRate = uniqueVisitorsCount > 0 ? Math.round((returningVids.size / uniqueVisitorsCount) * 100) : 0;
+  const avgViews = uniqueVisitorsCount > 0 ? (totalViews / uniqueVisitorsCount).toFixed(1) : "0.0";
+
+  // KPIs
+  if($("anaTotalVisitors")) $("anaTotalVisitors").textContent = uniqueVisitorsCount;
+  if($("anaTotalViews")) $("anaTotalViews").textContent = totalViews.toLocaleString();
+  if($("anaReturningRate")) $("anaReturningRate").textContent = `${retRate}%`;
+  if($("anaAvgViews")) $("anaAvgViews").textContent = avgViews;
+  if($("anaGoogleCount")) $("anaGoogleCount").textContent = googleCount;
+  if($("anaGuestCount")) $("anaGuestCount").textContent = guestCount;
+
+  // Devices
+  const mobPct = Math.round((mob / totalSessions) * 100);
+  const deskPct = Math.round((desk / totalSessions) * 100);
+  const tabPct = Math.max(0, 100 - mobPct - deskPct);
+
+  if($("anaMobPct")) $("anaMobPct").textContent = `${mobPct}% (${mob})`;
+  if($("anaDeskPct")) $("anaDeskPct").textContent = `${deskPct}% (${desk})`;
+  if($("anaTabPct")) $("anaTabPct").textContent = `${tabPct}% (${tab})`;
+  if($("anaMobBar")) $("anaMobBar").style.width = `${mobPct}%`;
+  if($("anaDeskBar")) $("anaDeskBar").style.width = `${deskPct}%`;
+  if($("anaTabBar")) $("anaTabBar").style.width = `${tabPct}%`;
+
+  // OS breakdown
+  const osContainer = $("anaOsList");
+  if(osContainer){
+    const sortedOs = Object.entries(osMap).sort((a,b) => b[1] - a[1]);
+    if(sortedOs.length === 0){
+      osContainer.innerHTML = `<div style="font-size:12px;color:var(--muted)">No OS records yet.</div>`;
+    } else {
+      osContainer.innerHTML = sortedOs.map(([name, count]) => {
+        const pct = Math.round((count / totalSessions) * 100);
+        return `
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700">
+              <span>${escapeHtml(name)}</span>
+              <span>${pct}% (${count})</span>
+            </div>
+            <div class="progress-track" style="height:6px">
+              <div class="progress-fill" style="width:${pct}%;background:var(--ink)"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  // Browser breakdown
+  const browserContainer = $("anaBrowserList");
+  if(browserContainer){
+    const sortedBr = Object.entries(browserMap).sort((a,b) => b[1] - a[1]);
+    if(sortedBr.length === 0){
+      browserContainer.innerHTML = `<div style="font-size:12px;color:var(--muted)">No browser records yet.</div>`;
+    } else {
+      browserContainer.innerHTML = sortedBr.map(([name, count]) => {
+        const pct = Math.round((count / totalSessions) * 100);
+        return `
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700">
+              <span>🌐 ${escapeHtml(name)}</span>
+              <span>${pct}% (${count})</span>
+            </div>
+            <div class="progress-track" style="height:6px">
+              <div class="progress-fill" style="width:${pct}%;background:var(--accent)"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  // Artwork leaderboard
+  const artContainer = $("anaArtLeaderboard");
+  if(artContainer){
+    const sortedArts = Object.entries(artworkViewsMap).sort((a,b) => b[1] - a[1]);
+    if(sortedArts.length === 0){
+      // Fallback: If no visitor has opened a modal yet, show artworks ready for views
+      if(arts && arts.length > 0){
+        artContainer.innerHTML = arts.slice(0, 5).map((a, i) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--soft);padding:12px 18px;border-radius:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-weight:700;color:var(--muted);width:24px">#${i + 1}</span>
+              <img src="${escapeHtml(a.image || 'logo.png')}" style="width:36px;height:36px;border-radius:8px;object-fit:cover" alt="">
+              <div>
+                <div style="font-weight:700;font-size:13.5px">${escapeHtml(a.title)}</div>
+                <div style="font-size:11px;color:var(--muted)">${escapeHtml(a.cat || 'Art')}</div>
+              </div>
+            </div>
+            <div class="badge" style="background:#fff;color:var(--accent)">Ready for Views</div>
+          </div>
+        `).join("");
+      } else {
+        artContainer.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted)">No artwork views recorded yet. Visitor clicks will display here in real time.</div>`;
+      }
+    } else {
+      const maxViews = sortedArts[0][1] || 1;
+      artContainer.innerHTML = sortedArts.slice(0, 10).map(([title, count], idx) => {
+        const pct = Math.round((count / maxViews) * 100);
+        const rankMedal = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : `#${idx + 1}`));
+        return `
+          <div style="background:var(--soft);padding:12px 18px;border-radius:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-weight:700;width:24px">${rankMedal}</span>
+                <span style="font-weight:700;font-size:13.5px">${escapeHtml(title)}</span>
+              </div>
+              <span style="font-size:12px;font-weight:700;color:var(--accent)">${count} views</span>
+            </div>
+            <div class="progress-track" style="height:6px">
+              <div class="progress-fill" style="width:${pct}%;background:var(--accent)"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+}
+
+async function cleanExpiredSessions(){
+  if(!fb || !fb.db) return;
+  const cutoff = Date.now() - 48 * 3600 * 1000;
+  const expired = liveSessions.filter(s => (s.lastActive || s.startedAt || 0) < cutoff);
+  if(expired.length === 0){
+    toast("No expired sessions found (> 48 hours old).");
+    return;
+  }
+  if(!confirm(`Clean up ${expired.length} expired visitor sessions older than 48 hours?`)) return;
+
+  try {
+    const batch = fb.db.batch();
+    expired.forEach(s => {
+      const ref = fb.db.collection("faheemgraphy_live_sessions").doc(s.id);
+      batch.delete(ref);
+    });
+    await batch.commit();
+    toast(`Successfully purged ${expired.length} old sessions!`);
+  } catch(err) {
+    console.error("Cleanup error:", err);
+    toast("Cleanup error: " + err.message);
   }
 }
 
