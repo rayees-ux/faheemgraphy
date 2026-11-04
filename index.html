@@ -1826,6 +1826,18 @@ async function sendCustom(e, ig){
       await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderDoc);
       registerCustomerOrder(orderRef);
       toast(`Custom order ${orderRef} recorded in studio dashboard! ✨`);
+      // Dispatch Real-time notification to Admin Portal
+      sendNotificationToAdmin({
+        type: "order",
+        title: "🛍️ New customized artwork request",
+        message: `New custom order #${orderRef} (${type}) from ${name || 'Customer'}`,
+        targetId: orderRef,
+        targetTab: "orders",
+        orderRef: orderRef,
+        customerName: name,
+        artworkTitle: `Custom: ${type}`,
+        artworkImage: homeCustomRefData || null
+      });
     } catch(err){
       console.warn("Could not save custom order doc:", err);
     }
@@ -1853,6 +1865,41 @@ let currentReplyingCommentId = null;
 let currentReplyingCommentAuthor = null;
 let currentOrderArtwork = null;
 let currentRefImageData = null;
+
+// Real-Time Notification Dispatcher to Admin Dashboard
+async function sendNotificationToAdmin({ type, title, message, targetId, targetTab, customerName, artworkTitle, artworkImage, orderRef }){
+  try {
+    const fb = initFirebase();
+    if(!fb || !fb.db) return;
+
+    let resolvedName = customerName;
+    if(!resolvedName && currentVisitorAuth && currentVisitorAuth.displayName){
+      resolvedName = currentVisitorAuth.displayName;
+    }
+    if(!resolvedName){
+      const saved = localStorage.getItem("fg_visitor_name");
+      if(saved) resolvedName = saved;
+    }
+
+    const notif = {
+      type: type || "general",
+      title: title || "New Notification",
+      message: message || "",
+      targetId: targetId ? String(targetId) : null,
+      targetTab: targetTab || "dashboard",
+      customerName: resolvedName || null,
+      artworkTitle: artworkTitle || null,
+      artworkImage: artworkImage || null,
+      orderRef: orderRef || null,
+      read: false,
+      createdAt: Date.now()
+    };
+
+    await fb.db.collection("faheemgraphy_notifications").add(notif);
+  } catch(err){
+    console.warn("Could not dispatch notification:", err);
+  }
+}
 
 // 1. LIKES SYSTEM
 function initLikesListener(){
@@ -1926,7 +1973,17 @@ function toggleLike(artworkId, event){
     likesMap[aid] = Math.max(0, (likesMap[aid] || 1) - 1);
     updateAllLikeBadges();
     renderModalLikeState();
-    fb.db.collection("faheemgraphy_likes").doc(docId).delete().catch(err => console.warn(err));
+    fb.db.collection("faheemgraphy_likes").doc(docId).delete().then(() => {
+      sendNotificationToAdmin({
+        type: "unlike",
+        title: "🤍 Artwork unliked",
+        message: `Someone unliked "${a ? a.title : 'artwork'}"`,
+        targetId: aid,
+        targetTab: "likes",
+        artworkTitle: a ? a.title : "Artwork",
+        artworkImage: a ? a.img : ""
+      });
+    }).catch(err => console.warn(err));
   } else {
     visitorLikes.add(aid);
     likesMap[aid] = (likesMap[aid] || 0) + 1;
@@ -1946,6 +2003,16 @@ function toggleLike(artworkId, event){
     fb.db.collection("faheemgraphy_likes").doc(docId).set(likeDoc).then(() => {
       toast(`Liked "${a ? a.title : 'artwork'}" ❤️`);
       trackVisitorActivity("Liked Artwork: " + (a ? a.title : aid), true);
+      sendNotificationToAdmin({
+        type: "like",
+        title: "❤️ Someone liked your artwork",
+        message: `${likeDoc.userName !== 'Anonymous Art Lover' ? likeDoc.userName : 'Someone'} liked "${a ? a.title : 'artwork'}"`,
+        targetId: aid,
+        targetTab: "likes",
+        customerName: likeDoc.userName !== 'Anonymous Art Lover' ? likeDoc.userName : null,
+        artworkTitle: a ? a.title : "Artwork",
+        artworkImage: a ? a.img : ""
+      });
     }).catch(err => console.warn(err));
   }
 }
@@ -2185,9 +2252,36 @@ async function submitComment(e){
   try {
     await fb.db.collection("faheemgraphy_comments").add(commentData);
     $("commentTextInput").value = "";
+    const wasReply = !!commentData.replyToId;
+    const repliedTo = commentData.replyToAuthor;
     cancelReply();
     toast("Comment posted! ✨");
     trackVisitorActivity("Commented on Artwork: " + (a ? a.title : aid), true);
+
+    // Send instant notification to Admin
+    if(wasReply){
+      sendNotificationToAdmin({
+        type: "reply",
+        title: "💬 Customer replied to a comment",
+        message: `${authorName} replied to @${repliedTo} on "${a ? a.title : 'artwork'}"`,
+        targetId: aid,
+        targetTab: "comments",
+        customerName: authorName !== 'Art Lover' ? authorName : null,
+        artworkTitle: a ? a.title : "Artwork",
+        artworkImage: a ? a.img : ""
+      });
+    } else {
+      sendNotificationToAdmin({
+        type: "comment",
+        title: `💬 New comment on ${a ? a.title : 'artwork'}`,
+        message: `${authorName} commented on "${a ? a.title : 'artwork'}": "${text.substring(0, 55)}${text.length > 55 ? '...' : ''}"`,
+        targetId: aid,
+        targetTab: "comments",
+        customerName: authorName !== 'Art Lover' ? authorName : null,
+        artworkTitle: a ? a.title : "Artwork",
+        artworkImage: a ? a.img : ""
+      });
+    }
   } catch(err){
     console.error("Comment submit error:", err);
     toast("Failed to post comment: " + err.message);
@@ -2338,6 +2432,19 @@ async function handleOrderSubmit(e){
 
     toast(`Order ${orderRef} submitted successfully! 🎉`);
     trackVisitorActivity("Submitted Artwork Order: " + orderRef + " (" + a.title + ")", true);
+
+    // Dispatch Real-time Notification to Admin Portal
+    sendNotificationToAdmin({
+      type: "order",
+      title: "🛍️ New artwork order received!",
+      message: `Order #${orderRef} received for "${a.title}" from ${customerName || 'Customer'}`,
+      targetId: orderRef,
+      targetTab: "orders",
+      orderRef: orderRef,
+      customerName: customerName,
+      artworkTitle: a.title,
+      artworkImage: a.img || ""
+    });
   } catch(err){
     console.error("Order error:", err);
     toast("Order submission error: " + err.message);
@@ -2657,14 +2764,49 @@ function renderMyOrders(){
 
         ${adminNoteBlock}
 
-        <div class="my-order-actions">
+        <div class="my-order-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
           <a href="${waLink}" target="_blank" rel="noopener" class="btn wa" style="padding:7px 14px;font-size:11px;display:inline-flex;align-items:center;gap:6px">
             <span>💬</span> Inquire on WhatsApp
           </a>
+          ${(!rawStatus.includes('cancel') && !rawStatus.includes('deliver')) ? `
+            <button type="button" class="btn line sm" onclick="customerCancelOrder('${ref}')" style="padding:6px 12px;font-size:11px;color:var(--danger);border-color:#f1b0b0" title="Cancel this order">
+              Cancel Order
+            </button>
+          ` : ''}
         </div>
       </div>
     `;
   }).join("");
+}
+
+async function customerCancelOrder(ref){
+  if(!confirm(`Are you sure you want to cancel order #${ref}?`)) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    await fb.db.collection("faheemgraphy_orders").doc(ref).update({
+      status: "Cancelled",
+      cancelledAt: Date.now(),
+      cancelledBy: "Customer"
+    });
+    if(myOrdersMap[ref]){
+      myOrdersMap[ref].status = "Cancelled";
+      renderMyOrders();
+    }
+    toast(`Order #${ref} has been cancelled.`);
+    // Send instant notification to Admin!
+    sendNotificationToAdmin({
+      type: "order_cancel",
+      title: "⚠️ Customer cancelled an order",
+      message: `Customer cancelled artwork order #${ref}`,
+      targetId: ref,
+      targetTab: "orders",
+      orderRef: ref
+    });
+  } catch(err){
+    console.error("Cancel order error:", err);
+    toast("Could not cancel order: " + err.message);
+  }
 }
 
 function showZoom(src){

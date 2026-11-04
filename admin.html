@@ -1073,6 +1073,364 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
   border-radius: 10px;
   gap: 12px;
 }
+
+/* =========================================================
+   ADMIN REAL-TIME NOTIFICATIONS SYSTEM
+   ========================================================= */
+.admin-notif-wrap{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+}
+.admin-notif-bell-btn{
+  position:relative;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--ink);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:all .18s ease;
+}
+.admin-notif-bell-btn:hover{
+  background:var(--soft);
+  color:var(--accent);
+  border-color:var(--accent);
+}
+.admin-notif-badge{
+  position:absolute;
+  top:-2px;
+  right:-2px;
+  background:#dc2626;
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  min-width:18px;
+  height:18px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 4px;
+  box-shadow:0 0 0 2px #fff;
+  animation:notifBadgePulse 2s infinite;
+}
+@keyframes notifBadgePulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+  100%{transform:scale(1)}
+}
+
+/* Dropdown Window */
+.admin-notif-dropdown{
+  position:absolute;
+  top:calc(100% + 12px);
+  right:0;
+  width:380px;
+  max-width:calc(100vw - 20px);
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 14px 40px rgba(0,0,0,0.14);
+  z-index:99999;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+  animation:notifDropIn .2s cubic-bezier(0.16,1,0.3,1);
+}
+.admin-notif-dropdown.show{
+  display:flex;
+}
+@keyframes notifDropIn{
+  from{opacity:0;transform:translateY(-8px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.notif-dropdown-header{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#faf9f6;
+}
+.notif-dropdown-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink);
+}
+.notif-unread-pill{
+  font-size:10.5px;
+  background:#fdf2f2;
+  color:#dc2626;
+  padding:2px 8px;
+  border-radius:999px;
+  font-weight:700;
+  font-family:sans-serif;
+}
+.notif-dropdown-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.notif-btn-action{
+  background:transparent;
+  border:0;
+  color:var(--accent);
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  padding:4px 7px;
+  border-radius:5px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  transition:background .15s ease;
+}
+.notif-btn-action:hover{
+  background:rgba(200,100,60,0.1);
+}
+.notif-dropdown-list{
+  max-height:380px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+.notif-item{
+  padding:12px 14px;
+  border-bottom:1px solid #f2f1ec;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  cursor:pointer;
+  transition:background .15s ease;
+  position:relative;
+  text-decoration:none;
+  color:inherit;
+}
+.notif-item:hover{
+  background:#faf8f5;
+}
+.notif-item.unread{
+  background:#fffaf6;
+}
+.notif-item.unread::before{
+  content:'';
+  position:absolute;
+  left:4px;
+  top:50%;
+  transform:translateY(-50%);
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--accent);
+}
+.notif-icon-wrap{
+  width:34px;
+  height:34px;
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  flex-shrink:0;
+}
+.notif-icon-wrap.type-like{background:#fdf2f2;color:#e74c3c}
+.notif-icon-wrap.type-unlike{background:#f4f2ed;color:#8a8a78}
+.notif-icon-wrap.type-comment{background:#eff6ff;color:#2563eb}
+.notif-icon-wrap.type-reply{background:#f5f3ff;color:#7c3aed}
+.notif-icon-wrap.type-order{background:#eef7f2;color:#1f8f4e}
+.notif-icon-wrap.type-order_cancel{background:#fef2f2;color:#dc2626}
+
+.notif-content{
+  flex:1;
+  min-width:0;
+}
+.notif-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  margin-bottom:2px;
+}
+.notif-title-text{
+  font-size:12px;
+  font-weight:700;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-time{
+  font-size:10px;
+  color:var(--muted);
+  white-space:nowrap;
+  font-family:sans-serif;
+}
+.notif-msg-text{
+  font-size:11.5px;
+  color:#555;
+  line-height:1.4;
+  margin-bottom:4px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-meta-tags{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  font-family:sans-serif;
+}
+.notif-meta-pill{
+  background:#f0ede6;
+  color:#555;
+  padding:2px 6px;
+  border-radius:4px;
+}
+.notif-thumb{
+  width:34px;
+  height:34px;
+  border-radius:6px;
+  object-fit:cover;
+  border:1px solid var(--line);
+  flex-shrink:0;
+}
+.notif-dropdown-footer{
+  padding:10px 14px;
+  background:#faf9f6;
+  border-top:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.notif-footer-link{
+  background:none;
+  border:0;
+  color:var(--accent);
+  font-size:11.5px;
+  font-weight:700;
+  cursor:pointer;
+  padding:4px 0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-footer-clear{
+  background:none;
+  border:0;
+  color:var(--muted);
+  font-size:11px;
+  cursor:pointer;
+  padding:4px 0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-footer-clear:hover{color:#dc2626}
+
+/* Dedicated Notification Center Styles */
+.notif-filter-bar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.notif-tab-btn{
+  padding:8px 16px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--ink);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:all .15s ease;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-tab-btn:hover{
+  background:var(--soft);
+  border-color:var(--accent);
+}
+.notif-tab-btn.active{
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink);
+}
+.notif-tab-btn .badge-pill{
+  background:rgba(0,0,0,.08);
+  padding:1px 6px;
+  border-radius:10px;
+  font-size:10px;
+}
+.notif-tab-btn.active .badge-pill{
+  background:rgba(255,255,255,.2);
+  color:#fff;
+}
+.notif-full-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px 18px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  transition:all .18s ease;
+  position:relative;
+}
+.notif-full-card:hover{
+  box-shadow:0 6px 20px rgba(0,0,0,.04);
+  border-color:#dcd8ce;
+}
+.notif-full-card.unread{
+  border-left:4px solid var(--accent);
+  background:linear-gradient(180deg, #fffcf9 0%, #ffffff 100%);
+}
+.notif-full-body{
+  flex:1;
+  min-width:0;
+}
+.notif-full-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:6px;
+}
+.notif-full-title{
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-full-message{
+  font-size:13px;
+  color:#444;
+  line-height:1.5;
+  margin-bottom:10px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.notif-full-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
 </style>
 </head>
 <body>
@@ -1227,6 +1585,15 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
 
       <div class="nav-section-label">Orders &amp; Interactions</div>
 
+      <!-- Notifications Center -->
+      <button class="nav-item" data-tab="notifications" onclick="switchTab('notifications')" title="Notifications Center">
+        <span class="nav-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        </span>
+        <span class="nav-label">Notifications</span>
+        <span class="nav-badge" id="sideBadgeNotifications" style="background:#fdf2f2;color:var(--danger);display:none">0</span>
+      </button>
+
       <!-- Live Orders -->
       <button class="nav-item" data-tab="orders" onclick="switchTab('orders')" title="Live Orders">
         <span class="nav-icon">
@@ -1341,6 +1708,37 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         </div>
       </div>
       <div class="header-right">
+        <!-- Live Notification Bell & Dropdown -->
+        <div class="admin-notif-wrap" id="adminNotifWrap">
+          <button type="button" class="admin-notif-bell-btn" id="adminNotifBellBtn" onclick="toggleNotifDropdown(event)" aria-label="Notifications" title="Live Studio Notifications">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span class="admin-notif-badge" id="adminNotifBadge" style="display:none">0</span>
+          </button>
+          
+          <!-- Dropdown Window -->
+          <div class="admin-notif-dropdown" id="adminNotifDropdown">
+            <div class="notif-dropdown-header">
+              <div class="notif-dropdown-title">
+                <span>🔔 Notifications</span>
+                <span class="notif-unread-pill" id="notifDropdownUnreadCount">0 new</span>
+              </div>
+              <div class="notif-dropdown-actions">
+                <button type="button" class="notif-btn-action" onclick="toggleSoundFromDropdown()" id="dropdownSoundToggleBtn" title="Toggle notification sound">🔔 Sound ON</button>
+                <button type="button" class="notif-btn-action" onclick="markAllNotificationsAsRead()" title="Mark all as read">Mark all read</button>
+              </div>
+            </div>
+            <div class="notif-dropdown-list" id="notifDropdownList">
+              <div style="text-align:center;padding:28px 16px;color:var(--muted);font-size:12px">
+                Listening for live notifications...
+              </div>
+            </div>
+            <div class="notif-dropdown-footer">
+              <button type="button" class="notif-footer-link" onclick="switchTab('notifications');closeNotifDropdown()">Open Notification Center →</button>
+              <button type="button" class="notif-footer-clear" onclick="clearAllNotifications()">Clear All</button>
+            </div>
+          </div>
+        </div>
+
         <span class="badge" id="adminCloudStatus" style="background:#eef7f2;color:#1f8f4e;display:inline-flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e"></span> Cloud Live</span>
         <a class="btn line sm" href="./" target="_blank" rel="noopener"><span>View Portfolio</span> ↗</a>
       </div>
@@ -1940,6 +2338,121 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
       </div>
 
       <!-- ==============================================
+           TAB: NOTIFICATIONS CENTER
+           ============================================== -->
+      <div id="tab-notifications" class="tab-content hide">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <h1>Notifications Center</h1>
+            <p style="color:var(--muted);margin-top:4px">Real-time studio alerts for customer likes, comments, replies, artwork orders, and cancellations.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button type="button" class="btn sm line" id="notifCenterSoundBtn" onclick="toggleSoundFromDropdown()" style="display:inline-flex;align-items:center;gap:6px">
+              <span id="notifCenterSoundIcon">🔔</span>
+              <span id="notifCenterSoundText">Sound ON</span>
+            </button>
+            <button type="button" class="btn sm" onclick="markAllNotificationsAsRead()" style="background:var(--accent);color:#fff">
+              ✓ Mark All Read
+            </button>
+            <button type="button" class="btn sm line" onclick="clearAllNotifications()" style="color:var(--danger);border-color:#f8d7da">
+              🧹 Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- Notification Stat Cards -->
+        <div class="stats-grid" style="margin-bottom:24px">
+          <div class="stat-card" style="border-left:4px solid var(--accent)">
+            <span class="stat-num" id="notifKpiTotal">0</span>
+            <span class="stat-label">Total Notifications</span>
+          </div>
+          <div class="stat-card" style="border-left:4px solid #dc2626">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="stat-num" style="color:#dc2626" id="notifKpiUnread">0</span>
+              <span class="pulse-dot" id="notifKpiPulse" style="display:none"></span>
+            </div>
+            <span class="stat-label">Unread Alerts</span>
+          </div>
+          <div class="stat-card" style="border-left:4px solid #1f8f4e">
+            <span class="stat-num" style="color:#1f8f4e" id="notifKpiOrders">0</span>
+            <span class="stat-label">Artwork Orders</span>
+          </div>
+          <div class="stat-card" style="border-left:4px solid #2563eb">
+            <span class="stat-num" style="color:#2563eb" id="notifKpiSocial">0</span>
+            <span class="stat-label">Likes &amp; Comments</span>
+          </div>
+        </div>
+
+        <!-- Sound & Alert Preferences Quick Bar -->
+        <div class="panel" style="margin-bottom:24px;padding:18px 22px;background:linear-gradient(135deg, #ffffff 0%, #faf8f5 100%)">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#fef3eb;color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px">
+                🔔
+              </div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--ink)">Real-Time Notification Chimes</div>
+                <div style="font-size:12px;color:var(--muted)">Plays a gentle double chime when new customer orders, comments, or likes arrive.</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <label style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;cursor:pointer">
+                <input type="checkbox" id="notifSoundToggleInput" onchange="handleSoundToggleChange(this.checked)" checked style="width:16px;height:16px;accent-color:var(--accent)">
+                <span>Enable Chime Sound</span>
+              </label>
+              <div style="display:inline-flex;align-items:center;gap:8px;font-size:12px">
+                <span style="color:var(--muted)">Volume:</span>
+                <input type="range" id="notifVolumeSlider" min="0" max="1" step="0.05" value="0.75" oninput="handleVolumeSliderChange(this.value)" style="width:100px;accent-color:var(--accent)">
+                <span id="notifVolumeLabel" style="font-weight:700;min-width:34px">75%</span>
+              </div>
+              <button type="button" class="btn sm line" onclick="testNotificationSound()" style="font-size:11.5px;padding:5px 12px">
+                🔊 Test Chime
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Notification Stream Panel -->
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+            <!-- Filter Pills -->
+            <div class="notif-filter-bar" style="margin-bottom:0">
+              <button type="button" class="notif-tab-btn active" data-filter="all" onclick="filterNotifications('all')">
+                All <span class="badge-pill" id="filterCountAll">0</span>
+              </button>
+              <button type="button" class="notif-tab-btn" data-filter="orders" onclick="filterNotifications('orders')">
+                🛍️ Orders <span class="badge-pill" id="filterCountOrders">0</span>
+              </button>
+              <button type="button" class="notif-tab-btn" data-filter="comments" onclick="filterNotifications('comments')">
+                💬 Comments <span class="badge-pill" id="filterCountComments">0</span>
+              </button>
+              <button type="button" class="notif-tab-btn" data-filter="likes" onclick="filterNotifications('likes')">
+                ❤️ Likes <span class="badge-pill" id="filterCountLikes">0</span>
+              </button>
+              <button type="button" class="notif-tab-btn" data-filter="unread" onclick="filterNotifications('unread')">
+                🔴 Unread <span class="badge-pill" id="filterCountUnread">0</span>
+              </button>
+            </div>
+
+            <!-- Search Filter -->
+            <div style="position:relative;min-width:220px">
+              <input type="text" id="notifSearchInput" placeholder="Search notifications..." oninput="handleNotifSearch(this.value)" style="width:100%;padding:7px 12px 7px 32px;font-size:12px;border:1px solid var(--line);border-radius:20px;background:#fff">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+          </div>
+
+          <!-- Notification Cards List -->
+          <div id="adminNotificationsFullList" style="display:flex;flex-direction:column;gap:10px">
+            <div style="text-align:center;padding:48px 16px;color:var(--muted)">
+              <div style="font-size:36px;margin-bottom:8px">🔔</div>
+              <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:4px">Connecting to Live Notifications...</div>
+              <div style="font-size:12.5px">Customer likes, comments, and orders will sync here automatically without refreshing.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
            8. TAB: LIVE VISITORS
            ============================================== -->
       <div id="tab-visitors" class="tab-content hide">
@@ -2231,6 +2744,39 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
             <div style="background:var(--soft);padding:18px;border-radius:14px">
               <div style="font-weight:700;font-size:13px;margin-bottom:4px">Default Password Security</div>
               <div style="font-size:12px;color:var(--muted)">No default password hints are ever displayed on public or login screens.</div>
+            </div>
+          </div>
+
+          <!-- Live Notification & Sound Alerts Panel -->
+          <div class="panel" style="grid-column: 1 / -1; margin-top: 18px">
+            <h2>Live Notification &amp; Sound Alerts</h2>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Configure real-time chime sounds, volume, and event alerts for customer orders, comments, and likes.</p>
+            
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;margin-bottom:18px">
+              <div style="background:var(--soft);padding:18px;border-radius:14px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                  <span style="font-weight:700;font-size:13.5px">Notification Chime Sound</span>
+                  <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+                    <input type="checkbox" id="settingsSoundToggle" onchange="handleSoundToggleChange(this.checked)" checked style="width:18px;height:18px;accent-color:var(--accent)">
+                    <span id="settingsSoundToggleText" style="font-size:12px;font-weight:700;color:var(--accent)">ON</span>
+                  </label>
+                </div>
+                <div style="font-size:12px;color:var(--muted)">Play a soft acoustic chime when genuine customer likes, comments, or orders arrive.</div>
+              </div>
+
+              <div style="background:var(--soft);padding:18px;border-radius:14px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                  <span style="font-weight:700;font-size:13.5px">Alert Volume</span>
+                  <span id="settingsVolumeLabel" style="font-weight:700;font-size:13px;color:var(--accent)">75%</span>
+                </div>
+                <input type="range" id="settingsVolumeSlider" min="0" max="1" step="0.05" value="0.75" oninput="handleVolumeSliderChange(this.value)" style="width:100%;accent-color:var(--accent);margin-top:6px">
+                <div style="font-size:11.5px;color:var(--muted);margin-top:4px">Adjust audio volume to match your workspace environment.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <button type="button" class="btn dark sm" onclick="testNotificationSound()">🔊 Test Notification Chime</button>
+              <button type="button" class="btn line sm" onclick="switchTab('notifications')">Open Notifications Center →</button>
             </div>
           </div>
         </div>
@@ -2707,6 +3253,7 @@ async function init(){
   }catch(e){}
 
   if(!cats || !cats.length) cats = [...DEFAULT_CATS];
+  updateSoundUI();
 
   // Initialize Firebase Cloud Connection
   initCloudRealtime();
@@ -2778,6 +3325,9 @@ function initCloudRealtime(){
 
     // 8. Real-time Artwork Likes listener
     initAdminLikesListener();
+
+    // 9. Real-time Live Notifications listener
+    initAdminNotificationsListener();
 
   }catch(err){
     console.error("Firebase init error:", err);
@@ -4243,6 +4793,575 @@ function renderAdminLikes(){
         `;
       }).join("");
     }
+  }
+}
+
+/* =========================================================
+   REAL-TIME NOTIFICATIONS ENGINE & AUDIO CHIME SYSTEM
+   ========================================================= */
+let adminNotifications = [];
+let adminNotificationsUnsub = null;
+let notifsInitialLoaded = false;
+const adminDashboardStartTime = Date.now();
+let currentNotifFilter = "all";
+let currentNotifSearch = "";
+let notifAudioContext = null;
+
+// Sound settings helpers
+function getNotifSoundEnabled(){
+  return localStorage.getItem("fg_notif_sound_enabled") !== "0";
+}
+
+function getNotifVolume(){
+  const val = parseFloat(localStorage.getItem("fg_notif_volume"));
+  return isNaN(val) ? 0.75 : Math.max(0, Math.min(1, val));
+}
+
+function getNotifAudioContext(){
+  if(!notifAudioContext){
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(AudioCtx) notifAudioContext = new AudioCtx();
+  }
+  if(notifAudioContext && notifAudioContext.state === "suspended"){
+    notifAudioContext.resume().catch(()=>{});
+  }
+  return notifAudioContext;
+}
+
+// Unlock audio on first user interaction with dashboard
+['click', 'keydown', 'touchstart'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    getNotifAudioContext();
+  }, { once: true, passive: true });
+});
+
+function playNotificationSound(type = "default"){
+  if(!getNotifSoundEnabled()) return;
+  const vol = getNotifVolume();
+  if(vol <= 0) return;
+
+  try {
+    const ctx = getNotifAudioContext();
+    if(!ctx) return;
+    if(ctx.state === "suspended") ctx.resume();
+
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(vol * 0.35, now);
+    master.connect(ctx.destination);
+
+    // Dynamic musical tones for different triggers
+    let notes = [587.33, 880]; // D5 -> A5
+    if(type === 'order' || type === 'order_cancel'){
+      // Majestic ascending chime for artwork orders
+      notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    } else if(type === 'like' || type === 'unlike'){
+      // Pleasant twin-bell for hearts
+      notes = [659.25, 880]; // E5 -> A5
+    } else if(type === 'comment' || type === 'reply'){
+      // Warm glass chime for conversation
+      notes = [587.33, 783.99, 987.77]; // D5 -> G5 -> B5
+    }
+
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+
+      gain.gain.setValueAtTime(0, now + idx * 0.09);
+      gain.gain.linearRampToValueAtTime(1, now + idx * 0.09 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.36);
+
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now + idx * 0.09);
+      osc.stop(now + idx * 0.09 + 0.38);
+    });
+  } catch(e){
+    console.warn("Notification sound warning:", e);
+  }
+}
+
+function handleSoundToggleChange(enabled){
+  localStorage.setItem("fg_notif_sound_enabled", enabled ? "1" : "0");
+  updateSoundUI();
+  if(enabled) playNotificationSound("like");
+}
+
+function handleVolumeSliderChange(val){
+  const num = parseFloat(val);
+  localStorage.setItem("fg_notif_volume", String(num));
+  updateSoundUI();
+}
+
+function toggleSoundFromDropdown(){
+  const current = getNotifSoundEnabled();
+  handleSoundToggleChange(!current);
+}
+
+function testNotificationSound(){
+  getNotifAudioContext();
+  playNotificationSound("order");
+  toast("🔔 Playing test notification chime!");
+}
+
+function updateSoundUI(){
+  const enabled = getNotifSoundEnabled();
+  const vol = getNotifVolume();
+  const pctStr = Math.round(vol * 100) + "%";
+
+  // Dropdown toggle button
+  const ddBtn = $("dropdownSoundToggleBtn");
+  if(ddBtn){
+    ddBtn.textContent = enabled ? "🔔 Sound ON" : "🔕 Muted";
+    ddBtn.style.color = enabled ? "var(--accent)" : "var(--muted)";
+  }
+
+  // Notif center top button
+  const centerBtn = $("notifCenterSoundBtn");
+  const centerIcon = $("notifCenterSoundIcon");
+  const centerText = $("notifCenterSoundText");
+  if(centerBtn){
+    if(centerIcon) centerIcon.textContent = enabled ? "🔔" : "🔕";
+    if(centerText) centerText.textContent = enabled ? "Sound ON" : "Muted";
+    centerBtn.style.borderColor = enabled ? "var(--accent)" : "var(--line)";
+  }
+
+  // Checkboxes & sliders
+  if($("notifSoundToggleInput")) $("notifSoundToggleInput").checked = enabled;
+  if($("settingsSoundToggle")) $("settingsSoundToggle").checked = enabled;
+  if($("settingsSoundToggleText")){
+    $("settingsSoundToggleText").textContent = enabled ? "ON" : "OFF";
+    $("settingsSoundToggleText").style.color = enabled ? "var(--accent)" : "var(--muted)";
+  }
+
+  if($("notifVolumeSlider")) $("notifVolumeSlider").value = vol;
+  if($("settingsVolumeSlider")) $("settingsVolumeSlider").value = vol;
+  if($("notifVolumeLabel")) $("notifVolumeLabel").textContent = pctStr;
+  if($("settingsVolumeLabel")) $("settingsVolumeLabel").textContent = pctStr;
+}
+
+// Dropdown Toggling
+function toggleNotifDropdown(e){
+  if(e){
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const dd = $("adminNotifDropdown");
+  if(!dd) return;
+  const isShown = dd.classList.contains("show");
+  if(isShown){
+    closeNotifDropdown();
+  } else {
+    dd.classList.add("show");
+    renderNotificationsUI();
+  }
+}
+
+function closeNotifDropdown(){
+  $("adminNotifDropdown")?.classList.remove("show");
+}
+
+document.addEventListener("click", e => {
+  const wrap = $("adminNotifWrap");
+  if(wrap && !wrap.contains(e.target)){
+    closeNotifDropdown();
+  }
+});
+
+// Relative time formatting
+function formatNotifTime(ts){
+  if(!ts) return "Just now";
+  const diff = Date.now() - ts;
+  if(diff < 60000) return "Just now";
+  if(diff < 3600000) return Math.floor(diff / 60000) + "m ago";
+  if(diff < 86400000) return Math.floor(diff / 3600000) + "h ago";
+  if(diff < 604800000) return Math.floor(diff / 86400000) + "d ago";
+  return new Date(ts).toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+// Icon and styling helper
+function getNotifTypeMeta(type){
+  switch(type){
+    case "order":
+      return { icon: "🛍️", cls: "type-order", label: "Artwork Order" };
+    case "order_cancel":
+      return { icon: "⚠️", cls: "type-order_cancel", label: "Order Cancelled" };
+    case "comment":
+      return { icon: "💬", cls: "type-comment", label: "Comment" };
+    case "reply":
+      return { icon: "↩️", cls: "type-reply", label: "Reply" };
+    case "like":
+      return { icon: "❤️", cls: "type-like", label: "Artwork Like" };
+    case "unlike":
+      return { icon: "🤍", cls: "type-unlike", label: "Unliked" };
+    default:
+      return { icon: "🔔", cls: "type-comment", label: "Alert" };
+  }
+}
+
+// Firestore Listener
+function initAdminNotificationsListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    console.warn("Firebase not ready for notifications");
+    return;
+  }
+  if(adminNotificationsUnsub){
+    try{ adminNotificationsUnsub(); }catch(e){}
+  }
+
+  adminNotificationsUnsub = fb.db.collection("faheemgraphy_notifications")
+    .orderBy("createdAt", "desc")
+    .limit(100)
+    .onSnapshot(snapshot => {
+      const docs = [];
+      snapshot.forEach(doc => {
+        docs.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Sound and live toast for genuinely NEW events
+      if(notifsInitialLoaded){
+        snapshot.docChanges().forEach(change => {
+          if(change.type === "added"){
+            const d = { id: change.doc.id, ...change.doc.data() };
+            // Play sound and toast only if created very recently
+            if(d.createdAt && d.createdAt >= adminDashboardStartTime - 3000){
+              playNotificationSound(d.type);
+              const meta = getNotifTypeMeta(d.type);
+              toast(`${meta.icon} ${d.title}: ${d.message}`);
+            }
+          }
+        });
+      } else {
+        notifsInitialLoaded = true;
+      }
+
+      adminNotifications = docs;
+      updateSoundUI();
+      renderNotificationsUI();
+    }, err => {
+      console.warn("Notifications listener error:", err);
+    });
+}
+
+function renderNotificationsUI(){
+  const notifs = adminNotifications || [];
+  const unreadList = notifs.filter(n => !n.read);
+  const unreadCount = unreadList.length;
+
+  // 1. Update Top Bar Bell Badge
+  const bellBadge = $("adminNotifBadge");
+  if(bellBadge){
+    if(unreadCount > 0){
+      bellBadge.textContent = unreadCount > 99 ? "99+" : unreadCount;
+      bellBadge.style.display = "flex";
+    } else {
+      bellBadge.style.display = "none";
+    }
+  }
+
+  // 2. Update Sidebar Badge
+  const sideBadge = $("sideBadgeNotifications");
+  if(sideBadge){
+    if(unreadCount > 0){
+      sideBadge.textContent = unreadCount;
+      sideBadge.style.display = "inline-block";
+    } else {
+      sideBadge.style.display = "none";
+    }
+  }
+
+  // 3. Update Dropdown Header Unread Pill
+  const ddPill = $("notifDropdownUnreadCount");
+  if(ddPill){
+    ddPill.textContent = unreadCount + " new";
+    ddPill.style.display = unreadCount > 0 ? "inline-block" : "none";
+  }
+
+  // 4. Update Notifications Center KPIs
+  if($("notifKpiTotal")) $("notifKpiTotal").textContent = notifs.length;
+  if($("notifKpiUnread")) $("notifKpiUnread").textContent = unreadCount;
+  if($("notifKpiPulse")) $("notifKpiPulse").style.display = unreadCount > 0 ? "inline-block" : "none";
+  
+  const ordersCount = notifs.filter(n => n.type === 'order' || n.type === 'order_cancel').length;
+  const commentsCount = notifs.filter(n => n.type === 'comment' || n.type === 'reply').length;
+  const likesCount = notifs.filter(n => n.type === 'like' || n.type === 'unlike').length;
+  
+  if($("notifKpiOrders")) $("notifKpiOrders").textContent = ordersCount;
+  if($("notifKpiSocial")) $("notifKpiSocial").textContent = commentsCount + likesCount;
+
+  // Filter badges in Notification Center
+  if($("filterCountAll")) $("filterCountAll").textContent = notifs.length;
+  if($("filterCountOrders")) $("filterCountOrders").textContent = ordersCount;
+  if($("filterCountComments")) $("filterCountComments").textContent = commentsCount;
+  if($("filterCountLikes")) $("filterCountLikes").textContent = likesCount;
+  if($("filterCountUnread")) $("filterCountUnread").textContent = unreadCount;
+
+  // 5. Render Dropdown List (latest 10)
+  renderDropdownList(notifs.slice(0, 10));
+
+  // 6. Render Full Notification Center List
+  renderFullNotificationsList();
+}
+
+function renderDropdownList(items){
+  const container = $("notifDropdownList");
+  if(!container) return;
+
+  if(!items.length){
+    container.innerHTML = `
+      <div style="text-align:center;padding:36px 16px;color:var(--muted)">
+        <div style="font-size:26px;margin-bottom:6px">🔔</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px">No notifications yet</div>
+        <div style="font-size:11.5px">Customer interactions will appear here instantly.</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = items.map(n => {
+    const meta = getNotifTypeMeta(n.type);
+    const timeStr = formatNotifTime(n.createdAt);
+    const isUnread = !n.read;
+    const thumbHtml = n.artworkImage ? `<img src="${escapeHtml(n.artworkImage)}" alt="Art" class="notif-thumb" onerror="this.style.display='none'">` : '';
+
+    return `
+      <div class="notif-item ${isUnread ? 'unread' : ''}" onclick="handleNotificationClick('${n.id}')">
+        <div class="notif-icon-wrap ${meta.cls}">
+          ${meta.icon}
+        </div>
+        <div class="notif-content">
+          <div class="notif-title-row">
+            <span class="notif-title-text">${escapeHtml(n.title)}</span>
+            <span class="notif-time">${timeStr}</span>
+          </div>
+          <div class="notif-msg-text">${escapeHtml(n.message)}</div>
+          <div class="notif-meta-tags">
+            ${n.customerName ? `<span class="notif-meta-pill">👤 ${escapeHtml(n.customerName)}</span>` : ''}
+            ${n.orderRef ? `<span class="notif-meta-pill">#${escapeHtml(n.orderRef)}</span>` : ''}
+          </div>
+        </div>
+        ${thumbHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+function filterNotifications(cat){
+  currentNotifFilter = cat;
+  document.querySelectorAll(".notif-tab-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.filter === cat);
+  });
+  renderFullNotificationsList();
+}
+
+function handleNotifSearch(val){
+  currentNotifSearch = (val || "").trim().toLowerCase();
+  renderFullNotificationsList();
+}
+
+function renderFullNotificationsList(){
+  const container = $("adminNotificationsFullList");
+  if(!container) return;
+
+  let filtered = [...adminNotifications];
+
+  // Category filter
+  if(currentNotifFilter === "orders"){
+    filtered = filtered.filter(n => n.type === 'order' || n.type === 'order_cancel');
+  } else if(currentNotifFilter === "comments"){
+    filtered = filtered.filter(n => n.type === 'comment' || n.type === 'reply');
+  } else if(currentNotifFilter === "likes"){
+    filtered = filtered.filter(n => n.type === 'like' || n.type === 'unlike');
+  } else if(currentNotifFilter === "unread"){
+    filtered = filtered.filter(n => !n.read);
+  }
+
+  // Search filter
+  if(currentNotifSearch){
+    filtered = filtered.filter(n => {
+      const haystack = `${n.title || ''} ${n.message || ''} ${n.customerName || ''} ${n.orderRef || ''} ${n.artworkTitle || ''}`.toLowerCase();
+      return haystack.includes(currentNotifSearch);
+    });
+  }
+
+  if(!filtered.length){
+    container.innerHTML = `
+      <div style="text-align:center;padding:56px 20px;color:var(--muted);background:var(--soft);border-radius:14px;border:1px dashed var(--line)">
+        <div style="font-size:36px;margin-bottom:8px">📭</div>
+        <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:4px">No Notifications Found</div>
+        <div style="font-size:12.5px">There are no notifications matching your current filter.</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(n => {
+    const meta = getNotifTypeMeta(n.type);
+    const exactDate = n.createdAt ? new Date(n.createdAt).toLocaleString([], { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "Recently";
+    const relativeTime = formatNotifTime(n.createdAt);
+    const isUnread = !n.read;
+    const thumbHtml = n.artworkImage ? `
+      <img src="${escapeHtml(n.artworkImage)}" alt="Artwork" style="width:52px;height:52px;border-radius:8px;object-fit:cover;border:1px solid var(--line);cursor:pointer;flex-shrink:0" onclick="zoomPhoto('${escapeHtml(n.artworkImage)}')" title="Click to zoom">
+    ` : '';
+
+    let actionButtonText = "View in Dashboard →";
+    if(n.targetTab === "orders") actionButtonText = "Open Live Orders →";
+    else if(n.targetTab === "comments") actionButtonText = "Open Comments →";
+    else if(n.targetTab === "likes") actionButtonText = "Open Artwork Likes →";
+    else if(n.targetTab === "artworks") actionButtonText = "View Artwork →";
+
+    return `
+      <div class="notif-full-card ${isUnread ? 'unread' : ''}" id="notif_card_${n.id}">
+        <div class="notif-icon-wrap ${meta.cls}" style="width:42px;height:42px;font-size:18px">
+          ${meta.icon}
+        </div>
+
+        <div class="notif-full-body">
+          <div class="notif-full-header">
+            <div class="notif-full-title">
+              <span>${escapeHtml(n.title)}</span>
+              ${isUnread ? `<span style="background:#fdf2f2;color:#dc2626;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700">NEW</span>` : ''}
+              <span style="font-size:11px;font-weight:normal;color:var(--muted)">· ${meta.label}</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--muted);white-space:nowrap" title="${exactDate}">
+              🕒 ${relativeTime} <span style="font-size:10.5px;opacity:.75">(${exactDate})</span>
+            </div>
+          </div>
+
+          <div class="notif-full-message">
+            ${escapeHtml(n.message)}
+          </div>
+
+          <div class="notif-full-actions">
+            <button type="button" class="btn sm" onclick="handleNotificationClick('${n.id}')" style="background:var(--accent);color:#fff;font-size:11px;padding:5px 12px">
+              ${actionButtonText}
+            </button>
+            <button type="button" class="btn line sm" onclick="toggleNotificationReadState('${n.id}')" style="font-size:11px;padding:5px 12px">
+              ${isUnread ? 'Mark as Read ✓' : 'Mark as Unread'}
+            </button>
+            <button type="button" class="btn line sm" onclick="deleteNotification('${n.id}')" style="color:var(--danger);border-color:#fca5a5;font-size:11px;padding:5px 10px" title="Delete record">
+              🗑️ Delete
+            </button>
+            ${n.customerName ? `<span style="font-size:11px;color:var(--muted);margin-left:auto">Customer: <b>${escapeHtml(n.customerName)}</b></span>` : ''}
+          </div>
+        </div>
+
+        ${thumbHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+// Click Router: Marks as read and navigates to the relevant entity
+async function handleNotificationClick(id){
+  const notif = adminNotifications.find(n => n.id === id);
+  if(!notif) return;
+
+  // Mark as read in Firestore
+  if(!notif.read){
+    markNotificationAsRead(id);
+  }
+
+  closeNotifDropdown();
+
+  // Navigate to target section
+  const tab = notif.targetTab || "dashboard";
+  switchTab(tab);
+
+  // If order, automatically open the order detail modal
+  if(tab === "orders" && notif.targetId){
+    setTimeout(() => {
+      openOrderModalById(notif.targetId);
+    }, 200);
+  }
+}
+
+async function markNotificationAsRead(id){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    await fb.db.collection("faheemgraphy_notifications").doc(id).update({ read: true });
+    const n = adminNotifications.find(x => x.id === id);
+    if(n) n.read = true;
+    renderNotificationsUI();
+  } catch(e){
+    console.warn("Mark read error:", e);
+  }
+}
+
+async function toggleNotificationReadState(id){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  const n = adminNotifications.find(x => x.id === id);
+  if(!n) return;
+  const newRead = !n.read;
+  try {
+    await fb.db.collection("faheemgraphy_notifications").doc(id).update({ read: newRead });
+    n.read = newRead;
+    renderNotificationsUI();
+    toast(newRead ? "Notification marked as read" : "Notification marked as unread");
+  } catch(e){
+    toast("Update error: " + e.message);
+  }
+}
+
+async function markAllNotificationsAsRead(){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  const unreadDocs = adminNotifications.filter(n => !n.read);
+  if(!unreadDocs.length){
+    toast("All notifications are already marked as read! ✓");
+    return;
+  }
+  try {
+    const batch = fb.db.batch();
+    unreadDocs.forEach(n => {
+      const ref = fb.db.collection("faheemgraphy_notifications").doc(n.id);
+      batch.update(ref, { read: true });
+      n.read = true;
+    });
+    await batch.commit();
+    renderNotificationsUI();
+    toast("All notifications marked as read! ✓");
+  } catch(e){
+    console.warn("Batch mark read error:", e);
+    toast("Error marking read: " + e.message);
+  }
+}
+
+async function clearAllNotifications(){
+  if(!confirm("Are you sure you want to clear all notification records from the cloud database?")) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    const snap = await fb.db.collection("faheemgraphy_notifications").get();
+    const batch = fb.db.batch();
+    snap.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    adminNotifications = [];
+    renderNotificationsUI();
+    toast("All notifications cleared successfully. 🧹");
+  } catch(e){
+    console.warn("Clear error:", e);
+    toast("Clear error: " + e.message);
+  }
+}
+
+async function deleteNotification(id){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  try {
+    await fb.db.collection("faheemgraphy_notifications").doc(id).delete();
+    adminNotifications = adminNotifications.filter(n => n.id !== id);
+    renderNotificationsUI();
+    toast("Notification deleted. 🗑️");
+  } catch(e){
+    toast("Delete error: " + e.message);
   }
 }
 
