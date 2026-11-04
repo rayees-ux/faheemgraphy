@@ -471,9 +471,201 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
   .order-row2 { grid-template-columns: 1fr; }
   .order-type-grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   FAHEEM GRAPHY - PREMIUM SPLASH SCREEN
+   ========================================================================== */
+.fg-splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #141414;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.65s ease;
+  pointer-events: all;
+  user-select: none;
+}
+.fg-splash-screen.fg-splash-fadeout {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.fg-splash-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.09) 0%, rgba(255, 255, 255, 0.98) 65%, #ffffff 100%);
+  pointer-events: none;
+}
+.fg-splash-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  max-width: 460px;
+  width: 100%;
+}
+.fg-splash-logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  animation: fgLogoReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.fg-splash-glow {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, rgba(200, 100, 60, 0.12) 45%, transparent 70%);
+  filter: blur(14px);
+  animation: fgGlowPulse 2.2s infinite alternate ease-in-out;
+}
+.fg-splash-logo-img {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.12));
+}
+.fg-splash-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fgBrandReveal 1.25s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+.fg-splash-title {
+  font-family: 'Pirata One', serif;
+  font-size: clamp(34px, 7vw, 46px);
+  letter-spacing: 2px;
+  color: #141414;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.fg-splash-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  margin: 12px 0 10px;
+  position: relative;
+}
+.fg-splash-dot {
+  width: 5px;
+  height: 5px;
+  background: #d4af37;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.7);
+}
+.fg-splash-tagline {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: clamp(10.5px, 2.5vw, 12px);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #727168;
+  font-weight: 400;
+  margin: 0;
+}
+.fg-splash-loader-wrap {
+  width: 140px;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  margin-top: 26px;
+  overflow: hidden;
+  position: relative;
+}
+.fg-splash-loader-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #141414, #d4af37, #c8643c);
+  border-radius: 999px;
+  animation: fgLoaderFill 1.95s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes fgLogoReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes fgBrandReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fgGlowPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+@keyframes fgLoaderFill {
+  0% { width: 0%; }
+  35% { width: 50%; }
+  75% { width: 85%; }
+  100% { width: 100%; }
+}
 </style>
 </head>
 <body>
+
+<!-- FAHEEM GRAPHY PREMIUM SPLASH SCREEN -->
+<div id="fgSplashScreen" class="fg-splash-screen" aria-hidden="true">
+  <div class="fg-splash-backdrop"></div>
+  <div class="fg-splash-content">
+    <div class="fg-splash-logo-wrap">
+      <div class="fg-splash-glow"></div>
+      <img src="logo.png" alt="FAHEEM GRAPHY" class="fg-splash-logo-img">
+    </div>
+    
+    <div class="fg-splash-brand">
+      <span class="fg-splash-title">FAHEEM GRAPHY</span>
+      <div class="fg-splash-divider">
+        <span class="fg-splash-dot"></span>
+      </div>
+      <p class="fg-splash-tagline">Creative Artistry • Visual Stories</p>
+    </div>
+
+    <div class="fg-splash-loader-wrap">
+      <div class="fg-splash-loader-bar"></div>
+    </div>
+  </div>
+</div>
+<script>
+  (function(){
+    try {
+      if (sessionStorage.getItem('fg_splash_seen')) {
+        var s = document.getElementById('fgSplashScreen');
+        if (s) s.style.display = 'none';
+      }
+    } catch(e){}
+  })();
+</script>
 
 <header>
 <div class="wrap"><nav>
@@ -2125,6 +2317,27 @@ function updateVisitorAuthUI(user){
   }
 }
 
+function initSplashScreen(){
+  const splash = $("fgSplashScreen");
+  if(!splash) return;
+  try {
+    if(sessionStorage.getItem("fg_splash_seen")){
+      splash.remove();
+      return;
+    }
+    sessionStorage.setItem("fg_splash_seen", "true");
+  } catch(e){}
+
+  // Exactly 2 seconds animation before smooth fade out
+  setTimeout(() => {
+    splash.classList.add("fg-splash-fadeout");
+    setTimeout(() => {
+      if(splash.parentNode) splash.remove();
+    }, 650);
+  }, 2000);
+}
+
+initSplashScreen();
 init();
 initVisitorSession();
 
