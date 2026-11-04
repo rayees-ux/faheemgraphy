@@ -161,13 +161,10 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 
 <header>
 <div class="wrap"><nav>
-<div style="display:flex;align-items:center;gap:14px">
-  <a href="#top" style="display:flex;align-items:center;gap:12px">
-    <img src="logo.png" alt="Faheemgraphy Logo" style="width:38px;height:38px;border-radius:10px;object-fit:contain;background:#000;border:1px solid #222;display:block">
-    <span class="logo" id="navLogo">Faheemgraphy</span>
-  </a>
-  <span id="cloudStatus" style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#1f8f4e;font-weight:700;display:inline-flex;align-items:center;gap:5px;background:#eef7f2;padding:4px 10px;border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e"></span> Cloud Live</span>
-</div>
+<a href="#top" style="display:flex;align-items:center;gap:12px">
+  <img src="logo.png" alt="Faheemgraphy Logo" style="width:38px;height:38px;border-radius:10px;object-fit:contain;background:#000;border:1px solid #222;display:block">
+  <span class="logo" id="navLogo">Faheemgraphy</span>
+</a>
 <button class="menu" onclick="document.getElementById('lk').classList.toggle('open')" aria-label="Menu">☰</button>
 <div class="links" id="lk" onclick="this.classList.remove('open')">
 <a href="#categories">Categories</a>
@@ -311,17 +308,6 @@ let cloudConnected = false;
 
 function setCloudLive(active){
   cloudConnected = active;
-  const badge = $("cloudStatus");
-  if(!badge) return;
-  if(active){
-    badge.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#1f8f4e;box-shadow:0 0 6px #1f8f4e"></span> Cloud Live`;
-    badge.style.color = "#1f8f4e";
-    badge.style.background = "#eef7f2";
-  } else {
-    badge.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#c8643c"></span> Offline Mode`;
-    badge.style.color = "#c8643c";
-    badge.style.background = "#fdf3ee";
-  }
 }
 
 async function init(){
