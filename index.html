@@ -515,18 +515,65 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 <div class="step panel"><b>03</b><h4>Receive your art</h4><p>Your finished piece is delivered, safely packed.</p></div>
 </div>
 <div class="split">
-<form onsubmit="return sendCustom(event)">
-<div><label>Your name</label><input id="cn" required placeholder="Your full name"></div>
-<div><label>Artwork type</label><select id="ct"></select></div>
-<div><label>Size (optional)</label><input id="cs" placeholder="e.g. A4, A3, Canvas 12x16"></div>
-<div><label>Describe your idea</label><textarea id="cd" rows="4" required placeholder="Provide details about desired style, colors, reference, or custom text..."></textarea></div>
-<div style="display:flex;gap:12px;flex-wrap:wrap">
-  <button class="btn wa" type="submit" id="btnCustomWa">Send on WhatsApp</button>
-  <button class="btn ig" type="button" id="btnCustomIg" onclick="sendCustom(null,true)">Send on Instagram</button>
-</div>
+<form id="homeCustomOrderForm" onsubmit="return sendCustom(event)" style="display:grid;gap:14px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="custom-row2">
+    <div>
+      <label>Your Full Name *</label>
+      <input id="cn" required placeholder="Enter full name">
+    </div>
+    <div>
+      <label>Phone / WhatsApp Number *</label>
+      <input id="cp" type="tel" required placeholder="e.g. +91 9876543210">
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="custom-row2">
+    <div>
+      <label>Artwork Type *</label>
+      <select id="ct"></select>
+    </div>
+    <div>
+      <label>Preferred Size / Dimensions</label>
+      <input id="cs" placeholder="e.g. A4, A3, Canvas 24x36">
+    </div>
+  </div>
+
+  <div>
+    <label>Delivery Address &amp; City (optional)</label>
+    <input id="ca" placeholder="Delivery street, city, state, or pincode">
+  </div>
+
+  <div>
+    <label>Describe Your Idea &amp; Custom Requirements *</label>
+    <textarea id="cd" rows="3" required placeholder="Provide details about desired style, colors, reference, names to calligraphy, or special dates..."></textarea>
+  </div>
+
+  <div>
+    <label>Upload Reference Photo (Optional - portraits, sketch idea)</label>
+    <input type="file" id="customRefFileInput" accept="image/*" onchange="handleHomeCustomRefPhoto(this)">
+    <div id="homeCustomRefPreviewWrap" style="display:none;margin-top:8px;align-items:center;gap:10px">
+      <img id="homeCustomRefPreviewImg" src="" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--line)" alt="Reference Preview">
+      <span style="font-size:11px;color:var(--muted)">Reference photo attached</span>
+      <button type="button" onclick="clearHomeCustomRefPhoto()" style="background:none;border:0;color:var(--danger);font-size:11px;cursor:pointer">Remove ✕</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+    <button class="btn wa" type="submit" id="btnCustomWa" style="padding:13px 24px">✨ Submit Order &amp; Open WhatsApp</button>
+    <button class="btn ig" type="button" id="btnCustomIg" onclick="sendCustom(null,true)" style="padding:13px 24px">Send on Instagram</button>
+  </div>
 </form>
 <div class="about panel">
-  <p id="customTipText">Tip: after you press a button, WhatsApp opens with your message ready to send. For Instagram, your message is copied and a chat with <b id="igTipHandle">@fa_i_heem</b> opens — just paste and send.</p>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+    <span style="width:8px;height:8px;border-radius:50%;background:#1f8f4e;box-shadow:0 0 8px #1f8f4e"></span>
+    <strong style="font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)">Real-Time Studio Sync</strong>
+  </div>
+  <p id="customTipText" style="font-size:13px;line-height:1.6;color:#55554c;margin-bottom:14px">
+    When you submit this order, it is instantly recorded directly in Faheem's cloud Admin Dashboard with your specifications, size, and reference photo.
+  </p>
+  <p style="font-size:12px;color:var(--muted);line-height:1.5">
+    WhatsApp will then open with your order reference pre-formatted so you can chat directly with Faheem about delivery timing and pricing.
+  </p>
 </div>
 </div>
 </div></section>
@@ -1078,17 +1125,106 @@ function igSend(msg){
   window.open(`https://ig.me/m/${igHandle}`, "_blank");
 }
 
-function sendCustom(e, ig){
+let homeCustomRefData = null;
+
+function handleHomeCustomRefPhoto(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 800;
+      let w = img.width, h = img.height;
+      if(w > maxDim || h > maxDim){
+        if(w > h){ h = Math.round((h * maxDim) / w); w = maxDim; }
+        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      homeCustomRefData = canvas.toDataURL("image/jpeg", 0.75);
+
+      if($("homeCustomRefPreviewImg")) $("homeCustomRefPreviewImg").src = homeCustomRefData;
+      if($("homeCustomRefPreviewWrap")) $("homeCustomRefPreviewWrap").style.display = "flex";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearHomeCustomRefPhoto(){
+  homeCustomRefData = null;
+  if($("customRefFileInput")) $("customRefFileInput").value = "";
+  if($("homeCustomRefPreviewWrap")) $("homeCustomRefPreviewWrap").style.display = "none";
+  if($("homeCustomRefPreviewImg")) $("homeCustomRefPreviewImg").src = "";
+}
+
+async function sendCustom(e, ig){
   if(e) e.preventDefault();
-  if(!$("cn").value || !$("cd").value){
-    toast("Please fill in your name and idea");
+  const name = $("cn").value.trim();
+  const phone = $("cp") ? $("cp").value.trim() : "";
+  const type = $("ct").value;
+  const size = $("cs").value.trim() || "To be discussed";
+  const address = $("ca") ? $("ca").value.trim() : "";
+  const idea = $("cd").value.trim();
+
+  if(!name || !idea){
+    toast("Please enter your name and describe your idea");
     return false;
   }
-  trackVisitorActivity("Custom Commission Inquiry: " + $("ct").value, true);
+
+  // Generate distinct Order Reference ID
+  const orderRef = "FG-CUST-" + Math.floor(100000 + Math.random() * 900000);
+  const btn = $("btnCustomWa");
+  if(btn && !ig) btn.textContent = "Recording Order to Cloud...";
+
+  // Save into Cloud Firestore faheemgraphy_orders so it instantly shows in Admin Dashboard
+  const fb = initFirebase();
+  if(fb && fb.db){
+    const orderDoc = {
+      orderId: orderRef,
+      artworkId: "custom_" + Date.now(),
+      artworkTitle: `Custom Order: ${type}`,
+      artworkCat: type,
+      artworkPrice: "Custom Quote",
+      artworkImage: homeCustomRefData || (arts[0] ? arts[0].img : "logo.png"),
+      orderType: `Custom Commission (${type})`,
+      size: size,
+      framing: "Custom Choice",
+      quantity: 1,
+      customerName: name,
+      customerPhone: phone || "Not specified",
+      customerEmail: currentVisitorAuth ? currentVisitorAuth.email : null,
+      customerAddress: address || "To be confirmed via chat",
+      customNotes: idea,
+      refImage: homeCustomRefData || null,
+      status: "New",
+      adminNotes: "Submitted via Homepage Custom Orders section",
+      visitorId: currentVisitorId || localStorage.getItem("fg_vid") || "visitor",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    try {
+      await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderDoc);
+      toast(`Custom order ${orderRef} recorded in studio dashboard! ✨`);
+    } catch(err){
+      console.warn("Could not save custom order doc:", err);
+    }
+  }
+
+  trackVisitorActivity("Submitted Custom Order: " + orderRef + " (" + type + ")", true);
   const brand = settings.brandName || "Faheemgraphy";
-  const msg = `Hi ${brand}, I'm ${$("cn").value}.\nI'd like a custom order.\nType: ${$("ct").value}\nSize: ${$("cs").value || "Not decided"}\nIdea: ${$("cd").value}`;
+  const msg = `Hi ${brand}, I just submitted a custom order on your website!\n\n📋 *Order Ref:* ${orderRef}\n🎨 *Type:* ${type}\n📏 *Size:* ${size}\n👤 *Name:* ${name}${phone ? '\n📞 *Phone:* ' + phone : ''}${address ? '\n📍 *Delivery Area:* ' + address : ''}\n📝 *Idea:* ${idea}\n\nPlease confirm availability and quote. Thank you!`;
+
+  if(btn && !ig) btn.textContent = "✨ Submit Order & Open WhatsApp";
+
   if(ig) igSend(msg);
   else window.open(`https://wa.me/${settings.whatsapp || "918921166278"}?text=${encodeURIComponent(msg)}`, "_blank");
+
   return false;
 }
 
