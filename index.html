@@ -105,7 +105,26 @@ label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mu
 .panel{background:var(--soft);border-radius:22px;padding:28px}
 .btn{border-radius:999px}
 .card .im{border-radius:20px}
-.hero-img{border-radius:28px;overflow:hidden}
+.hero-img{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 18px 45px -12px rgba(0,0,0,0.14);user-select:none}
+.hero-slides-layer{position:absolute;inset:0;width:100%;height:100%}
+.hero-slide-item{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.04);transition:opacity .85s cubic-bezier(.4,0,.2,1),transform 1.2s ease-out;cursor:pointer;z-index:1}
+.hero-slide-item.active{opacity:1;transform:scale(1);z-index:2}
+.hero-slide-overlay{position:absolute;left:0;right:0;bottom:0;padding:34px 22px 20px;background:linear-gradient(180deg,transparent 0%,rgba(15,15,15,.35) 35%,rgba(10,10,10,.88) 100%);color:#fff;z-index:5;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.hero-slide-info{display:flex;flex-direction:column;gap:4px;pointer-events:auto;cursor:pointer}
+.hero-slide-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hero-slide-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;background:var(--accent);color:#fff;padding:3px 10px;border-radius:999px;line-height:1.2}
+.hero-slide-counter{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.8);font-variant-numeric:tabular-nums;font-weight:600}
+.hero-slide-title{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(20px,2.4vw,26px);letter-spacing:.5px;text-transform:uppercase;line-height:1.15;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.hero-slide-controls{display:flex;align-items:center;justify-content:space-between;margin-top:6px;pointer-events:auto}
+.hero-slide-dots{display:flex;align-items:center;gap:6px}
+.hero-slide-dot{width:20px;height:4px;border-radius:2px;background:rgba(255,255,255,.35);cursor:pointer;position:relative;overflow:hidden;transition:width .3s ease,background .3s ease;border:0;padding:0}
+.hero-slide-dot.active{width:36px;background:rgba(255,255,255,.45)}
+.hero-slide-dot.active .hero-slide-dot-fill{position:absolute;top:0;left:0;bottom:0;width:0%;background:#fff;animation:heroSlideProgress 5s linear forwards}
+@keyframes heroSlideProgress{from{width:0%}to{width:100%}}
+.hero-nav-arrow{background:rgba(255,255,255,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,transform .2s;padding:0}
+.hero-nav-arrow:hover{background:rgba(255,255,255,.4);transform:scale(1.08)}
+.hero-nav-arrow svg{display:block}
+.hero-empty-state{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:13px;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:20px}
 input,select,textarea{border-radius:14px;background:var(--soft);border-color:transparent}
 .box{border-radius:24px}
 .ghead{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:18px;margin-top:18px;display:flex;justify-content:space-between;align-items:center}
@@ -1034,14 +1053,178 @@ function card(a){
   `;
 }
 
+// Hero 5 Recent Works Slideshow (5-second auto transition)
+let heroSlides = [];
+let heroCurrentIdx = 0;
+let heroSlideTimer = null;
+let heroSlidesPaused = false;
+
+function initHeroSlideshow(){
+  const container = $("heroImg");
+  if(!container) return;
+
+  const newSlides = (arts || []).slice(0, 5);
+  const newIds = newSlides.map(a => a.id).join(",");
+  const oldIds = heroSlides.map(a => a.id).join(",");
+
+  heroSlides = newSlides;
+
+  if(heroSlides.length === 0){
+    if(heroSlideTimer){ clearInterval(heroSlideTimer); heroSlideTimer = null; }
+    container.innerHTML = `<div class="hero-empty-state">Latest artwork appears here</div>`;
+    container.style.backgroundImage = "";
+    return;
+  }
+
+  if(heroSlides.length === 1){
+    if(heroSlideTimer){ clearInterval(heroSlideTimer); heroSlideTimer = null; }
+    const a = heroSlides[0];
+    container.innerHTML = `
+      <div class="hero-slides-layer">
+        <div class="hero-slide-item active" style="background-image:url('${esc(a.img)}')" onclick="show('${a.id}')" title="${esc(a.title)}"></div>
+      </div>
+      <div class="hero-slide-overlay">
+        <div class="hero-slide-info" onclick="show('${a.id}')">
+          <div class="hero-slide-meta">
+            <span class="hero-slide-badge">${esc(a.cat || "Recent Work")}</span>
+          </div>
+          <div class="hero-slide-title">${esc(a.title)}</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // If slide IDs haven't changed and DOM is present, simply update UI without re-rendering
+  if(newIds === oldIds && container.querySelector("#heroSlidesLayer")){
+    updateHeroSlideUI();
+    return;
+  }
+
+  if(heroCurrentIdx >= heroSlides.length){
+    heroCurrentIdx = 0;
+  }
+
+  container.innerHTML = `
+    <div class="hero-slides-layer" id="heroSlidesLayer">
+      ${heroSlides.map((a, idx) => `
+        <div class="hero-slide-item ${idx === heroCurrentIdx ? 'active' : ''}" 
+             data-idx="${idx}" 
+             style="background-image:url('${esc(a.img)}')" 
+             onclick="show('${a.id}')"
+             title="${esc(a.title)}"></div>
+      `).join("")}
+    </div>
+    <div class="hero-slide-overlay">
+      <div class="hero-slide-info" onclick="openHeroCurrentArtwork()">
+        <div class="hero-slide-meta">
+          <span class="hero-slide-badge" id="heroSlideBadge">${esc(heroSlides[heroCurrentIdx].cat || "Recent Work")}</span>
+          <span class="hero-slide-counter" id="heroSlideCounter">${heroCurrentIdx + 1} / ${heroSlides.length}</span>
+        </div>
+        <div class="hero-slide-title" id="heroSlideTitle">${esc(heroSlides[heroCurrentIdx].title)}</div>
+      </div>
+      <div class="hero-slide-controls">
+        <div class="hero-slide-dots" id="heroSlideDots">
+          ${heroSlides.map((_, idx) => `
+            <button type="button" class="hero-slide-dot ${idx === heroCurrentIdx ? 'active' : ''}" 
+                    onclick="setHeroSlide(${idx}, event)" 
+                    aria-label="Go to slide ${idx + 1}">
+              ${idx === heroCurrentIdx ? '<span class="hero-slide-dot-fill"></span>' : ''}
+            </button>
+          `).join("")}
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button type="button" class="hero-nav-arrow" onclick="prevHeroSlide(event)" aria-label="Previous artwork" title="Previous artwork">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button type="button" class="hero-nav-arrow" onclick="nextHeroSlide(event)" aria-label="Next artwork" title="Next artwork">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  container.onmouseenter = () => { heroSlidesPaused = true; };
+  container.onmouseleave = () => { heroSlidesPaused = false; };
+
+  startHeroSlideTimer();
+}
+
+function startHeroSlideTimer(){
+  if(heroSlideTimer) clearInterval(heroSlideTimer);
+  heroSlideTimer = setInterval(() => {
+    if(!heroSlidesPaused && heroSlides.length > 1){
+      nextHeroSlide();
+    }
+  }, 5000);
+}
+
+function openHeroCurrentArtwork(){
+  if(heroSlides[heroCurrentIdx]){
+    show(heroSlides[heroCurrentIdx].id);
+  }
+}
+
+function setHeroSlide(idx, event){
+  if(event) event.stopPropagation();
+  if(idx === heroCurrentIdx || !heroSlides[idx]) return;
+  heroCurrentIdx = idx;
+  updateHeroSlideUI();
+  startHeroSlideTimer();
+}
+
+function nextHeroSlide(event){
+  if(event) event.stopPropagation();
+  if(heroSlides.length <= 1) return;
+  heroCurrentIdx = (heroCurrentIdx + 1) % heroSlides.length;
+  updateHeroSlideUI();
+  startHeroSlideTimer();
+}
+
+function prevHeroSlide(event){
+  if(event) event.stopPropagation();
+  if(heroSlides.length <= 1) return;
+  heroCurrentIdx = (heroCurrentIdx - 1 + heroSlides.length) % heroSlides.length;
+  updateHeroSlideUI();
+  startHeroSlideTimer();
+}
+
+function updateHeroSlideUI(){
+  const items = document.querySelectorAll(".hero-slide-item");
+  items.forEach((item, idx) => {
+    item.classList.toggle("active", idx === heroCurrentIdx);
+  });
+
+  const a = heroSlides[heroCurrentIdx];
+  if(a){
+    const badge = $("heroSlideBadge");
+    const title = $("heroSlideTitle");
+    const counter = $("heroSlideCounter");
+    if(badge) badge.textContent = a.cat || "Recent Work";
+    if(title) title.textContent = a.title || "";
+    if(counter) counter.textContent = `${heroCurrentIdx + 1} / ${heroSlides.length}`;
+  }
+
+  const dotsContainer = $("heroSlideDots");
+  if(dotsContainer){
+    dotsContainer.innerHTML = heroSlides.map((_, idx) => `
+      <button type="button" class="hero-slide-dot ${idx === heroCurrentIdx ? 'active' : ''}" 
+              onclick="setHeroSlide(${idx}, event)" 
+              aria-label="Go to slide ${idx + 1}">
+        ${idx === heroCurrentIdx ? '<span class="hero-slide-dot-fill"></span>' : ''}
+      </button>
+    `).join("");
+  }
+}
+
 function render(){
   const count = c => arts.filter(a => a.cat === c).length;
   $("cats").innerHTML = `<div class="cat all" data-i="-1" onclick="goCat(-1)"><b>All Works</b></div>` + cats.map((c,i) => `<div class="cat" data-i="${i}" onclick="goCat(${i})"><b>${esc(c)}</b><small>${count(c)} artworks</small></div>`).join("");
   applyFilter();
   $("galleries").innerHTML = cats.map((c,i) => count(c) ? `<div class="gal" id="g${i}"><h3 class="gh">${esc(c)} <small>${count(c)}</small></h3><div class="grid">${arts.filter(a=>a.cat===c).map(card).join("")}</div></div>` : "").join("");
   $("ct").innerHTML = cats.map(c => `<option>${esc(c)}</option>`).join("")+"<option>Other</option>";
-  $("heroImg").style.backgroundImage = arts[0] ? `url(${arts[0].img})` : "";
-  $("heroImg").textContent = arts[0] ? "" : "Latest artwork appears here";
+  initHeroSlideshow();
 }
 
 const DEF_BIO = "I'm an independent artist creating detailed artwork, portraits, calligraphy, logos, and custom pieces for people, brands, and special occasions.";
