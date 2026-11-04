@@ -161,8 +161,9 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 
 <header>
 <div class="wrap"><nav>
-<a href="#top" style="display:inline-flex;align-items:center" aria-label="Faheemgraphy">
-  <img src="logo.png" alt="Faheemgraphy" id="navLogoImg" style="height:48px;width:auto;max-width:140px;object-fit:contain;display:block">
+<a href="#top" style="display:flex;align-items:center;gap:12px">
+  <img src="logo.png" alt="Faheemgraphy Logo" style="width:38px;height:38px;object-fit:contain;display:block">
+  <span class="logo" id="navLogo">Faheemgraphy</span>
 </a>
 <button class="menu" onclick="document.getElementById('lk').classList.toggle('open')" aria-label="Menu">☰</button>
 <div class="links" id="lk" onclick="this.classList.remove('open')">
@@ -246,8 +247,8 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
 <footer><div class="wrap">
 <div class="f-top">
 <div>
-<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-  <img src="logo.png" alt="Faheemgraphy Logo" style="width:48px;height:48px;border-radius:12px;background:#fff;padding:3px;object-fit:contain">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+  <img src="logo-white.png" alt="Faheemgraphy Logo" style="width:40px;height:40px;object-fit:contain;display:block">
   <span style="font-family:'Pirata One',serif;font-size:30px;letter-spacing:.5px;color:#fff">Faheemgraphy</span>
 </div>
 <div class="f-cta">Have an idea? Let's turn it into something you can keep forever.</div>
@@ -413,7 +414,7 @@ function applySettings(){
 
   // Header & Branding
   if(settings.brandName){
-    if($("navLogo")) $("navLogo").textContent = settings.brandName;
+    $("navLogo").textContent = settings.brandName;
     $("heroEyebrow").textContent = `${settings.brandName} – Studio & Gallery`;
     $("brandBotName").textContent = settings.brandName;
     document.title = `${settings.brandName} – Studio & Gallery`;
