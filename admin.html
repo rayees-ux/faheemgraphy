@@ -1090,7 +1090,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         <label for="loginUser">Administrator Username</label>
         <div class="login-input-wrap">
           <svg class="login-input-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="loginUser" class="login-input" placeholder="admin.graphy" required autofocus autocomplete="username" autocapitalize="none" spellcheck="false">
+          <input type="text" id="loginUser" class="login-input" placeholder="Enter admin username" required autofocus autocomplete="username" autocapitalize="none" spellcheck="false">
         </div>
       </div>
 
@@ -1110,7 +1110,6 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
           <input type="checkbox" id="loginRemember">
           <span>Remember this device</span>
         </label>
-        <span style="font-size:11px;color:var(--muted);letter-spacing:.05em">admin.graphy</span>
       </div>
 
       <div id="loginErr" class="login-err-box"></div>
@@ -2684,11 +2683,15 @@ async function init(){
   } else {
     $("loginView").classList.remove("hide");
     $("dashView").classList.add("hide");
-    const rememberedUser = localStorage.getItem("fg_remembered_user") || ADMIN_USERNAME;
+    const rememberedUser = localStorage.getItem("fg_remembered_user");
     if($("loginUser")){
-      $("loginUser").value = rememberedUser;
-      if(localStorage.getItem("fg_admin_remember") === "1" && $("loginRemember")){
-        $("loginRemember").checked = true;
+      if(rememberedUser){
+        $("loginUser").value = rememberedUser;
+        if(localStorage.getItem("fg_admin_remember") === "1" && $("loginRemember")){
+          $("loginRemember").checked = true;
+        }
+      } else {
+        $("loginUser").value = "";
       }
     }
   }
