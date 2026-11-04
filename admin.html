@@ -916,6 +916,163 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
   border-radius: 999px;
   transition: width 0.4s ease;
 }
+
+/* Live Comments & Likes UI Enhancements */
+.admin-comment-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.2s ease;
+}
+.admin-comment-card.hidden-moderated {
+  background: #fbfbf9;
+  border-style: dashed;
+  opacity: 0.72;
+}
+.admin-comment-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-comment-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e4e2db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.admin-comment-art-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--soft);
+  padding: 4px 10px 4px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.admin-comment-art-tag img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.admin-comment-content {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: #faf9f6;
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+.admin-comment-reply-preview {
+  background: #fdfaf6;
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-top: 2px;
+}
+.admin-comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.admin-reply-box-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 12px;
+  border-radius: 10px;
+}
+.admin-reply-textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 55px;
+  box-sizing: border-box;
+}
+
+/* Likes Leaderboard & Recent Likes */
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+.leaderboard-row:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+.rank-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.rank-badge-1 { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; box-shadow: 0 2px 6px rgba(245,158,11,0.25); }
+.rank-badge-2 { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.rank-badge-3 { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+.rank-badge-other { background: var(--soft); color: var(--muted); border: 1px solid var(--line); }
+.like-prog-wrap {
+  flex: 1;
+  background: var(--soft);
+  height: 7px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.like-prog-bar {
+  background: #e74c3c;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.recent-like-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  gap: 12px;
+}
 </style>
 </head>
 <body>
@@ -1763,6 +1920,21 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
           <div id="adminLikesLeaderboard" style="display:grid;gap:12px">
             <div style="text-align:center;padding:36px;color:var(--muted)">
               Gathering like statistics from Cloud Firestore...
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div>
+              <h2 style="margin-bottom:2px">Recent Likes &amp; Visitor Favorites</h2>
+              <p style="font-size:12px;color:var(--muted)">Real-time activity stream of audience likes across all artworks.</p>
+            </div>
+            <span style="font-size:11px;color:var(--muted)" id="likesRecentCount">Real-time</span>
+          </div>
+          <div id="adminLikesRecentFeed" style="display:grid;gap:10px">
+            <div style="text-align:center;padding:28px;color:var(--muted)">
+              Listening for customer likes...
             </div>
           </div>
         </div>
@@ -3453,28 +3625,622 @@ function zoomPhoto(src){
   openModal("modalPhotoZoom");
 }
 
-/* Safe fallback listeners for Comments & Likes */
-function initAdminCommentsListener(){
-  const fb = initFirebase();
-  if(!fb || !fb.db) return;
-  fb.db.collection("faheemgraphy_comments").onSnapshot(snapshot => {
-    const count = snapshot.size;
-    if($("sideBadgeComments")) $("sideBadgeComments").textContent = count;
-    if($("statTotalComments")) $("statTotalComments").textContent = count;
-    if($("commentKpiTotal")) $("commentKpiTotal").textContent = count;
-  }, err => console.warn("Comments listener:", err));
+/* =========================================================================
+   LIVE COMMENTS & LIKES REAL-TIME ENGINES
+   ========================================================================= */
+
+let adminComments = [];
+let adminCommentsUnsub = null;
+let commentsInitialLoadDone = false;
+let currentCommentFilter = 'all';
+let activeReplyCommentId = null;
+
+let adminLikes = [];
+let adminLikesUnsub = null;
+let likesInitialLoadDone = false;
+
+/* Sound synthesis for comments and likes (Web Audio API) */
+function playCommentSound(){
+  if(typeof orderAudioEnabled !== 'undefined' && !orderAudioEnabled) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const playTone = (freq, start, duration) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + start);
+      gain.gain.setValueAtTime(0.2, now + start);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + start + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + start);
+      osc.stop(now + start + duration);
+    };
+    playTone(783.99, 0, 0.25);    // G5
+    playTone(1046.50, 0.12, 0.4); // C6
+  } catch(e) {
+    console.warn("Audio comment chime:", e);
+  }
 }
 
-function initAdminLikesListener(){
+function playLikeSound(){
+  if(typeof orderAudioEnabled !== 'undefined' && !orderAudioEnabled) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, now);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.35);
+  } catch(e) {
+    console.warn("Audio like chime:", e);
+  }
+}
+
+function showLiveCommentPopup(c){
+  const popup = document.createElement("div");
+  popup.className = "live-order-alert-popup";
+  popup.style.borderColor = "var(--accent)";
+  const author = escapeHtml(c.authorName || "Customer");
+  const artTitle = escapeHtml(c.artworkTitle || "Artwork");
+  const rawText = c.text || "";
+  const snippet = escapeHtml(rawText.substring(0, 60)) + (rawText.length > 60 ? "..." : "");
+
+  popup.innerHTML = `
+    <div class="live-order-alert-content">
+      <div class="live-order-alert-icon" style="background:#1967d2">💬</div>
+      <div style="flex:1;min-width:0">
+        <div class="live-order-alert-title">New Customer Comment!</div>
+        <div class="live-order-alert-desc"><b>${author}</b> on <i>${artTitle}</i>: "${snippet}"</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px">Just now · Needs review</div>
+      </div>
+      <button class="live-order-alert-btn" onclick="switchTab('comments'); this.closest('.live-order-alert-popup').remove();">View</button>
+      <button class="live-order-alert-close" onclick="this.closest('.live-order-alert-popup').remove();">✕</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.classList.add("visible"), 20);
+  setTimeout(() => {
+    if(popup.parentNode){
+      popup.classList.remove("visible");
+      setTimeout(() => popup.remove(), 400);
+    }
+  }, 9000);
+}
+
+function showLiveLikePopup(l){
+  const popup = document.createElement("div");
+  popup.className = "live-order-alert-popup";
+  popup.style.borderColor = "#f9caca";
+  const user = escapeHtml(l.userName || "Art Enthusiast");
+  const artTitle = escapeHtml(l.artworkTitle || "Artwork");
+
+  popup.innerHTML = `
+    <div class="live-order-alert-content">
+      <div class="live-order-alert-icon" style="background:#e74c3c">❤️</div>
+      <div style="flex:1;min-width:0">
+        <div class="live-order-alert-title">New Artwork Like!</div>
+        <div class="live-order-alert-desc"><b>${user}</b> gave a heart to <b>${artTitle}</b></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px">Just now · Audience Favorite</div>
+      </div>
+      <button class="live-order-alert-btn" onclick="switchTab('likes'); this.closest('.live-order-alert-popup').remove();">View</button>
+      <button class="live-order-alert-close" onclick="this.closest('.live-order-alert-popup').remove();">✕</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.classList.add("visible"), 20);
+  setTimeout(() => {
+    if(popup.parentNode){
+      popup.classList.remove("visible");
+      setTimeout(() => popup.remove(), 400);
+    }
+  }, 7000);
+}
+
+/* --------------------------------------------------
+   CUSTOMER COMMENTS ENGINE
+   -------------------------------------------------- */
+function initAdminCommentsListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    console.warn("Firebase not ready for admin comments");
+    return;
+  }
+  if(adminCommentsUnsub){
+    try{ adminCommentsUnsub(); }catch(e){}
+  }
+
+  adminCommentsUnsub = fb.db.collection("faheemgraphy_comments").onSnapshot(snapshot => {
+    const docs = [];
+    snapshot.forEach(doc => {
+      docs.push({ id: doc.id, ...doc.data() });
+    });
+    docs.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    if(commentsInitialLoadDone){
+      snapshot.docChanges().forEach(change => {
+        if(change.type === "added"){
+          const newDoc = { id: change.doc.id, ...change.doc.data() };
+          playCommentSound();
+          showLiveCommentPopup(newDoc);
+          toast(`New comment on "${newDoc.artworkTitle || 'Artwork'}"! 💬`);
+        }
+      });
+    } else {
+      commentsInitialLoadDone = true;
+    }
+
+    adminComments = docs;
+    updateAdminCommentKPIs();
+    renderAdminComments();
+  }, err => {
+    console.warn("Comments listener error:", err);
+  });
+}
+
+function updateAdminCommentKPIs(){
+  const total = adminComments.length;
+  const active = adminComments.filter(c => !c.hidden && c.status !== "hidden").length;
+  const replied = adminComments.filter(c => !!c.adminReply).length;
+  const hidden = adminComments.filter(c => c.hidden || c.status === "hidden").length;
+  const needsReply = adminComments.filter(c => !c.adminReply && !c.hidden && c.status !== "hidden").length;
+
+  if($("commentKpiTotal")) $("commentKpiTotal").textContent = total;
+  if($("statTotalComments")) $("statTotalComments").textContent = total;
+  if($("countCommentAll")) $("countCommentAll").textContent = total;
+  if($("commentKpiActive")) $("commentKpiActive").textContent = active;
+  if($("commentKpiReplied")) $("commentKpiReplied").textContent = replied;
+  if($("commentKpiHidden")) $("commentKpiHidden").textContent = hidden;
+
+  if($("sideBadgeComments")){
+    $("sideBadgeComments").textContent = needsReply > 0 ? needsReply : total;
+    $("sideBadgeComments").style.background = needsReply > 0 ? "var(--accent)" : "var(--soft)";
+    $("sideBadgeComments").style.color = needsReply > 0 ? "#ffffff" : "var(--ink)";
+    $("sideBadgeComments").title = `${needsReply} comments need reply (${total} total)`;
+  }
+}
+
+function setCommentFilter(filter){
+  currentCommentFilter = filter;
+  document.querySelectorAll("[data-comment-filter]").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-comment-filter") === filter);
+  });
+  renderAdminComments();
+}
+
+function toggleReplyBox(commentId){
+  activeReplyCommentId = (activeReplyCommentId === commentId ? null : commentId);
+  renderAdminComments();
+  if(activeReplyCommentId){
+    setTimeout(() => {
+      const ta = $("adminReplyInput_" + commentId);
+      if(ta) ta.focus();
+    }, 50);
+  }
+}
+
+function renderAdminComments(){
+  const container = $("adminCommentsList");
+  if(!container) return;
+
+  let filtered = adminComments;
+  if(currentCommentFilter === "active"){
+    filtered = adminComments.filter(c => !c.hidden && c.status !== "hidden");
+  } else if(currentCommentFilter === "needs_reply"){
+    filtered = adminComments.filter(c => !c.adminReply && !c.hidden && c.status !== "hidden");
+  } else if(currentCommentFilter === "hidden"){
+    filtered = adminComments.filter(c => c.hidden || c.status === "hidden");
+  }
+
+  if(!filtered.length){
+    let emptyMsg = "No customer comments received yet.";
+    if(currentCommentFilter === "needs_reply") emptyMsg = "All active comments have been replied to! 🎨";
+    else if(currentCommentFilter === "hidden") emptyMsg = "No hidden comments.";
+    else if(currentCommentFilter === "active") emptyMsg = "No active comments found.";
+
+    container.innerHTML = `
+      <div style="text-align:center;padding:48px 24px;color:var(--muted);background:var(--soft);border-radius:14px;border:1px dashed var(--line)">
+        <div style="font-size:32px;margin-bottom:8px">💬</div>
+        <div style="font-weight:700;color:var(--ink);margin-bottom:4px">No Comments in this View</div>
+        <div style="font-size:12.5px">${emptyMsg}</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(c => {
+    const isHidden = !!(c.hidden || c.status === "hidden");
+    const isReplied = !!c.adminReply;
+    const authorName = escapeHtml(c.authorName || "Customer");
+    const initial = authorName.trim().charAt(0).toUpperCase();
+    const hasPhoto = c.authorPhoto && c.authorPhoto.length > 5;
+    const avatarHtml = hasPhoto
+      ? `<img src="${escapeHtml(c.authorPhoto)}" class="admin-comment-avatar" alt="Author" onerror="this.outerHTML='<div class=\\'admin-comment-avatar\\'>${initial}</div>'">`
+      : `<div class="admin-comment-avatar">${initial}</div>`;
+
+    // Match artwork image
+    const artId = String(c.artworkId || "");
+    let artImg = c.artworkImage || "";
+    let artTitle = c.artworkTitle || ("Artwork #" + artId);
+    let artCat = c.artworkCat || "";
+    if(!artImg && typeof arts !== 'undefined' && Array.isArray(arts)){
+      const found = arts.find(a => String(a.id) === artId);
+      if(found){
+        artImg = found.img || "";
+        if(!c.artworkTitle) artTitle = found.title;
+        if(!c.artworkCat) artCat = found.cat;
+      }
+    }
+
+    const timeStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Recently";
+    const editedTag = c.editedAt ? `<span style="font-size:10.5px;color:var(--muted);margin-left:4px">(edited)</span>` : "";
+
+    // Status Pill
+    const visibilityBadge = isHidden
+      ? `<span style="background:#fee2e2;color:#991b1b;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px">Hidden from Public</span>`
+      : `<span style="background:#dcfce7;color:#166534;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px">Publicly Active</span>`;
+
+    const replyBadge = isReplied
+      ? `<span style="background:#fef3c7;color:#92400e;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px">Artist Replied</span>`
+      : `<span style="background:#f3f4f6;color:#4b5563;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px">Needs Reply</span>`;
+
+    const replyToLabel = c.replyToAuthor ? `<div style="font-size:11.5px;color:var(--accent);margin-bottom:4px;font-weight:600">↪ Replying to @${escapeHtml(c.replyToAuthor)}</div>` : "";
+
+    // Existing Admin Reply Block
+    const adminReplyBlock = isReplied ? `
+      <div class="admin-comment-reply-preview">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-weight:700;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:6px">
+            <span>🎨 Faheem's Artist Reply</span>
+            <span style="font-size:10px;color:var(--muted);font-weight:normal">${c.adminRepliedAt ? new Date(c.adminRepliedAt).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""}</span>
+          </div>
+          <button type="button" onclick="removeAdminReply('${c.id}')" style="background:none;border:0;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 6px" title="Remove Reply">Remove ✕</button>
+        </div>
+        <div style="color:var(--ink);font-size:13px;line-height:1.45">${escapeHtml(c.adminReply)}</div>
+      </div>
+    ` : "";
+
+    // Inline Reply Box
+    const isReplyingNow = (activeReplyCommentId === c.id);
+    const inlineReplyBox = isReplyingNow ? `
+      <div class="admin-reply-box-input" style="margin-top:8px">
+        <div style="font-weight:700;font-size:12px;color:var(--ink)">Reply as Faheem to ${authorName}:</div>
+        <textarea id="adminReplyInput_${c.id}" class="admin-reply-textarea" placeholder="Type your reply here... (customers will see this instantly on the artwork modal)">${isReplied ? escapeHtml(c.adminReply) : ""}</textarea>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" class="btn secondary" style="padding:6px 14px;font-size:11.5px" onclick="toggleReplyBox('${c.id}')">Cancel</button>
+          <button type="button" class="btn" style="padding:6px 16px;font-size:11.5px" onclick="submitAdminReply('${c.id}')">Publish Reply ✨</button>
+        </div>
+      </div>
+    ` : "";
+
+    return `
+      <div class="admin-comment-card ${isHidden ? 'hidden-moderated' : ''}" id="adm_comment_${c.id}">
+        <div class="admin-comment-header">
+          <div class="admin-comment-user">
+            ${avatarHtml}
+            <div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;font-size:13.5px;color:var(--ink)">${authorName}</span>
+                ${c.isAuth ? `<span style="background:#e8f0fe;color:#1967d2;font-size:9.5px;padding:1px 6px;border-radius:999px;font-weight:700">Google Verified</span>` : ""}
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">
+                <span>${timeStr}</span>${editedTag}
+                <span style="margin:0 4px">·</span>
+                <span style="font-family:monospace;font-size:10px">${escapeHtml((c.visitorId || "").substring(0, 10))}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${visibilityBadge}
+            ${replyBadge}
+            <div class="admin-comment-art-tag">
+              ${artImg ? `<img src="${escapeHtml(artImg)}" alt="${escapeHtml(artTitle)}" onclick="zoomPhoto('${escapeHtml(artImg)}')" style="cursor:pointer" title="Click to zoom">` : ""}
+              <span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(artTitle)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-comment-content">
+          ${replyToLabel}
+          ${escapeHtml(c.text)}
+        </div>
+
+        ${adminReplyBlock}
+        ${inlineReplyBox}
+
+        <div class="admin-comment-actions">
+          <button type="button" class="btn secondary" style="padding:6px 12px;font-size:11px;display:inline-flex;align-items:center;gap:5px" onclick="toggleReplyBox('${c.id}')">
+            <span>🎨</span> ${isReplied ? 'Edit Artist Reply' : 'Reply as Faheem'}
+          </button>
+          
+          <button type="button" class="btn secondary" style="padding:6px 12px;font-size:11px;display:inline-flex;align-items:center;gap:5px" onclick="toggleHideComment('${c.id}', ${isHidden})">
+            <span>${isHidden ? '👁️' : '👁️‍🗨️'}</span> ${isHidden ? 'Restore to Public' : 'Hide from Public'}
+          </button>
+
+          <button type="button" class="btn secondary" style="padding:6px 12px;font-size:11px;color:#e74c3c;border-color:#fca5a5;display:inline-flex;align-items:center;gap:5px" onclick="deleteCommentDoc('${c.id}')">
+            <span>🗑️</span> Delete
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function submitAdminReply(commentId){
+  const textarea = $("adminReplyInput_" + commentId);
+  if(!textarea) return;
+  const replyText = textarea.value.trim();
+  if(!replyText){
+    toast("Reply text cannot be empty");
+    return;
+  }
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    toast("Database not ready");
+    return;
+  }
+  fb.db.collection("faheemgraphy_comments").doc(commentId).update({
+    adminReply: replyText,
+    adminRepliedAt: Date.now()
+  }).then(() => {
+    toast("Reply published! Customer will see it instantly on the artwork 🎨");
+    activeReplyCommentId = null;
+  }).catch(err => {
+    toast("Failed to post reply: " + err.message);
+  });
+}
+
+function removeAdminReply(commentId){
+  if(!confirm("Remove your artist reply from this comment?")) return;
   const fb = initFirebase();
   if(!fb || !fb.db) return;
-  fb.db.collection("faheemgraphy_likes").onSnapshot(snapshot => {
-    let total = 0;
-    snapshot.forEach(doc => { total += (doc.data().count || 0); });
-    if($("sideBadgeLikes")) $("sideBadgeLikes").textContent = total;
-    if($("statTotalLikes")) $("statTotalLikes").textContent = total;
-    if($("likesKpiTotal")) $("likesKpiTotal").textContent = total;
-  }, err => console.warn("Likes listener:", err));
+  fb.db.collection("faheemgraphy_comments").doc(commentId).update({
+    adminReply: null,
+    adminRepliedAt: null
+  }).then(() => {
+    toast("Reply removed 🗑️");
+  }).catch(err => toast("Error: " + err.message));
+}
+
+function toggleHideComment(commentId, currentlyHidden){
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  const newHidden = !currentlyHidden;
+  fb.db.collection("faheemgraphy_comments").doc(commentId).update({
+    hidden: newHidden,
+    status: newHidden ? "hidden" : "active"
+  }).then(() => {
+    toast(newHidden ? "Comment hidden from public gallery 👁️‍🗨️" : "Comment restored to public gallery ✨");
+  }).catch(err => toast("Error updating status: " + err.message));
+}
+
+function deleteCommentDoc(commentId){
+  if(!confirm("Are you sure you want to permanently delete this comment?")) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db) return;
+  fb.db.collection("faheemgraphy_comments").doc(commentId).delete().then(() => {
+    toast("Comment permanently deleted 🗑️");
+  }).catch(err => toast("Delete error: " + err.message));
+}
+
+/* --------------------------------------------------
+   ARTWORK LIKES ENGINE
+   -------------------------------------------------- */
+function initAdminLikesListener(){
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    console.warn("Firebase not ready for admin likes");
+    return;
+  }
+  if(adminLikesUnsub){
+    try{ adminLikesUnsub(); }catch(e){}
+  }
+
+  adminLikesUnsub = fb.db.collection("faheemgraphy_likes").onSnapshot(snapshot => {
+    const docs = [];
+    snapshot.forEach(doc => {
+      docs.push({ id: doc.id, ...doc.data() });
+    });
+    docs.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    if(likesInitialLoadDone){
+      snapshot.docChanges().forEach(change => {
+        if(change.type === "added"){
+          const newLike = { id: change.doc.id, ...change.doc.data() };
+          playLikeSound();
+          showLiveLikePopup(newLike);
+          toast(`❤️ New like for "${newLike.artworkTitle || 'Artwork'}"!`);
+        }
+      });
+    } else {
+      likesInitialLoadDone = true;
+    }
+
+    adminLikes = docs;
+    updateAdminLikeKPIs();
+    renderAdminLikes();
+  }, err => {
+    console.warn("Likes listener error:", err);
+  });
+}
+
+function updateAdminLikeKPIs(){
+  const total = adminLikes.length;
+  const artCounts = {};
+  adminLikes.forEach(l => {
+    const aid = String(l.artworkId || "");
+    if(aid){
+      artCounts[aid] = (artCounts[aid] || 0) + 1;
+    }
+  });
+
+  const uniqueCount = Object.keys(artCounts).length;
+  let topAid = null;
+  let topMax = 0;
+  for(const aid in artCounts){
+    if(artCounts[aid] > topMax){
+      topMax = artCounts[aid];
+      topAid = aid;
+    }
+  }
+
+  let topTitle = "–";
+  if(topAid){
+    const match = adminLikes.find(l => String(l.artworkId) === topAid);
+    if(match && match.artworkTitle){
+      topTitle = `${match.artworkTitle} (${topMax} ❤️)`;
+    } else if(typeof arts !== 'undefined' && Array.isArray(arts)){
+      const found = arts.find(a => String(a.id) === topAid);
+      topTitle = found ? `${found.title} (${topMax} ❤️)` : `#${topAid} (${topMax} ❤️)`;
+    } else {
+      topTitle = `#${topAid} (${topMax} ❤️)`;
+    }
+  }
+
+  if($("likeKpiTotal")) $("likeKpiTotal").textContent = total;
+  if($("statTotalLikes")) $("statTotalLikes").textContent = total;
+  if($("sideBadgeLikes")) $("sideBadgeLikes").textContent = total;
+  if($("likeKpiArtCount")) $("likeKpiArtCount").textContent = uniqueCount;
+  if($("likeKpiTopArt")) $("likeKpiTopArt").textContent = topTitle;
+}
+
+function renderAdminLikes(){
+  const lbContainer = $("adminLikesLeaderboard");
+  const feedContainer = $("adminLikesRecentFeed");
+  if(!lbContainer && !feedContainer) return;
+
+  const artMap = {};
+  adminLikes.forEach(l => {
+    const aid = String(l.artworkId || "");
+    if(!aid) return;
+    if(!artMap[aid]){
+      artMap[aid] = {
+        artworkId: aid,
+        artworkTitle: l.artworkTitle || ("Artwork #" + aid),
+        artworkCat: l.artworkCat || "",
+        artworkImage: l.artworkImage || "",
+        count: 0,
+        latestLikeAt: l.createdAt || 0
+      };
+    }
+    artMap[aid].count += 1;
+    if(l.createdAt && l.createdAt > artMap[aid].latestLikeAt){
+      artMap[aid].latestLikeAt = l.createdAt;
+    }
+    if(!artMap[aid].artworkImage && l.artworkImage){
+      artMap[aid].artworkImage = l.artworkImage;
+    }
+  });
+
+  if(typeof arts !== 'undefined' && Array.isArray(arts)){
+    arts.forEach(a => {
+      const aid = String(a.id);
+      if(artMap[aid]){
+        if(!artMap[aid].artworkImage) artMap[aid].artworkImage = a.img;
+        if(artMap[aid].artworkTitle === "Artwork #" + aid) artMap[aid].artworkTitle = a.title;
+        if(!artMap[aid].artworkCat) artMap[aid].artworkCat = a.cat;
+      }
+    });
+  }
+
+  const sortedLeaderboard = Object.values(artMap).sort((a,b) => b.count - a.count || b.latestLikeAt - a.latestLikeAt);
+  const maxLikes = sortedLeaderboard.length ? sortedLeaderboard[0].count : 1;
+
+  if(lbContainer){
+    if(!sortedLeaderboard.length){
+      lbContainer.innerHTML = `
+        <div style="text-align:center;padding:48px 24px;color:var(--muted);background:var(--soft);border-radius:14px;border:1px dashed var(--line)">
+          <div style="font-size:32px;margin-bottom:8px">❤️</div>
+          <div style="font-weight:700;color:var(--ink);margin-bottom:4px">No Likes Recorded Yet</div>
+          <div style="font-size:12.5px">Customer hearts from the public website will rank here automatically in real time.</div>
+        </div>
+      `;
+    } else {
+      lbContainer.innerHTML = sortedLeaderboard.map((item, idx) => {
+        const rank = idx + 1;
+        let rankClass = "rank-badge-other";
+        if(rank === 1) rankClass = "rank-badge-1";
+        else if(rank === 2) rankClass = "rank-badge-2";
+        else if(rank === 3) rankClass = "rank-badge-3";
+
+        const pct = Math.round((item.count / maxLikes) * 100);
+
+        return `
+          <div class="leaderboard-row">
+            <div class="rank-badge ${rankClass}">#${rank}</div>
+            ${item.artworkImage ? `<img src="${escapeHtml(item.artworkImage)}" alt="${escapeHtml(item.artworkTitle)}" onclick="zoomPhoto('${escapeHtml(item.artworkImage)}')" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer" title="Zoom">` : `<div style="width:40px;height:40px;border-radius:8px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`}
+            
+            <div style="min-width:180px;flex:1.5">
+              <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${escapeHtml(item.artworkTitle)}</div>
+              <div style="font-size:11px;color:var(--muted)">${escapeHtml(item.artworkCat || 'Art')}</div>
+            </div>
+
+            <div class="like-prog-wrap">
+              <div class="like-prog-bar" style="width:${pct}%"></div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px;color:#e74c3c;min-width:90px;justify-content:flex-end">
+              <span>❤️</span>
+              <span>${item.count}</span>
+              <span style="font-size:11px;font-weight:normal;color:var(--muted)">likes</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  if(feedContainer){
+    const recent = adminLikes.slice(0, 15);
+    if($("likesRecentCount")) $("likesRecentCount").textContent = `${adminLikes.length} total recorded`;
+
+    if(!recent.length){
+      feedContainer.innerHTML = `
+        <div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">
+          Waiting for visitors to like artworks...
+        </div>
+      `;
+    } else {
+      feedContainer.innerHTML = recent.map(l => {
+        const user = escapeHtml(l.userName || "Anonymous Art Lover");
+        const title = escapeHtml(l.artworkTitle || "Artwork");
+        const timeStr = l.createdAt ? new Date(l.createdAt).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Just now";
+        
+        let thumb = l.artworkImage || "";
+        if(!thumb && typeof arts !== 'undefined' && Array.isArray(arts)){
+          const match = arts.find(a => String(a.id) === String(l.artworkId));
+          if(match) thumb = match.img;
+        }
+
+        return `
+          <div class="recent-like-row">
+            <div style="display:flex;align-items:center;gap:10px">
+              ${thumb ? `<img src="${escapeHtml(thumb)}" alt="${title}" style="width:30px;height:30px;border-radius:6px;object-fit:cover">` : `<div style="width:30px;height:30px;border-radius:6px;background:#fdf2f2;color:#e74c3c;display:flex;align-items:center;justify-content:center;font-size:13px">❤️</div>`}
+              <div>
+                <div style="font-size:12.5px;color:var(--ink)">
+                  <b>${user}</b> liked <i>${title}</i>
+                </div>
+                <div style="font-size:10.5px;color:var(--muted)">${timeStr} · Visitor ID: ${escapeHtml((l.visitorId || "").substring(0, 10))}</div>
+              </div>
+            </div>
+            <span style="background:#fdf2f2;color:#e74c3c;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">❤️ +1</span>
+          </div>
+        `;
+      }).join("");
+    }
+  }
 }
 
 /* Login & Logout */

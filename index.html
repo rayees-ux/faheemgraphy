@@ -1495,6 +1495,7 @@ function toggleLike(artworkId, event){
       artworkId: aid,
       artworkTitle: a ? a.title : "Artwork",
       artworkCat: a ? a.cat : "",
+      artworkImage: a ? a.img : "",
       visitorId: vid,
       userName: (currentVisitorAuth && currentVisitorAuth.displayName) ? currentVisitorAuth.displayName : "Anonymous Art Lover",
       userPhoto: (currentVisitorAuth && currentVisitorAuth.photoURL) ? currentVisitorAuth.photoURL : null,
@@ -1551,7 +1552,7 @@ function initCommentsListener(){
 function renderArtworkComments(){
   if(!currentViewingArtworkId) return;
   const aid = String(currentViewingArtworkId);
-  const comments = allComments.filter(c => String(c.artworkId) === aid && c.status !== "hidden");
+  const comments = allComments.filter(c => String(c.artworkId) === aid && c.status !== "hidden" && !c.hidden);
   
   if($("vCommentCount")) $("vCommentCount").textContent = comments.length;
   const listEl = $("vCommentsList");
@@ -1566,7 +1567,11 @@ function renderArtworkComments(){
     return;
   }
 
+  const currentVid = currentVisitorId || localStorage.getItem("fg_vid");
+  const currentEmail = currentVisitorAuth ? currentVisitorAuth.email : null;
+
   listEl.innerHTML = comments.map(c => {
+    const isMyComment = (currentVid && c.visitorId === currentVid) || (currentEmail && c.authorEmail === currentEmail);
     const initial = (c.authorName || "C").trim().charAt(0).toUpperCase();
     const hasPhoto = c.authorPhoto && c.authorPhoto.length > 5;
     const avatarHtml = hasPhoto
@@ -1574,6 +1579,13 @@ function renderArtworkComments(){
       : `<div class="comment-avatar">${initial}</div>`;
     
     const replyBtn = `<button type="button" onclick="setReplyTo('${c.id}', '${esc(c.authorName)}')" style="background:none;border:0;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;padding:0">Reply</button>`;
+
+    const myActionsHtml = isMyComment ? `
+      <div style="display:flex;align-items:center;gap:6px">
+        <button type="button" onclick="editCustomerComment('${c.id}')" title="Edit your comment" style="background:none;border:0;color:var(--muted);font-size:10.5px;cursor:pointer;padding:1px 4px;border-radius:4px" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">Edit</button>
+        <button type="button" onclick="deleteCustomerComment('${c.id}')" title="Delete your comment" style="background:none;border:0;color:#e74c3c;font-size:10.5px;cursor:pointer;padding:1px 4px;border-radius:4px" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Delete</button>
+      </div>
+    ` : "";
 
     const adminReplyHtml = c.adminReply ? `
       <div class="admin-reply-box">
@@ -1586,29 +1598,76 @@ function renderArtworkComments(){
     ` : "";
 
     const replyingLabel = c.replyToAuthor ? `<span style="color:var(--accent);font-size:11px;margin-right:4px">@${esc(c.replyToAuthor)}</span>` : "";
+    const editedLabel = c.editedAt ? `<span style="font-size:10px;color:var(--muted);margin-left:4px">(edited)</span>` : "";
 
     return `
-      <div class="comment-item">
+      <div class="comment-item" id="comment-item-${c.id}">
         <div class="comment-header">
           <div class="comment-author-wrap">
             ${avatarHtml}
             <div>
               <span class="comment-name">${esc(c.authorName || "Art Lover")}</span>
               ${c.isAuth ? `<span style="background:#e8f0fe;color:#1967d2;font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;margin-left:4px">Google User</span>` : ""}
+              ${isMyComment ? `<span style="background:#f0eee9;color:var(--ink);font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;margin-left:4px">You</span>` : ""}
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="comment-time">${formatCommentTime(c.createdAt)}</span>
+            <span class="comment-time">${formatCommentTime(c.createdAt)}${editedLabel}</span>
             ${replyBtn}
+            ${myActionsHtml}
           </div>
         </div>
-        <div class="comment-text">
+        <div class="comment-text" id="comment-text-${c.id}">
           ${replyingLabel}${esc(c.text)}
         </div>
         ${adminReplyHtml}
       </div>
     `;
   }).join("");
+}
+
+function editCustomerComment(commentId){
+  const c = allComments.find(x => x.id === commentId);
+  if(!c) return;
+  const currentText = c.text || "";
+  const newText = prompt("Edit your comment:", currentText);
+  if(newText === null) return;
+  const trimmed = newText.trim();
+  if(!trimmed){
+    toast("Comment cannot be empty");
+    return;
+  }
+  if(trimmed === currentText.trim()) return;
+
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    toast("Database not ready");
+    return;
+  }
+  fb.db.collection("faheemgraphy_comments").doc(commentId).update({
+    text: trimmed,
+    editedAt: Date.now()
+  }).then(() => {
+    toast("Comment updated ✨");
+  }).catch(err => {
+    console.error("Comment edit error:", err);
+    toast("Failed to update comment: " + err.message);
+  });
+}
+
+function deleteCustomerComment(commentId){
+  if(!confirm("Are you sure you want to delete your comment?")) return;
+  const fb = initFirebase();
+  if(!fb || !fb.db){
+    toast("Database not ready");
+    return;
+  }
+  fb.db.collection("faheemgraphy_comments").doc(commentId).delete().then(() => {
+    toast("Comment deleted 🗑️");
+  }).catch(err => {
+    console.error("Comment delete error:", err);
+    toast("Failed to delete comment: " + err.message);
+  });
 }
 
 function formatCommentTime(ts){
@@ -1666,6 +1725,7 @@ async function submitComment(e){
     artworkId: aid,
     artworkTitle: a ? a.title : "Artwork",
     artworkCat: a ? a.cat : "",
+    artworkImage: a ? a.img : "",
     authorName,
     authorPhoto: currentVisitorAuth ? currentVisitorAuth.photoURL : null,
     authorEmail: currentVisitorAuth ? currentVisitorAuth.email : null,
@@ -1673,6 +1733,8 @@ async function submitComment(e){
     visitorId: currentVisitorId || localStorage.getItem("fg_vid") || "visitor",
     text,
     status: "active",
+    hidden: false,
+    isRead: false,
     replyToId: currentReplyingCommentId || null,
     replyToAuthor: currentReplyingCommentAuthor || null,
     adminReply: null,
