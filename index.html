@@ -2125,14 +2125,9 @@ function render(){
   if(recent5.length > 0){
     galleriesHtml += `
       <div class="gal recent-works-gal" id="gRecent">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px">
-          <h3 class="gh" style="margin-bottom:0">
-            Recent Works <small>Latest 5 Uploads</small>
-          </h3>
-          <button type="button" class="btn line sm" onclick="openDedicatedGallery('all')" style="font-size:11.5px;letter-spacing:.08em;font-weight:700">
-            SEE ALL (${totalArtworks}) ↗
-          </button>
-        </div>
+        <h3 class="gh" style="margin-bottom:22px">
+          Recent Works <small>Latest 5 Uploads</small>
+        </h3>
         <div class="grid">
           ${recent5.map(card).join("")}
         </div>
@@ -2147,7 +2142,7 @@ function render(){
     `;
   }
 
-  // 2. ALL CATEGORIES: ONLY LATEST 5 ARTWORKS PER CATEGORY + SEPARATE "SEE MORE" OPTION
+  // 2. ALL CATEGORIES: ONLY LATEST 5 ARTWORKS PER CATEGORY + SEPARATE "SEE MORE" OPTION UNDERNEATH
   cats.forEach((c, i) => {
     const catArtworks = (arts || []).filter(a => a.cat === c);
     if(!catArtworks.length) return;
@@ -2155,14 +2150,9 @@ function render(){
 
     galleriesHtml += `
       <div class="gal" id="g${i}">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px">
-          <h3 class="gh" style="margin-bottom:0">
-            ${esc(c)} <small>${catArtworks.length} artworks</small>
-          </h3>
-          <button type="button" class="btn line sm" onclick="openDedicatedGallery('${esc(c)}')" style="font-size:11.5px;letter-spacing:.08em;font-weight:700">
-            SEE MORE ↗
-          </button>
-        </div>
+        <h3 class="gh" style="margin-bottom:22px">
+          ${esc(c)} <small>${catArtworks.length} artworks</small>
+        </h3>
         <div class="grid">
           ${cat5.map(card).join("")}
         </div>
