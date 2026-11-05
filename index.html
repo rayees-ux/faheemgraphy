@@ -858,6 +858,294 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
   75% { width: 85%; }
   100% { width: 100%; }
 }
+
+/* =========================================================
+   HOMEPAGE RECENT WORKS & DEDICATED FULL GALLERY SYSTEM
+   ========================================================= */
+.see-more-wrap{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 32px 0 54px;
+}
+.see-more-action-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 34px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #ffffff;
+  border: 1px solid var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .24s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+.see-more-action-btn:hover{
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(200, 100, 60, 0.3);
+}
+.see-more-action-btn.cat-btn{
+  background: #ffffff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  padding: 12px 28px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.see-more-action-btn.cat-btn:hover{
+  background: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+.see-more-badge{
+  background: rgba(255,255,255,0.22);
+  color: inherit;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.see-more-action-btn.cat-btn .see-more-badge{
+  background: var(--soft);
+  color: var(--muted);
+}
+.see-more-action-btn.cat-btn:hover .see-more-badge{
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+/* Dedicated Gallery View (Full-Page Overlay) */
+.dedicated-gallery-modal{
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: galModalIn .25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dedicated-gallery-modal.open{
+  display: flex;
+}
+@keyframes galModalIn{
+  from{ opacity: 0; transform: translateY(16px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+.gal-modal-header{
+  padding: 14px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.gal-modal-back-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s ease;
+  font-family: inherit;
+}
+.gal-modal-back-btn:hover{
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.gal-modal-close-x{
+  background: none;
+  border: 0;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: color .18s;
+}
+.gal-modal-close-x:hover{
+  color: var(--accent);
+}
+.gal-modal-body{
+  flex: 1;
+  overflow-y: auto;
+  padding: 36px 0 70px;
+  -webkit-overflow-scrolling: touch;
+}
+.gal-counter-badge{
+  display: inline-flex;
+  align-items: center;
+  background: var(--soft);
+  color: var(--accent);
+  border: 1px solid var(--line);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.gal-toolbar{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+.gal-search-box{
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.gal-search-box svg{
+  position: absolute;
+  left: 14px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.gal-search-box input{
+  width: 100%;
+  padding: 12px 38px 12px 42px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  font-size: 13.5px;
+  outline: none;
+  transition: all .2s;
+  box-sizing: border-box;
+}
+.gal-search-box input:focus{
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(200, 100, 60, 0.12);
+}
+.gal-search-box button{
+  position: absolute;
+  right: 14px;
+}
+.gal-category-chips{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.gal-category-chips::-webkit-scrollbar{
+  display: none;
+}
+.gal-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--ink);
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  font-family: inherit;
+}
+.gal-chip:hover{
+  background: #eae8e1;
+}
+.gal-chip.active{
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.gal-chip .chip-cnt{
+  font-size: 10.5px;
+  opacity: .75;
+}
+.gal-pagination-wrap{
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.gal-pagination-box{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+.gal-page-progress{
+  font-size: 13px;
+  color: var(--muted);
+  width: 100%;
+}
+.gal-progress-bar{
+  width: 100%;
+  height: 6px;
+  background: var(--line);
+  border-radius: 999px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.gal-progress-fill{
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width .3s ease;
+}
+.load-more-btn{
+  padding: 13px 32px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+@media(max-width:768px){
+  .see-more-action-btn{
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 12px;
+  }
+  .gal-modal-header{
+    padding: 12px 16px;
+  }
+  .gal-toolbar{
+    padding: 14px;
+    margin-bottom: 24px;
+  }
+  .gal-modal-body{
+    padding: 24px 0 50px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1307,6 +1595,72 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
   </div>
 </div>
 
+<!-- DEDICATED FULL ARTWORKS GALLERY MODAL -->
+<div id="dedicatedGalleryModal" class="dedicated-gallery-modal" onclick="if(event.target===this)closeDedicatedGallery()">
+  <!-- Header -->
+  <div class="gal-modal-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="logo.png" alt="FAHEEM GRAPHY" style="width:34px;height:34px;object-fit:contain">
+      <div>
+        <div style="font-family:'Pirata One',serif;font-size:22px;line-height:1;letter-spacing:.5px;color:var(--ink)">Faheemgraphy</div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase">Art Archive &amp; Full Collection</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button type="button" class="gal-modal-back-btn" onclick="closeDedicatedGallery()" title="Return to Homepage">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Back to Homepage</span>
+      </button>
+      <button type="button" class="gal-modal-close-x" onclick="closeDedicatedGallery()" aria-label="Close Gallery">×</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="gal-modal-body" id="galModalBody">
+    <div class="wrap">
+      <!-- Title & Live Counter -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+        <div>
+          <h2 id="dedicatedGalleryTitle" style="font-family:'Anton',sans-serif;font-size:clamp(30px,4.2vw,48px);text-transform:uppercase;line-height:1;letter-spacing:.3px;margin-bottom:6px">
+            All Works
+          </h2>
+          <p id="dedicatedGallerySubtitle" style="font-size:13.5px;color:var(--muted);margin:0">
+            Browse the complete studio archive. Tap any artwork for full details, high-res zoom, likes, comments, and orders.
+          </p>
+        </div>
+        <div id="dedicatedGalleryCounterBadge" class="gal-counter-badge">
+          0 Artworks
+        </div>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div class="gal-toolbar">
+        <!-- Live Search -->
+        <div class="gal-search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="dedicatedGallerySearch" placeholder="Search artworks by title or category..." oninput="handleGallerySearch(this.value)">
+          <button type="button" id="dedicatedGallerySearchClear" onclick="clearGallerySearch()" style="display:none;background:none;border:0;cursor:pointer;color:var(--muted);font-size:14px">✕</button>
+        </div>
+
+        <!-- Category Pills Bar -->
+        <div class="gal-category-chips" id="dedicatedGalleryCats">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Artworks Grid (5 on desktop, 3 on tablet, 2 on mobile) -->
+      <div class="grid" id="dedicatedGalleryGrid">
+        <!-- Cards rendered here -->
+      </div>
+
+      <!-- Pagination / Load More Bar -->
+      <div id="dedicatedGalleryPagination" class="gal-pagination-wrap">
+        <!-- Load More controls -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1372,7 +1726,7 @@ function initCloudRealtime(){
       snapshot.forEach(doc => {
         items.push({ id: doc.id, ...doc.data() });
       });
-      items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      items.sort((a,b) => (b.uploadedAt || b.createdAt || 0) - (a.uploadedAt || a.createdAt || 0));
       arts = items;
       render();
       setCloudLive(true);
@@ -1650,12 +2004,80 @@ function updateHeroSlideUI(){
 }
 
 function render(){
-  const count = c => arts.filter(a => a.cat === c).length;
-  $("cats").innerHTML = `<div class="cat all" data-i="-1" onclick="goCat(-1)"><b>All Works</b></div>` + cats.map((c,i) => `<div class="cat" data-i="${i}" onclick="goCat(${i})"><b>${esc(c)}</b><small>${count(c)} artworks</small></div>`).join("");
+  const count = c => (arts || []).filter(a => a.cat === c).length;
+  const totalArtworks = (arts || []).length;
+
+  // Category Selector Chips
+  $("cats").innerHTML = `<div class="cat all ${activeCat === -1 ? 'active' : ''}" data-i="-1" onclick="goCat(-1)"><b>All Works</b><small>${totalArtworks} artworks</small></div>` + cats.map((c,i) => `<div class="cat ${activeCat === i ? 'active' : ''}" data-i="${i}" onclick="goCat(${i})"><b>${esc(c)}</b><small>${count(c)} artworks</small></div>`).join("");
+
+  let galleriesHtml = "";
+
+  // 1. HOMEPAGE: 5 RECENT WORKS ONLY (Latest uploads, newest first)
+  const recent5 = (arts || []).slice(0, 5);
+  if(recent5.length > 0){
+    galleriesHtml += `
+      <div class="gal recent-works-gal" id="gRecent">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+          <h3 class="gh" style="margin-bottom:0">
+            Recent Works <small>Latest 5 Uploads</small>
+          </h3>
+          <button type="button" class="btn line sm" onclick="openDedicatedGallery('all')" style="font-size:11.5px;letter-spacing:.08em;font-weight:700">
+            SEE ALL (${totalArtworks}) ↗
+          </button>
+        </div>
+        <div class="grid">
+          ${recent5.map(card).join("")}
+        </div>
+        <div class="see-more-wrap">
+          <button type="button" class="see-more-action-btn" onclick="openDedicatedGallery('all')" title="View all artworks in our complete collection">
+            <span>SEE ALL WORKS</span>
+            <span class="see-more-badge">${totalArtworks} Total</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. ALL CATEGORIES: ONLY LATEST 5 ARTWORKS PER CATEGORY + SEPARATE "SEE MORE" OPTION
+  cats.forEach((c, i) => {
+    const catArtworks = (arts || []).filter(a => a.cat === c);
+    if(!catArtworks.length) return;
+    const cat5 = catArtworks.slice(0, 5);
+
+    galleriesHtml += `
+      <div class="gal" id="g${i}">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+          <h3 class="gh" style="margin-bottom:0">
+            ${esc(c)} <small>${catArtworks.length} artworks</small>
+          </h3>
+          <button type="button" class="btn line sm" onclick="openDedicatedGallery('${esc(c)}')" style="font-size:11.5px;letter-spacing:.08em;font-weight:700">
+            SEE MORE ↗
+          </button>
+        </div>
+        <div class="grid">
+          ${cat5.map(card).join("")}
+        </div>
+        <div class="see-more-wrap">
+          <button type="button" class="see-more-action-btn cat-btn" onclick="openDedicatedGallery('${esc(c)}')" title="View all ${esc(c)} artworks">
+            <span>SEE MORE ${esc(c).toUpperCase()}</span>
+            <span class="see-more-badge">${catArtworks.length} Artworks</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  $("galleries").innerHTML = galleriesHtml;
   applyFilter();
-  $("galleries").innerHTML = cats.map((c,i) => count(c) ? `<div class="gal" id="g${i}"><h3 class="gh">${esc(c)} <small>${count(c)}</small></h3><div class="grid">${arts.filter(a=>a.cat===c).map(card).join("")}</div></div>` : "").join("");
   $("ct").innerHTML = cats.map(c => `<option>${esc(c)}</option>`).join("")+"<option>Other</option>";
   initHeroSlideshow();
+
+  // If dedicated gallery modal is currently open, refresh its content in real-time
+  if(dedicatedGalleryOpen){
+    renderDedicatedGallery();
+  }
 }
 
 const DEF_BIO = "I'm an independent artist creating detailed artwork, portraits, calligraphy, logos, and custom pieces for people, brands, and special occasions.";
@@ -1675,21 +2097,211 @@ function renderAbout(){
 let activeCat = -1;
 const isMobile = () => window.matchMedia("(max-width:900px)").matches;
 function applyFilter(){
-  const m = isMobile();
-  document.querySelectorAll("#cats .cat").forEach(el => el.classList.toggle("active", m && +el.dataset.i === activeCat));
-  document.querySelectorAll("#galleries .gal").forEach(g => g.style.display = (!m || activeCat === -1 || g.id === "g"+activeCat) ? "" : "none");
-}
-function goCat(i){
-  if(isMobile()){
-    activeCat = i; applyFilter();
-    if(i !== -1 && !$("g"+i)) toast("No artworks in this category yet");
-    const chip = document.querySelector(`#cats .cat[data-i="${i}"]`);
-    if(chip) chip.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
-    return;
+  document.querySelectorAll("#cats .cat").forEach(el => el.classList.toggle("active", +el.dataset.i === activeCat));
+  const recentG = $("gRecent");
+  if(recentG){
+    recentG.style.display = (activeCat === -1) ? "" : "none";
   }
-  const el = $("g"+i);
-  if(el) el.scrollIntoView({behavior:"smooth"});
-  else toast("No artworks in this category yet");
+  document.querySelectorAll("#galleries .gal:not(#gRecent)").forEach(g => {
+    g.style.display = (activeCat === -1 || g.id === "g"+activeCat) ? "" : "none";
+  });
+}
+
+function goCat(i){
+  activeCat = i;
+  applyFilter();
+  if(i !== -1){
+    const el = $("g"+i);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+    else toast("No artworks in this category yet");
+  } else {
+    const el = $("gRecent") || $("cats");
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  const chip = document.querySelector(`#cats .cat[data-i="${i}"]`);
+  if(chip) chip.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
+}
+
+/* =========================================================
+   DEDICATED FULL ARTWORKS GALLERY ENGINE (PAGINATION & SEARCH)
+   ========================================================= */
+let dedicatedGalleryOpen = false;
+let dedicatedGalleryCategory = 'all';
+let dedicatedGallerySearchQuery = '';
+let dedicatedGalleryLoadedCount = 15;
+const GALLERY_PAGE_SIZE = 15;
+
+function openDedicatedGallery(category = 'all'){
+  dedicatedGalleryCategory = category;
+  dedicatedGallerySearchQuery = '';
+  dedicatedGalleryLoadedCount = GALLERY_PAGE_SIZE;
+  dedicatedGalleryOpen = true;
+
+  if($("dedicatedGallerySearch")){
+    $("dedicatedGallerySearch").value = '';
+  }
+  if($("dedicatedGallerySearchClear")){
+    $("dedicatedGallerySearchClear").style.display = 'none';
+  }
+
+  const modal = $("dedicatedGalleryModal");
+  if(modal){
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  renderDedicatedGallery();
+  trackVisitorActivity("Viewing: " + (category === 'all' ? 'All Artworks Gallery' : category + ' Collection'));
+}
+
+function closeDedicatedGallery(){
+  dedicatedGalleryOpen = false;
+  const modal = $("dedicatedGalleryModal");
+  if(modal){
+    modal.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  trackVisitorActivity("Viewing: Categories & Gallery");
+}
+
+function handleGallerySearch(val){
+  dedicatedGallerySearchQuery = (val || "").trim().toLowerCase();
+  dedicatedGalleryLoadedCount = GALLERY_PAGE_SIZE;
+  if($("dedicatedGallerySearchClear")){
+    $("dedicatedGallerySearchClear").style.display = dedicatedGallerySearchQuery ? "block" : "none";
+  }
+  renderDedicatedGallery();
+}
+
+function clearGallerySearch(){
+  if($("dedicatedGallerySearch")) $("dedicatedGallerySearch").value = "";
+  if($("dedicatedGallerySearchClear")) $("dedicatedGallerySearchClear").style.display = "none";
+  dedicatedGallerySearchQuery = "";
+  dedicatedGalleryLoadedCount = GALLERY_PAGE_SIZE;
+  renderDedicatedGallery();
+}
+
+function selectDedicatedGalleryCat(cat){
+  dedicatedGalleryCategory = cat;
+  dedicatedGalleryLoadedCount = GALLERY_PAGE_SIZE;
+  renderDedicatedGallery();
+}
+
+function loadMoreGalleryArtworks(){
+  dedicatedGalleryLoadedCount += GALLERY_PAGE_SIZE;
+  renderDedicatedGallery();
+}
+
+function renderDedicatedGallery(){
+  if(!dedicatedGalleryOpen) return;
+
+  // 1. Filter by category
+  let list = [...(arts || [])];
+  if(dedicatedGalleryCategory !== 'all'){
+    list = list.filter(a => a.cat === dedicatedGalleryCategory);
+  }
+
+  // 2. Filter by search query
+  if(dedicatedGallerySearchQuery){
+    const q = dedicatedGallerySearchQuery;
+    list = list.filter(a => {
+      return (a.title && a.title.toLowerCase().includes(q)) ||
+             (a.cat && a.cat.toLowerCase().includes(q)) ||
+             (a.desc && a.desc.toLowerCase().includes(q));
+    });
+  }
+
+  const totalFiltered = list.length;
+  const visibleList = list.slice(0, dedicatedGalleryLoadedCount);
+
+  // Update Header Title & Subtitle
+  const titleEl = $("dedicatedGalleryTitle");
+  const subEl = $("dedicatedGallerySubtitle");
+  const counterEl = $("dedicatedGalleryCounterBadge");
+  if(titleEl){
+    titleEl.textContent = dedicatedGalleryCategory === 'all' ? 'All Studio Works' : `${dedicatedGalleryCategory}`;
+  }
+  if(subEl){
+    subEl.textContent = dedicatedGalleryCategory === 'all' 
+      ? 'Browse the complete Faheemgraphy collection. Showing newest first with real-time live availability.'
+      : `Complete collection of ${dedicatedGalleryCategory} artworks. Tap any piece to order or view details.`;
+  }
+  if(counterEl){
+    counterEl.textContent = `${totalFiltered} ${totalFiltered === 1 ? 'Artwork' : 'Artworks'}`;
+  }
+
+  // Render Category Chips
+  const chipsEl = $("dedicatedGalleryCats");
+  if(chipsEl){
+    chipsEl.innerHTML = `
+      <button type="button" class="gal-chip ${dedicatedGalleryCategory === 'all' ? 'active' : ''}" onclick="selectDedicatedGalleryCat('all')">
+        <span>All Works</span>
+        <span class="chip-cnt">(${arts.length})</span>
+      </button>
+    ` + cats.map(c => {
+      const cnt = (arts || []).filter(a => a.cat === c).length;
+      return `
+        <button type="button" class="gal-chip ${dedicatedGalleryCategory === c ? 'active' : ''}" onclick="selectDedicatedGalleryCat('${esc(c)}')">
+          <span>${esc(c)}</span>
+          <span class="chip-cnt">(${cnt})</span>
+        </button>
+      `;
+    }).join("");
+  }
+
+  // Render Cards Grid (Strictly 5 on desktop, 3 on tablet, 2 on mobile)
+  const gridEl = $("dedicatedGalleryGrid");
+  if(gridEl){
+    if(!visibleList.length){
+      gridEl.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 64px 20px; color: var(--muted)">
+          <div style="font-size: 42px; margin-bottom: 12px">🎨</div>
+          <div style="font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 6px">No Artworks Found</div>
+          <div style="font-size: 13px">Try clearing your search keyword or switching category tabs.</div>
+        </div>
+      `;
+    } else {
+      gridEl.innerHTML = visibleList.map(card).join("");
+    }
+  }
+
+  // Render Pagination / Load More Bar
+  const pagEl = $("dedicatedGalleryPagination");
+  if(pagEl){
+    if(totalFiltered <= GALLERY_PAGE_SIZE){
+      pagEl.innerHTML = totalFiltered > 0 ? `
+        <div style="font-size: 12.5px; color: var(--muted); margin-top: 14px">
+          Showing all ${totalFiltered} artworks ✨
+        </div>
+      ` : "";
+    } else if(visibleList.length < totalFiltered){
+      const remaining = totalFiltered - visibleList.length;
+      const pct = Math.round((visibleList.length / totalFiltered) * 100);
+      pagEl.innerHTML = `
+        <div class="gal-pagination-box">
+          <div class="gal-page-progress">
+            Showing <b>${visibleList.length}</b> of <b>${totalFiltered}</b> artworks (${pct}%)
+            <div class="gal-progress-bar"><div class="gal-progress-fill" style="width: ${pct}%"></div></div>
+          </div>
+          <button type="button" class="btn dark load-more-btn" onclick="loadMoreGalleryArtworks()">
+            Load More Artworks (${remaining} remaining) ↓
+          </button>
+        </div>
+      `;
+    } else {
+      pagEl.innerHTML = `
+        <div class="gal-pagination-box">
+          <div class="gal-page-progress">
+            Showing all <b>${totalFiltered}</b> artworks
+            <div class="gal-progress-bar"><div class="gal-progress-fill" style="width: 100%"></div></div>
+          </div>
+          <div style="font-size: 12.5px; color: var(--muted); margin-top: 6px">
+            You've viewed all ${totalFiltered} artworks in this collection ✨
+          </div>
+        </div>
+      `;
+    }
+  }
 }
 window.addEventListener("resize", applyFilter);
 const esc = s => String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
