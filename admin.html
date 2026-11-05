@@ -8,6 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Pirata+One&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="favicon.png">
 
+<!-- Immediate Anti-Flicker Admin Theme Initialization -->
+<script>
+  (function(){
+    try {
+      const saved = localStorage.getItem("fg_theme_admin");
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = saved ? saved : (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    } catch(e){}
+  })();
+</script>
+
 <!-- Firebase Cloud SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -32,8 +44,83 @@
   --sidebar-width:260px;
   --sidebar-collapsed-width:72px;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Libre Baskerville',Georgia,serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden}
+
+[data-theme="dark"]{
+  --bg:#0e0e11;
+  --sidebar-bg:#141417;
+  --sidebar-border:#232328;
+  --panel:#17171b;
+  --ink:#f4f4f0;
+  --muted:#99998e;
+  --accent:#df794f;
+  --accent-hover:#ef8b62;
+  --line:#26262c;
+  --soft:#1d1d22;
+  --card-shadow:0 8px 30px rgba(0,0,0,.45);
+}
+
+body{
+  font-family:'Libre Baskerville',Georgia,serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  overflow-x:hidden;
+  transition:background-color .25s ease,color .25s ease;
+}
+
+/* Admin Theme Toggle Button */
+.admin-theme-toggle-btn{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--ink);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:all .2s ease;
+  flex-shrink:0;
+  padding:0;
+}
+.admin-theme-toggle-btn:hover{
+  background:var(--soft);
+  color:var(--accent);
+  border-color:var(--accent);
+  transform:scale(1.05);
+}
+.admin-theme-sun{display:none}
+.admin-theme-moon{display:block}
+[data-theme="dark"] .admin-theme-sun{display:block;color:#f59e0b}
+[data-theme="dark"] .admin-theme-moon{display:none}
+
+/* Dark Mode Admin Components */
+[data-theme="dark"] .content-header{background:var(--panel);border-bottom-color:var(--line)}
+[data-theme="dark"] .nav-item:hover{background:#1f1f26}
+[data-theme="dark"] .nav-item.active{background:#25252e}
+[data-theme="dark"] .sidebar-user-footer{border-top-color:var(--sidebar-border)}
+[data-theme="dark"] .user-card:hover{background:#1f1f26}
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea{background:var(--soft);color:var(--ink);border-color:var(--line)}
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus{background:#22222a;border-color:var(--accent)}
+[data-theme="dark"] .table-wrap,
+[data-theme="dark"] table{border-color:var(--line)}
+[data-theme="dark"] th{background:var(--soft);color:var(--muted)}
+[data-theme="dark"] tr:hover{background:rgba(255,255,255,0.02)}
+[data-theme="dark"] .live-order-card{background:var(--panel);border-color:var(--line)}
+[data-theme="dark"] .live-order-card.is-new{background:linear-gradient(180deg,#1f1614 0%,var(--panel) 100%)}
+[data-theme="dark"] .notif-dropdown-header,
+[data-theme="dark"] .notif-dropdown-footer{background:#1b1b20}
+[data-theme="dark"] .notif-item:hover{background:#1f1f26}
+[data-theme="dark"] .notif-item.unread{background:#201a18}
+[data-theme="dark"] .admin-order-modal-dialog{background:var(--panel);border-color:var(--line)}
+[data-theme="dark"] .login-card{background:var(--panel);border-color:var(--line)}
+[data-theme="dark"] .recent-like-row{background:var(--panel);border-color:var(--line)}
+[data-theme="dark"] .stat-card{background:var(--panel)}
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font-family:inherit}
 
@@ -1448,7 +1535,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         <label for="loginUser">Administrator Username</label>
         <div class="login-input-wrap">
           <svg class="login-input-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="loginUser" class="login-input" placeholder="Enter admin username" required autofocus autocomplete="username" autocapitalize="none" spellcheck="false">
+          <input type="text" id="loginUser" class="login-input" placeholder="Enter admin username" required autofocus autocomplete="off" autocapitalize="none" spellcheck="false" value="">
         </div>
       </div>
 
@@ -1708,6 +1795,12 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);bac
         </div>
       </div>
       <div class="header-right">
+        <!-- Theme Toggle Button (Light / Dark Mode) -->
+        <button type="button" class="admin-theme-toggle-btn" id="adminThemeToggleBtn" onclick="toggleAdminTheme()" aria-label="Toggle Theme" title="Switch Theme (Light / Dark)">
+          <svg class="admin-theme-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="admin-theme-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+
         <!-- Live Notification Bell & Dropdown -->
         <div class="admin-notif-wrap" id="adminNotifWrap">
           <button type="button" class="admin-notif-bell-btn" id="adminNotifBellBtn" onclick="toggleNotifDropdown(event)" aria-label="Notifications" title="Live Studio Notifications">
@@ -3215,8 +3308,43 @@ function switchTab(name){
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/* =========================================================
+   ADMIN DASHBOARD DARK & LIGHT MODE THEME ENGINE
+   ========================================================= */
+function getAdminTheme(){
+  return document.documentElement.getAttribute("data-theme") || "light";
+}
+
+function setAdminTheme(theme){
+  document.documentElement.setAttribute("data-theme", theme);
+  try {
+    localStorage.setItem("fg_theme_admin", theme);
+  } catch(e){}
+  const btn = $("adminThemeToggleBtn");
+  if(btn){
+    btn.setAttribute("title", theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode");
+  }
+}
+
+function toggleAdminTheme(){
+  const cur = getAdminTheme();
+  const next = cur === "dark" ? "light" : "dark";
+  setAdminTheme(next);
+  toast(next === "dark" ? "🌙 Dark Mode activated" : "☀️ Light Mode activated");
+}
+
+function initAdminThemeUI(){
+  const current = getAdminTheme();
+  const btn = $("adminThemeToggleBtn");
+  if(btn){
+    btn.setAttribute("title", current === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode");
+  }
+}
+
 /* Initialization */
 async function init(){
+  initAdminThemeUI();
+
   // Check sidebar collapse state
   if(localStorage.getItem("fg_sidebar_collapsed") === "1" && window.innerWidth > 960){
     $("adminSidebar")?.classList.add("collapsed");
@@ -3229,16 +3357,8 @@ async function init(){
   } else {
     $("loginView").classList.remove("hide");
     $("dashView").classList.add("hide");
-    const rememberedUser = localStorage.getItem("fg_remembered_user");
     if($("loginUser")){
-      if(rememberedUser){
-        $("loginUser").value = rememberedUser;
-        if(localStorage.getItem("fg_admin_remember") === "1" && $("loginRemember")){
-          $("loginRemember").checked = true;
-        }
-      } else {
-        $("loginUser").value = "";
-      }
+      $("loginUser").value = "";
     }
   }
 
