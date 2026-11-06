@@ -606,7 +606,7 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
    MY ORDERS COMPONENT STYLES
    ========================================================================== */
 .nav-my-orders-btn {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 7px;
   background: var(--soft);
@@ -622,6 +622,9 @@ footer{background:#181818;color:#fff;padding:90px 0 36px}
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+}
+.nav-my-orders-btn.visible {
+  display: inline-flex !important;
 }
 .nav-my-orders-btn:hover {
   background: var(--ink);
@@ -2534,7 +2537,9 @@ async function sendCustom(e, ig){
 
     try {
       await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderDoc);
+      myOrdersMap[orderRef] = { id: orderRef, ...orderDoc };
       registerCustomerOrder(orderRef);
+      updateMyOrdersNavVisibility();
       toast(`Custom order ${orderRef} recorded in studio dashboard! ✨`);
       // Dispatch Real-time notification to Admin Portal
       sendNotificationToAdmin({
@@ -3125,7 +3130,9 @@ async function handleOrderSubmit(e){
 
   try {
     await fb.db.collection("faheemgraphy_orders").doc(orderRef).set(orderRecord);
+    myOrdersMap[orderRef] = { id: orderRef, ...orderRecord };
     registerCustomerOrder(orderRef);
+    updateMyOrdersNavVisibility();
 
     // Prepare WhatsApp Confirmation Link
     const brand = settings.brandName || "Faheemgraphy";
@@ -3205,19 +3212,24 @@ function updateMyOrdersNavVisibility(){
   const navBtn = $("navMyOrders");
   if(!navBtn) return;
 
-  const orderIds = getCustomerOrderIds();
-  const orderCount = Object.keys(myOrdersMap).length || orderIds.length;
+  // Real orders count: ONLY display My Orders when customer has at least one actual order
+  const validOrders = Object.values(myOrdersMap).filter(o => o && o.id);
+  const orderCount = validOrders.length;
 
   if(orderCount > 0){
+    navBtn.classList.add("visible");
     navBtn.style.display = "inline-flex";
     const badge = $("navMyOrdersBadge");
     if(badge){
-      const activeCount = Object.values(myOrdersMap).filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length;
+      const activeCount = validOrders.filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length;
       badge.textContent = activeCount > 0 ? activeCount : orderCount;
       badge.style.display = "inline-block";
     }
   } else {
+    navBtn.classList.remove("visible");
     navBtn.style.display = "none";
+    const badge = $("navMyOrdersBadge");
+    if(badge) badge.style.display = "none";
   }
 }
 
@@ -3326,6 +3338,15 @@ function subscribeSingleOrder(orderId){
         myOrdersMap[doc.id] = newData;
         renderMyOrders();
         updateMyOrdersNavVisibility();
+      } else {
+        // Order deleted or does not exist
+        delete myOrdersMap[orderId];
+        try {
+          let list = getCustomerOrderIds().filter(x => x !== orderId);
+          localStorage.setItem("fg_my_order_ids", JSON.stringify(list));
+        } catch(e){}
+        renderMyOrders();
+        updateMyOrdersNavVisibility();
       }
     }, err => console.warn("Order snapshot err:", err));
     myOrdersUnsubs.push(unsub);
@@ -3349,6 +3370,15 @@ function initMyOrdersListener(){
   if(vid){
     try {
       const unsubVid = fb.db.collection("faheemgraphy_orders").where("visitorId", "==", vid).onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if(change.type === "removed"){
+            delete myOrdersMap[change.doc.id];
+            try {
+              let list = getCustomerOrderIds().filter(x => x !== change.doc.id);
+              localStorage.setItem("fg_my_order_ids", JSON.stringify(list));
+            } catch(e){}
+          }
+        });
         snapshot.forEach(doc => {
           registerCustomerOrder(doc.id);
           myOrdersMap[doc.id] = { id: doc.id, ...doc.data() };
@@ -3364,6 +3394,15 @@ function initMyOrdersListener(){
   if(currentVisitorAuth && currentVisitorAuth.email){
     try {
       const unsubEmail = fb.db.collection("faheemgraphy_orders").where("customerEmail", "==", currentVisitorAuth.email).onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if(change.type === "removed"){
+            delete myOrdersMap[change.doc.id];
+            try {
+              let list = getCustomerOrderIds().filter(x => x !== change.doc.id);
+              localStorage.setItem("fg_my_order_ids", JSON.stringify(list));
+            } catch(e){}
+          }
+        });
         snapshot.forEach(doc => {
           registerCustomerOrder(doc.id);
           myOrdersMap[doc.id] = { id: doc.id, ...doc.data() };
@@ -3382,9 +3421,11 @@ function renderMyOrders(){
   const listEl = $("myOrdersList");
   if(!listEl) return;
 
-  const orders = Object.values(myOrdersMap).sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const validOrders = Object.values(myOrdersMap).filter(o => o && o.id);
+  const orders = validOrders.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
 
   if(!orders.length){
+    updateMyOrdersNavVisibility();
     listEl.innerHTML = `
       <div style="text-align:center;padding:48px 16px;color:var(--muted)">
         <div style="font-size:36px;margin-bottom:10px">🛍️</div>
